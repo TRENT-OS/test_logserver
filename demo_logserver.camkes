@@ -1,0 +1,67 @@
+import <std_connector.camkes>;
+
+
+import "components/LOG_SERVER/LOG_SERVER.camkes";
+import "components/TIME_SERVER/TIME_SERVER.camkes";
+import "components/APP01/APP01.camkes";
+import "components/APP02/APP02.camkes";
+import "components/APP03/APP03.camkes";
+
+
+assembly {
+    composition {
+        component LOG_SERVER  log_server;
+        component TIMEBASE    timebase;
+        component TIME_SERVER time_server;
+        component APP01       app01;
+        component APP02       app02;
+        component APP03       app03;
+
+        //----------------------------------------------------------------------
+        // TIME SERVER configuration
+        //----------------------------------------------------------------------
+        connection seL4HardwareMMIO time_server_mem(from time_server.reg, to timebase.reg);
+        connection seL4HardwareInterrupt time_server_irq_ticks(from timebase.irq_ticks, to time_server.irq_ticks);
+        connection seL4HardwareInterrupt time_server_irq_sleep(from timebase.irq_sleep, to time_server.irq_sleep);
+
+        //----------------------------------------------------------------------
+        // TIME CLIENT configuration
+        //----------------------------------------------------------------------
+        connection seL4RPCCall log_server_2_time_server(from log_server.api_time_server, to time_server.api_time_server);
+
+        //----------------------------------------------------------------------
+        // backward communication: log server is ready to receive some data
+        //----------------------------------------------------------------------
+        connection  seL4Notification    conn_dataAvailable_logServer2app01(from log_server.logServer_ready_app01, to app01.logServer_ready);
+        connection  seL4Notification    conn_dataAvailable_logServer2app02(from log_server.logServer_ready_app02, to app02.logServer_ready);
+        connection  seL4Notification    conn_dataAvailable_logServer2app03(from log_server.logServer_ready_app03, to app03.logServer_ready);
+
+        //----------------------------------------------------------------------
+        // client has data and push it into databuffer
+        //----------------------------------------------------------------------
+        connection  seL4Notification    conn_dataAvailable_app01(from app01.dataAvailable, to log_server.dataAvailable_app01);
+        connection  seL4SharedData      conn_dataConnection_app01(from app01.dataport_buf, to log_server.dataport_buf_app01);
+
+        //----------------------------------------------------------------------
+        // client has data and push it into databuffer
+        //----------------------------------------------------------------------
+        connection  seL4Notification    conn_dataAvailable_app02(from app02.dataAvailable, to log_server.dataAvailable_app02);
+        connection  seL4SharedData      conn_dataConnection_app02(from app02.dataport_buf, to log_server.dataport_buf_app02);
+
+        //----------------------------------------------------------------------
+        // client has data and push it into databuffer
+        //----------------------------------------------------------------------
+        connection  seL4Notification    conn_dataAvailable_app03(from app03.dataAvailable, to log_server.dataAvailable_app03);
+        connection  seL4SharedData      conn_dataConnection_app03(from app03.dataport_buf, to log_server.dataport_buf_app03);
+    }
+    configuration {
+        timebase.reg_paddr = 0xF8001000;    // paddr of mmio registers
+        timebase.reg_size = 0x1000;         // size of mmio registers
+        timebase.irq_ticks_irq_number = 42; // time_server irq number
+        timebase.irq_sleep_irq_number = 43; // time_server irq number
+
+        /* assign an initial value to semaphore */
+        time_server.sem_ticks_value = 0;
+        time_server.sem_sleep_value = 0;
+    }
+}

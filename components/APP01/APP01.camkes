@@ -1,0 +1,10 @@
+component APP01 {
+    control;
+
+    //-------------------------------------------------
+    // interface to log server
+    dataport Buf                dataport_buf;
+    emits    DataAvailableEvent dataAvailable;
+
+    consumes DataAvailableEvent logServer_ready;
+}
