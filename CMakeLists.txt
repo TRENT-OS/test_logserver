@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.7.2)
 
+set(SEOS_LOG_SERVER_CONFIG_H_FILE ${CMAKE_CURRENT_LIST_DIR}/config/seos_log_server_config.h)
+
 seos_set_config_file(config/config.h)
 
 seos_use_libs(
@@ -20,6 +22,7 @@ DeclareCAmkESComponent(LOG_SERVER
 
         "seos_log/lib/src/log_databuffer.c"
         "seos_log/lib/src/listT.c"
+        "seos_log/lib/src/log_consumer_callback.c"
         "seos_log/lib/src/log_consumer.c"
         "seos_log/lib/src/consumer_chain.c"
         "seos_log/lib/src/log_filter.c"
@@ -29,6 +32,7 @@ DeclareCAmkESComponent(LOG_SERVER
     C_FLAGS
         -Wall
         -Werror
+        -DSEOS_LOG_SERVER_CONFIG_H_FILE=${SEOS_LOG_SERVER_CONFIG_H_FILE}
     LIBS
         seos_libs
 )
@@ -61,8 +65,11 @@ DeclareCAmkESComponent(APP01
         "components/APP01/src/main.c"
 
         "seos_log/lib/src/log_databuffer.c"
-        "seos_log/lib/src/log_emitter.c"
+        "seos_log/lib/src/listT.c"
+        "seos_log/lib/src/log_consumer_callback.c"
         "seos_log/lib/src/log_consumer.c"
+        "seos_log/lib/src/log_emitter_callback.c"
+        "seos_log/lib/src/log_emitter.c"
         "seos_log/lib/src/log_filter.c"
         "seos_log/lib/src/log_format.c"
 
@@ -70,11 +77,12 @@ DeclareCAmkESComponent(APP01
     C_FLAGS
         -Wall
         -Werror
+        -DSEOS_LOG_SERVER_CONFIG_H_FILE=${SEOS_LOG_SERVER_CONFIG_H_FILE}
     LIBS
         seos_libs
 )
 
-# log server
+# app 02
 DeclareCAmkESComponent(APP02
     INCLUDES
         seos_log/include
@@ -85,6 +93,7 @@ DeclareCAmkESComponent(APP02
         "components/APP02/src/main.c"
 
         "seos_log/lib/src/log_databuffer.c"
+        "seos_log/lib/src/log_emitter_callback.c"
         "seos_log/lib/src/log_emitter.c"
         "seos_log/lib/src/log_filter.c"
 
@@ -92,11 +101,12 @@ DeclareCAmkESComponent(APP02
     C_FLAGS
         -Wall
         -Werror
+        -DSEOS_LOG_SERVER_CONFIG_H_FILE=${SEOS_LOG_SERVER_CONFIG_H_FILE}
     LIBS
         seos_libs
 )
 
-# log server
+# app 03
 DeclareCAmkESComponent(APP03
     INCLUDES
         seos_log/include
@@ -107,6 +117,7 @@ DeclareCAmkESComponent(APP03
         "components/APP03/src/main.c"
 
         "seos_log/lib/src/log_databuffer.c"
+        "seos_log/lib/src/log_emitter_callback.c"
         "seos_log/lib/src/log_emitter.c"
         "seos_log/lib/src/log_filter.c"
 
@@ -114,6 +125,7 @@ DeclareCAmkESComponent(APP03
     C_FLAGS
         -Wall
         -Werror
+        -DSEOS_LOG_SERVER_CONFIG_H_FILE=${SEOS_LOG_SERVER_CONFIG_H_FILE}
     LIBS
         seos_libs
 )

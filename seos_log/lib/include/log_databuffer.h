@@ -1,7 +1,7 @@
 #pragma once
 
 
-#include "symbol.h"
+#include "log_symbol.h"
 #include "timestamp.h"
 #include <stdint.h>
 
@@ -44,6 +44,10 @@ Log_databuffer_get_log_level_client(void *buf, Log_databuffer_t *log_databuffer)
 
 bool
 Log_databuffer_get_log_message(void *buf, Log_databuffer_t *log_databuffer);
+
+
+bool
+Log_databuffer_get_info(void *buf, Log_databuffer_t *log_databuffer);
 
 
 bool

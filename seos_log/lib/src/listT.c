@@ -1,28 +1,7 @@
 #include "listT.h"
+#include "log_symbol.h"
 #include <string.h>
 #include <stddef.h>
-
-
-
-#define ASSERT_SELF__(self)             \
-    if(self == NULL)                    \
-        nullptr = true;
-
-
-
-#define ASSERT_VTABLE__(self)           \
-    if(self->vtable == NULL)            \
-        nullptr = true;
-
-
-
-#define ASSERT_SELF(self)               \
-    ASSERT_SELF__(self)                 \
-                                        \
-    if(nullptr == false)                \
-    {                                   \
-        ASSERT_VTABLE__(self)           \
-    }
 
 
 
@@ -65,8 +44,6 @@ ListT_ctor(ListT_t *self)
         // Debug_printf
         return false;
     }
-
-    memset(self, 0, sizeof (ListT_t));
 
     self->vtable = &ListT_vtable;
 

@@ -1,7 +1,7 @@
 #pragma once
 
 
-// common makro hacks
+// common macro hacks
 #define x_2_cat(a,b)                    a##b
 
 #define VAR_EXPAND_2_VAR(x,y)           x_2_cat(x,y)
@@ -13,6 +13,14 @@
 
 
 #define OVERFLOW( a, b, max)            (((b) > 0) && ((a) > (max) - (b)))
+
+
+// include parameter for configuration file
+#if !defined(SEOS_LOG_SERVER_CONFIG_H_FILE)
+    #error "a configuration file must be provided! See seos_log_server_config.h.example"
+#else
+    #include STR(SEOS_LOG_SERVER_CONFIG_H_FILE)
+#endif
 
 
 // configuration of log server
@@ -42,3 +50,28 @@
                                          FORMAT_LOG_LEVEL_SERVER_LENGTH +   \
                                          FORMAT_LOG_LEVEL_CLIENT_LENGTH +   \
                                          FORMAT_LOG_MESSAGE_LENGTH)
+
+
+// macros
+#define ASSERT_SELF__(self)             \
+    if(self == NULL)                    \
+        nullptr = true
+
+#define ASSERT_VTABLE_PARENT__(self)    \
+    if(self->vtable == NULL)            \
+        nullptr = true
+
+#define ASSERT_VTABLE_CHILD__(self)     \
+    if(self->parent.vtable == NULL)     \
+        nullptr = true
+
+#define ASSERT_SELF_PARENT(self)        \
+    ASSERT_SELF__(self);                \
+                                        \
+    ASSERT_VTABLE_PARENT__(self)
+
+#define ASSERT_SELF(self)               \
+    ASSERT_SELF__(self);                \
+                                        \
+    if(nullptr == false)                \
+        ASSERT_VTABLE_CHILD__(self)

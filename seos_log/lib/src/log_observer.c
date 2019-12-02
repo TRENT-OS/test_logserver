@@ -1,40 +1,6 @@
 #include "log_observer.h"
+#include "log_symbol.h"
 #include <string.h>
-
-
-
-#define ASSERT_SELF__(self)             \
-    if(self == NULL)                    \
-        nullptr = true;
-
-
-
-#define ASSERT_VTABLE_PARENT__(self)    \
-    if(self->vtable == NULL)            \
-        nullptr = true;
-
-
-
-#define ASSERT_VTABLE_CHILD__(self)     \
-    if(self->parent.vtable == NULL)     \
-        nullptr = true;
-
-
-
-#define ASSERT_SELF_PARENT(self)        \
-    ASSERT_SELF__(self)                 \
-                                        \
-    ASSERT_VTABLE_PARENT__(self)
-
-
-
-#define ASSERT_SELF(self)               \
-    ASSERT_SELF__(self)                 \
-                                        \
-    if(nullptr == false)                \
-    {                                   \
-        ASSERT_VTABLE_CHILD__(self)     \
-    }
 
 
 
@@ -92,8 +58,6 @@ Log_observer_ctor(Log_observer_t *self)
         // Debug_printf
         return false;
     }
-
-    memset(self, 0, sizeof (Log_observer_t));
 
     self->node.prev = NULL;
     self->node.next = NULL;

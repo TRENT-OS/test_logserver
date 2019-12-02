@@ -1,6 +1,6 @@
 #include "Debug.h"
 
-#include "seos_log_server_config.h"
+#include "log_symbol.h"
 #include "local_log_server.h"
 
 #include <camkes.h>
@@ -9,10 +9,15 @@
 
 int run()
 {
+    // set up log filter layer
+    Log_filter_t filter_client, filter_server;
+    Log_filter_ctor(&filter_client, Debug_LOG_LEVEL_DEBUG);
+    Log_filter_ctor(&filter_server, Debug_LOG_LEVEL_DEBUG);
+
     // local Log server
     char buf[DATABUFFER_SIZE];
 
-    Local_log_server_init(buf, Debug_LOG_LEVEL_NONE, "Local");
+    Local_log_server_init(buf, &filter_server, &filter_client, "Local");
 
     Debug_LOG_FATAL("APP01");
     Debug_LOG(Debug_LOG_LEVEL_FATAL, "FATAL", "APP01a");
@@ -20,7 +25,11 @@ int run()
 
     // ...
 
+    // destruction
     Log_emitter_dtor();
+
+    Log_filter_dtor(&filter_server);
+    Log_filter_dtor(&filter_client);
 
     return 0;
 }

@@ -10,8 +10,9 @@
 
 bool
 Local_log_server_init(void *buffer,
-                           uint8_t log_level,
-                           const char *name);
+                      Log_filter_t *log_filter_server,
+                      Log_filter_t *log_filter_client,
+                      const char *name);
 
 
 void

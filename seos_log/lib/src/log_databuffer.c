@@ -115,6 +115,31 @@ Log_databuffer_get_log_message(void *buf, Log_databuffer_t *log_databuffer)
 
 
 bool
+Log_databuffer_get_info(void *buf, Log_databuffer_t *log_databuffer)
+{
+    if(buf == NULL || log_databuffer == NULL)
+        return false;
+
+    bool retval = false;
+
+    retval = Log_databuffer_get_log_level_server(buf, log_databuffer);
+    if(retval == false)
+        return false;
+
+    retval = Log_databuffer_get_log_level_client(buf, log_databuffer);
+    if(retval == false)
+        return false;
+
+    retval = Log_databuffer_get_log_message(buf, log_databuffer);
+    if(retval == false)
+        return false;
+
+    return true;
+}
+
+
+
+bool
 Log_databuffer_clear_databuffer(void *buf)
 {
     if(buf == NULL)

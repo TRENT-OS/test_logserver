@@ -3,28 +3,6 @@
 
 
 
-#define ASSERT_SELF__(self)             \
-    if(self == NULL)                    \
-        nullptr = true;
-
-
-
-#define ASSERT_VTABLE__(self)           \
-    if(self->parent.vtable == NULL)     \
-        nullptr = true;
-
-
-
-#define ASSERT_SELF(self)               \
-    ASSERT_SELF__(self)                 \
-                                        \
-    if(nullptr == false)                \
-    {                                   \
-        ASSERT_VTABLE__(self)           \
-    }
-
-
-
 static const Consumer_chain_Vtable Consumer_chain_vtable =
 {
     .dtor   = Consumer_chain_dtor,
@@ -47,7 +25,6 @@ get_instance_Consumer_chain(void)
     if(this == NULL){
         bool retval = false;
 
-        memset(&_consumer_chain, 0, sizeof (Consumer_chain_t));
         this = &_consumer_chain;
         this->vtable = &Consumer_chain_vtable;
 
@@ -151,14 +128,14 @@ Consumer_chain_poll(void)
     next = this->first;
 
     while (1) {
-        if(Log_consumer_callback_handler(next, &Log_consumer_callback) >= 0){
+        if(Log_consumer_callback_handler(next, Log_consumer_callback) >= 0){
             Log_consumer_emit(next);
         }
 
         while (this->parent.vtable->has_next(&next->node)) {
             next = this->parent.vtable->get_next(&next->node);
 
-            if(Log_consumer_callback_handler(next, &Log_consumer_callback) >= 0){
+            if(Log_consumer_callback_handler(next, Log_consumer_callback) >= 0){
                 Log_consumer_emit(next);
             }
         }

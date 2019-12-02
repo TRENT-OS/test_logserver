@@ -10,44 +10,25 @@
 
 
 
-#define ASSERT_SELF__(self)             \
-    if(self == NULL)                    \
-        nullptr = true;
-
-
-
-#define ASSERT_VTABLE__(self)           \
-    if(self->parent.vtable == NULL)     \
-        nullptr = true;
-
-
-
-#define ASSERT_SELF(self)               \
-    ASSERT_SELF__(self)                 \
-                                        \
-    if(nullptr == false)                \
-    {                                   \
-        ASSERT_VTABLE__(self)           \
-    }
-
-
-
 // foreward declaration
-static bool    _Log_consumer_init(Log_consumer_t *self);
+static bool    _Log_consumer_init(void *buffer, Log_filter_t *log_filter);
 static uint8_t _create_id(Log_consumer_t *self);
 static bool    _create_id_string(Log_consumer_t *self, const char *name);
 
 
 
 static bool
-_Log_consumer_init(Log_consumer_t *self)
+_Log_consumer_init(void *buffer, Log_filter_t *log_filter)
 {
-    if(self == NULL)
+    if(buffer == NULL)
         return false;
 
-    Log_databuffer_clear_databuffer(self->buf);
-    Log_databuffer_set_log_level_server(self->buf, self->log_level);
-    Log_filter_ctor(&self->log_filter);
+    Log_databuffer_clear_databuffer(buffer);
+
+    if(log_filter != NULL){
+        // Debug_printf -> no log filter installed
+        Log_databuffer_set_log_level_server(buffer, log_filter->log_level);
+    }
 
     return true;
 }
@@ -95,10 +76,8 @@ _create_id_string(Log_consumer_t *self, const char *name)
 bool
 Log_consumer_ctor(Log_consumer_t *self,
                   void *buffer,
-                  uint8_t log_level,
-                  Log_consumer_callbackHandlerT reg_callback,
-                  Log_consumer_emitT emit,
-                  Log_consumer_get_timestampT get_timestamp,
+                  Log_filter_t *log_filter,
+                  Log_consumer_callback_t *callback_vtable,
                   const char *name)
 {
     bool nullptr = false;
@@ -111,9 +90,8 @@ Log_consumer_ctor(Log_consumer_t *self,
         return false;
     }
 
-    // "emit" can be NULL, if Log_consumer_t will be declared as "local"
-    // "get_timestamp" can be NULL, if timestamp is not necessary
-    if(buffer == NULL || /*emit == NULL || get_timestamp == NULL ||*/ reg_callback == NULL){
+    // "log_filter" can be NULL, if no log filter is installed
+    if(buffer == NULL || callback_vtable == NULL /*|| log_filter == NULL*/){
         // Debug_printf
         return retval;
     }
@@ -123,16 +101,17 @@ Log_consumer_ctor(Log_consumer_t *self,
         return retval;
     }
 
-    memset(self, 0, sizeof (Log_consumer_t));
-
     self->buf = buffer;
-    self->log_level = log_level;
-    self->vtable.reg_callback = reg_callback;
-    self->vtable.emit = emit;
-    self->vtable.get_timestamp = get_timestamp;
+    self->log_filter = log_filter;
+    self->callback_vtable = callback_vtable;
 
     retval = _create_id_string(self, name);
-    retval = _Log_consumer_init(self);
+    if(retval == false){
+         // Debug_printf
+         return false;
+     }
+
+    retval = _Log_consumer_init(self->buf, self->log_filter);
 
     return retval;
 }
@@ -156,18 +135,18 @@ Log_consumer_callback_handler(Log_consumer_t *self, Log_consumer_callbackT callb
 
     if(nullptr){
         // Debug_printf
-        return false;
+        return -1;
     }
 
     if(callback == NULL){
         // Debug_printf
-        return false;
+        return -2;
     }
 
-    if(self->vtable.reg_callback != NULL)
-        return self->vtable.reg_callback(callback, self);
+    if(self->callback_vtable->reg_callback != NULL)
+        return self->callback_vtable->reg_callback(callback, self);
 
-    return EOF;
+    return -3;
 }
 
 
@@ -184,8 +163,8 @@ Log_consumer_emit(Log_consumer_t *self)
         return;
     }
 
-    if(self->vtable.emit != NULL)
-        self->vtable.emit();
+    if(self->callback_vtable->emit != NULL)
+        self->callback_vtable->emit();
 }
 
 
@@ -202,10 +181,10 @@ Log_consumer_get_timestamp(Log_consumer_t *self)
         return 0;
     }
 
-    if(self->vtable.get_timestamp == NULL)
-        return 0;
+    if(self->callback_vtable->get_timestamp != NULL)
+        return self->callback_vtable->get_timestamp();
 
-    return self->vtable.get_timestamp();
+    return 0;
 }
 
 
@@ -221,17 +200,18 @@ Log_consumer_callback(void *data)
     }
 
     Log_consumer_t *consumer = (Log_consumer_t *)data;
-    Log_databuffer_t log_databuffer;
+    static Log_databuffer_t log_databuffer;
 
-    if(consumer->log_filter.vtable->filtering(consumer->buf, consumer->log_level) == false){
+    // get log level client
+    Log_databuffer_get_log_level_client(consumer->buf, &log_databuffer);
+
+    if(Log_filter_filtering(consumer->log_filter, log_databuffer.log_level_client) == false){
         // Debug_printf -> Log filter!!!
         Log_databuffer_clear_databuffer(consumer->buf);
         return;
     }
 
-    Log_databuffer_get_log_level_server(consumer->buf, &log_databuffer);
-    Log_databuffer_get_log_level_client(consumer->buf, &log_databuffer);
-    Log_databuffer_get_log_message(consumer->buf, &log_databuffer);
+    Log_databuffer_get_info(consumer->buf, &log_databuffer);
 
     memcpy(&consumer->log_info.log_databuffer, &log_databuffer, sizeof (Log_databuffer_t));
 
@@ -239,7 +219,7 @@ Log_consumer_callback(void *data)
 
     consumer->log_info.timestamp.timestamp = Log_consumer_get_timestamp(consumer);
 
-    char buf[FORMAT_BUFFER_SIZE];
+    static char buf[FORMAT_BUFFER_SIZE];
     push_log_format(&buf, &consumer->log_info);
     print_log_format(buf);
 }

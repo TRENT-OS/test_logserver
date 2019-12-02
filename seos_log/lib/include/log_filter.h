@@ -13,7 +13,7 @@ typedef void
 
 
 typedef bool
-(*Log_filter_filteringT)(void *buf, uint8_t log_level_client);
+(*Log_filter_filteringT)(uint8_t log_level_self, uint8_t log_level);
 
 
 typedef struct
@@ -25,13 +25,18 @@ typedef struct
 
 struct Log_filter_t
 {
+    uint8_t                 log_level;
     const Log_filter_Vtable *vtable;
 } ;
 
 
 bool
-Log_filter_ctor(Log_filter_t *self);
+Log_filter_ctor(Log_filter_t *self, uint8_t log_level);
 
 
 void
 Log_filter_dtor(Log_filter_t *self);
+
+
+bool
+Log_filter_filtering(Log_filter_t *self, uint8_t log_level);

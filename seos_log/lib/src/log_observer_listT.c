@@ -1,27 +1,6 @@
 #include "log_observer_listT.h"
+#include "log_symbol.h"
 #include <stddef.h>
-
-
-
-#define ASSERT_SELF__(self)             \
-    if(self == NULL)                    \
-        nullptr = true;
-
-
-
-#define ASSERT_VTABLE__(self)           \
-    if(self->listT.vtable == NULL)      \
-        nullptr = true;
-
-
-
-#define ASSERT_SELF(self)               \
-    ASSERT_SELF__(self)                 \
-                                        \
-    if(nullptr == false)                \
-    {                                   \
-        ASSERT_VTABLE__(self)           \
-    }
 
 
 

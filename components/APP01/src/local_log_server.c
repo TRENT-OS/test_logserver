@@ -3,25 +3,31 @@
 
 
 
-static Log_consumer_t consumer;
+static Log_consumer_t _consumer;
+static Log_consumer_callback_t _consumer_vtable;
+static Log_emitter_callback_t _emitter_vtable;
 
 
 
 static void Local_emitter_emit(void);
-static int  Local_consumer_callbackHandler(Log_consumer_callbackT callback, void *data);
+int  Local_consumer_callbackHandler(Log_consumer_callbackT callback, void *data);
 
 
 
 bool
 Local_log_server_init(void *buffer,
-                           uint8_t log_level,
-                           const char *name)
+                      Log_filter_t *log_filter_server,
+                      Log_filter_t *log_filter_client,
+                      const char *name)
 {
-    if(buffer == NULL)
+    if(buffer == NULL || log_filter_server == NULL || log_filter_client == NULL)
         return false;
 
-    get_instance_Log_emitter(buffer, NULL, Local_emitter_emit);
-    Log_consumer_ctor(&consumer, buffer, log_level, Local_consumer_callbackHandler, NULL, NULL, name);
+    Log_consumer_callback_ctor(&_consumer_vtable, Local_consumer_callbackHandler, NULL, NULL);
+    Log_emitter_callback_ctor(&_emitter_vtable, NULL, Local_emitter_emit);
+
+    Log_consumer_ctor(&_consumer, buffer, log_filter_server, &_consumer_vtable, name);
+    get_instance_Log_emitter(buffer, log_filter_client, &_emitter_vtable);
 
     return true;
 }
@@ -31,7 +37,9 @@ Local_log_server_init(void *buffer,
 void
 Local_log_server_delete(void)
 {
-    Log_consumer_dtor(&consumer);
+    Log_consumer_dtor(&_consumer);
+    Log_consumer_callback_dtor(&_consumer_vtable);
+    Log_emitter_callback_dtor(&_emitter_vtable);
 }
 
 
@@ -39,12 +47,12 @@ Local_log_server_delete(void)
 static void
 Local_emitter_emit(void)
 {
-    Local_consumer_callbackHandler(Log_consumer_callback, &consumer);
+    Log_consumer_callback_handler(&_consumer, Log_consumer_callback);
 }
 
 
 
-static int
+int
 Local_consumer_callbackHandler(Log_consumer_callbackT callback, void *data)
 {
     callback(data);

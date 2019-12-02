@@ -4,50 +4,24 @@
 #include "listT.h"
 #include "log_databuffer.h"
 #include "log_filter.h"
-
-
-typedef void
-(*Log_consumer_callbackT)(void *data);
-
-
-typedef int
-(*Log_consumer_callbackHandlerT)(Log_consumer_callbackT callback, void *data);
-
-
-typedef void
-(*Log_consumer_emitT)(void);
-
-
-typedef uint64_t
-(*Log_consumer_get_timestampT)(void);
+#include "log_consumer_callback.h"
 
 
 typedef struct
 {
-    Log_consumer_emitT            emit;
-    Log_consumer_callbackHandlerT reg_callback;
-    Log_consumer_get_timestampT   get_timestamp;
-} Log_consumer_Vtable;
-
-
-typedef struct
-{
-    NodeT_t             node;
-    void                *buf;
-    uint8_t             log_level;
-    Log_info_t          log_info;
-    Log_filter_t        log_filter;
-    Log_consumer_Vtable vtable;
+    NodeT_t                 node;
+    void                    *buf;
+    Log_info_t              log_info;
+    Log_filter_t            *log_filter;
+    Log_consumer_callback_t *callback_vtable;
 } Log_consumer_t;
 
 
 bool
 Log_consumer_ctor(Log_consumer_t *self,
                   void *buffer,
-                  uint8_t log_level,
-                  Log_consumer_callbackHandlerT reg_callback,
-                  Log_consumer_emitT emit,
-                  Log_consumer_get_timestampT get_timestamp,
+                  Log_filter_t *log_filter,
+                  Log_consumer_callback_t *callback_vtable,
                   const char *name);
 
 

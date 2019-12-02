@@ -1,15 +1,12 @@
-/*
-   *  Configuration file for log server.
-   *
-   *  Copyright (C) 2019, Hensoldt Cyber GmbH
-*/
-
-
 #pragma once
 
 
+// include headers
+#include <camkes.h>
+
+
 // setup common
-#define DATABUFFER_SIZE                 4096
+#define DATABUFFER_SIZE                 PAGE_SIZE
 
 
 // setup dataports
@@ -17,6 +14,7 @@
 #if !defined (DATABUFFER_CLIENT)
     #define DATABUFFER_CLIENT           (void *)dataport_buf
 #endif
+
 
 // server part (each dataport have to name separately)
 #define DATABUFFER_SERVER_01            (void *)dataport_buf_app01

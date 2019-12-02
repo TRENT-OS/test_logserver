@@ -1,27 +1,6 @@
 #include "abstract_observer.h"
+#include "log_symbol.h"
 #include <string.h>
-
-
-
-#define ASSERT_SELF__(self)             \
-    if(self == NULL)                    \
-        nullptr = true;
-
-
-
-#define ASSERT_VTABLE__(self)           \
-    if(self->vtable == NULL)            \
-        nullptr = true;
-
-
-
-#define ASSERT_SELF(self)               \
-    ASSERT_SELF__(self)                 \
-                                        \
-    if(nullptr == false)                \
-    {                                   \
-        ASSERT_VTABLE__(self)           \
-    }
 
 
 
@@ -50,8 +29,6 @@ Observer_ctor(Observer_t *self, void *data)
         return false;
     }
 
-    memset(self, 0, sizeof (Observer_t));
-
     self->data = data;
     self->vtable = &Observer_vtable;
 
@@ -73,7 +50,7 @@ Observer_update(Observer_t *self)
 {
     bool nullptr = false;
 
-    ASSERT_SELF(self);
+    ASSERT_SELF__(self);
 
     if(nullptr){
         // Debug_printf

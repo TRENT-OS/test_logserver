@@ -1,46 +1,12 @@
 #include "log_subject.h"
 #include "log_observer_listT.h"
+#include "log_symbol.h"
 #include <string.h>
 #include <stddef.h>
 
 
 
 #define OBSERVER_TO_NODE                (Log_observer_t *)observer->data
-
-
-
-#define ASSERT_SELF__(self)             \
-    if(self == NULL)                    \
-        nullptr = true;
-
-
-
-#define ASSERT_VTABLE_PARENT__(self)    \
-    if(self->vtable == NULL)            \
-        nullptr = true;
-
-
-
-#define ASSERT_VTABLE_CHILD__(self)     \
-    if(self->parent.vtable == NULL)     \
-        nullptr = true;
-
-
-
-#define ASSERT_SELF_PARENT(self)        \
-    ASSERT_SELF__(self)                 \
-                                        \
-    ASSERT_VTABLE_PARENT__(self)
-
-
-
-#define ASSERT_SELF(self)               \
-    ASSERT_SELF__(self)                 \
-                                        \
-    if(nullptr == false)                \
-    {                                   \
-        ASSERT_VTABLE_CHILD__(self)     \
-    }
 
 
 
@@ -185,8 +151,6 @@ Log_subject_ctor(Log_subject_t *self)
         // Debug_printf
         return false;
     }
-
-    memset(self, 0, sizeof (Log_subject_t));
 
     retval = Subject_ctor(&self->parent, self);
 
