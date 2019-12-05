@@ -78,6 +78,7 @@ Log_consumer_ctor(Log_consumer_t *self,
                   void *buffer,
                   Log_filter_t *log_filter,
                   Log_consumer_callback_t *callback_vtable,
+                  Log_format_t *log_format,
                   const char *name)
 {
     bool nullptr = false;
@@ -91,7 +92,7 @@ Log_consumer_ctor(Log_consumer_t *self,
     }
 
     // "log_filter" can be NULL, if no log filter is installed
-    if(buffer == NULL || callback_vtable == NULL /*|| log_filter == NULL*/){
+    if(buffer == NULL || callback_vtable == NULL || log_format == NULL /*|| log_filter == NULL*/){
         // Debug_printf
         return retval;
     }
@@ -104,6 +105,7 @@ Log_consumer_ctor(Log_consumer_t *self,
     self->buf = buffer;
     self->log_filter = log_filter;
     self->callback_vtable = callback_vtable;
+    self->log_format = log_format;
 
     retval = _create_id_string(self, name);
     if(retval == false){
@@ -200,26 +202,23 @@ Log_consumer_callback(void *data)
     }
 
     Log_consumer_t *consumer = (Log_consumer_t *)data;
-    static Log_databuffer_t log_databuffer;
 
     // get log level client
-    Log_databuffer_get_log_level_client(consumer->buf, &log_databuffer);
+    Log_databuffer_get_log_level_client(consumer->buf, &consumer->log_info.log_databuffer);
 
-    if(Log_filter_filtering(consumer->log_filter, log_databuffer.log_level_client) == false){
+    if(Log_filter_filtering(consumer->log_filter, consumer->log_info.log_databuffer.log_level_client) == false){
         // Debug_printf -> Log filter!!!
         Log_databuffer_clear_databuffer(consumer->buf);
         return;
     }
 
-    Log_databuffer_get_info(consumer->buf, &log_databuffer);
-
-    memcpy(&consumer->log_info.log_databuffer, &log_databuffer, sizeof (Log_databuffer_t));
+    Log_databuffer_get_info(consumer->buf, &consumer->log_info.log_databuffer);
 
     Log_databuffer_clear_databuffer(consumer->buf);
 
     consumer->log_info.timestamp.timestamp = Log_consumer_get_timestamp(consumer);
 
-    static char buf[FORMAT_BUFFER_SIZE];
-    push_log_format(&buf, &consumer->log_info);
-    print_log_format(buf);
+    // log format layer
+    consumer->log_format->parent.vtable->convert(&consumer->log_format->parent, &consumer->log_info);
+    consumer->log_format->parent.vtable->print(&consumer->log_format->parent);
 }

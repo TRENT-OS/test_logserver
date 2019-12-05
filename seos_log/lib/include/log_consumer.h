@@ -5,6 +5,7 @@
 #include "log_databuffer.h"
 #include "log_filter.h"
 #include "log_consumer_callback.h"
+#include "log_format.h"
 
 
 typedef struct
@@ -13,6 +14,7 @@ typedef struct
     void                    *buf;
     Log_info_t              log_info;
     Log_filter_t            *log_filter;
+    Log_format_t            *log_format;
     Log_consumer_callback_t *callback_vtable;
 } Log_consumer_t;
 
@@ -22,6 +24,7 @@ Log_consumer_ctor(Log_consumer_t *self,
                   void *buffer,
                   Log_filter_t *log_filter,
                   Log_consumer_callback_t *callback_vtable,
+                  Log_format_t *log_format,
                   const char *name);
 
 

@@ -1,16 +1,62 @@
 #include "log_format.h"
 #include <stdio.h>
-#include <string.h>
+
+
+
+static const FormatT_Vtable Log_format_vtable = {
+    .dtor    = Log_format_dtor,
+    .convert = Log_format_convert,
+    .print   = Log_format_print
+};
 
 
 
 bool
-push_log_format(void *buf, Log_info_t *log_info)
+Log_format_ctor(Log_format_t *self)
 {
-    if(buf == NULL || log_info == NULL)
+    bool nullptr = false;
+
+    ASSERT_SELF__(self);
+
+    if(nullptr){
+        // Debug_printf
+        return false;
+    }
+    self->parent.vtable = &Log_format_vtable;
+    self->parent.data = (void *)self;
+
+    return true;
+}
+
+
+
+void
+Log_format_dtor(FormatT_t *self)
+{
+    memset(self, 0, sizeof (Log_format_t));
+}
+
+
+
+bool
+Log_format_convert(FormatT_t *self, Log_info_t *log_info)
+{
+    bool nullptr = false;
+
+    ASSERT_SELF__(self);
+
+    if(nullptr){
+        // Debug_printf
+        return false;
+    }
+
+    if(log_info == NULL)
         return false;
 
+    Log_format_t *log_format = (Log_format_t *)self->data;
+    char *buf = log_format->buffer;
     Time_t tm;
+
     Timestamp_get_time(&log_info->timestamp, 0, &tm);
 
     unsigned long msg_len = strlen(log_info->log_databuffer.log_message);
@@ -18,7 +64,7 @@ push_log_format(void *buf, Log_info_t *log_info)
     if(msg_len > LOG_MESSAGE_LENGTH)
         msg_len = LOG_MESSAGE_LENGTH;
 
-    sprintf((char *)buf, "%*s %02d.%02d.%04d-%02d:%02d:%02d%*d%*d %-*s",
+    sprintf(buf, "%*s %02d.%02d.%04d-%02d:%02d:%02d%*d%*d %-*s",
                 FORMAT_ID_LENGTH, log_info->log_id_name,
                 tm.day, tm.month, tm.year, tm.hour, tm.min, tm.sec,
                 FORMAT_LOG_LEVEL_SERVER_LENGTH, log_info->log_databuffer.log_level_srv,
@@ -31,10 +77,19 @@ push_log_format(void *buf, Log_info_t *log_info)
 
 
 void
-print_log_format(void *buf)
+Log_format_print(FormatT_t *self)
 {
-    if(buf == NULL)
-        return;
+    bool nullptr = false;
 
-    printf("%s\n", (char *)buf);
+    ASSERT_SELF_PARENT(self);
+
+    if(nullptr){
+        // Debug_printf
+        return;
+    }
+
+    Log_format_t *log_format = (Log_format_t *)self->data;
+    char *buf = log_format->buffer;
+
+    printf("%s\n", buf);
 }

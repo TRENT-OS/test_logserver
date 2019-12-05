@@ -5,14 +5,14 @@
 
 
 // foreward declaration
-static bool Observer_update(Observer_t *self);
+static bool _Observer_update(Observer_t *self);
 
 
 
 static const Observer_Vtable Observer_vtable =
 {
     .dtor   = Observer_dtor,
-    .update = Observer_update
+    .update = _Observer_update
 };
 
 
@@ -46,7 +46,7 @@ Observer_dtor(Observer_t *self)
 
 
 static bool
-Observer_update(Observer_t *self)
+_Observer_update(Observer_t *self)
 {
     bool nullptr = false;
 

@@ -5,18 +5,18 @@
 
 
 // foreward declaration
-static bool Subject_attach(Subject_t *self, Observer_t *observer);
-static bool Subject_detach(Subject_t *self, Observer_t *observer);
-static void Subject_notify(Subject_t *self);
+static bool _Subject_attach(Subject_t *self, Observer_t *observer);
+static bool _Subject_detach(Subject_t *self, Observer_t *observer);
+static void _Subject_notify(Subject_t *self);
 
 
 
 static const Subject_Vtable Subject_vtable =
 {
     .dtor   = Subject_dtor,
-    .attach = Subject_attach,
-    .detach = Subject_detach,
-    .notify = Subject_notify
+    .attach = _Subject_attach,
+    .detach = _Subject_detach,
+    .notify = _Subject_notify
 };
 
 
@@ -50,7 +50,7 @@ Subject_dtor(Subject_t *self)
 
 
 static bool
-Subject_attach(Subject_t *self, Observer_t *observer)
+_Subject_attach(Subject_t *self, Observer_t *observer)
 {
     bool nullptr = false;
 
@@ -72,7 +72,7 @@ Subject_attach(Subject_t *self, Observer_t *observer)
 
 
 static bool
-Subject_detach(Subject_t *self, Observer_t *observer)
+_Subject_detach(Subject_t *self, Observer_t *observer)
 {
     bool nullptr = false;
 
@@ -94,7 +94,7 @@ Subject_detach(Subject_t *self, Observer_t *observer)
 
 
 static void
-Subject_notify(Subject_t *self)
+_Subject_notify(Subject_t *self)
 {
     bool nullptr = false;
 

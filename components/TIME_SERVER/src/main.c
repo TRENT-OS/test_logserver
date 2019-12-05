@@ -7,6 +7,10 @@
 
 
 
+static Timestamp_t *timestamp;
+
+
+
 void
 api_time_server__init(void)
 {
@@ -20,7 +24,6 @@ api_time_server_get_timestamp(void)
 {
     uint64_t t_stamp = 0;
 
-    Timestamp_t *timestamp;
     timestamp = get_instance_Timestamp();
 
     t_stamp = timestamp->timestamp + get_timestamp_relative();
@@ -42,7 +45,6 @@ int run(void)
 {
     //Time_server_init();
 
-    Timestamp_t *timestamp;
     timestamp = get_instance_Timestamp();
 
     Timestamp_create_timestamp(__DATE__, __TIME__);

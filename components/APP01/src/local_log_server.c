@@ -18,6 +18,7 @@ bool
 Local_log_server_init(void *buffer,
                       Log_filter_t *log_filter_server,
                       Log_filter_t *log_filter_client,
+                      Log_format_t *log_format,
                       const char *name)
 {
     if(buffer == NULL || log_filter_server == NULL || log_filter_client == NULL)
@@ -26,7 +27,7 @@ Local_log_server_init(void *buffer,
     Log_consumer_callback_ctor(&_consumer_vtable, Local_consumer_callbackHandler, NULL, NULL);
     Log_emitter_callback_ctor(&_emitter_vtable, NULL, Local_emitter_emit);
 
-    Log_consumer_ctor(&_consumer, buffer, log_filter_server, &_consumer_vtable, name);
+    Log_consumer_ctor(&_consumer, buffer, log_filter_server, &_consumer_vtable, log_format, name);
     get_instance_Log_emitter(buffer, log_filter_client, &_emitter_vtable);
 
     return true;
