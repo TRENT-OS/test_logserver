@@ -4,7 +4,19 @@
 #include "consumer_chain.h"
 #include "log_format.h"
 
+#include "seos_fs.h"
+#include "seos_pm.h"
+
+#include <stdio.h>
 #include <camkes.h>
+
+
+
+#define PARTITION_ID    0
+
+
+
+int8_t TEST_APP__init(bool create_fs);
 
 
 
@@ -17,6 +29,13 @@ static Log_format_t format_01, format_02, format_03;
 
 int run()
 {
+    int8_t ret = EOF;
+    ret = TEST_APP__init(true);
+    if(ret < 0){
+        printf("Fail to init demo!\n");
+        return EOF;
+    }
+
     get_instance_Consumer_chain();
 
     // set up log filter layer
@@ -68,4 +87,36 @@ int run()
     Log_consumer_dtor(&log_consumer_03);
 
     return 0;
+}
+
+
+
+int8_t TEST_APP__init(bool create_fs){
+    hPartition_t phandle;
+    pm_disk_data_t pm_disk_data;
+    pm_partition_data_t pm_partition_data;
+
+    partition_manager_get_info_disk(&pm_disk_data);
+    partition_manager_get_info_partition(PARTITION_ID, &pm_partition_data);
+    partition_init(pm_partition_data.partition_id, 0);
+
+    phandle = partition_open(pm_partition_data.partition_id);
+
+    if(create_fs == true)
+        partition_fs_create(
+                    phandle,
+                    FS_TYPE_FAT32,
+                    pm_partition_data.partition_size,
+                    0,  // default value: size of sector:   512
+                    0,  // default value: size of cluster:  512
+                    0,  // default value: reserved sectors count: FAT12/FAT16 = 1; FAT32 = 3
+                    0,  // default value: count file/dir entries: FAT12/FAT16 = 16; FAT32 = 0
+                    0,  // default value: count header sectors: 512
+                    FS_PARTITION_OVERWRITE_CREATE);
+    else
+        partition_fs_mount(phandle);
+
+    partition_close(phandle);
+
+    return 1;
 }

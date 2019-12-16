@@ -1,0 +1,11 @@
+procedure partition_manager_interface {
+    include "seos_pm_datatypes.h";
+
+    seos_pm_result_t partition_manager_open(uint8_t partition_id);
+    seos_pm_result_t partition_manager_read(uint8_t partition_id, uint64_t offset, uint64_t len, dataport_ptr_t buffer);
+    seos_pm_result_t partition_manager_write(uint8_t partition_id, uint64_t offset, uint64_t len, dataport_ptr_t buffer);
+    seos_pm_result_t partition_manager_close(uint8_t partition_id);
+
+    seos_pm_result_t partition_manager_get_info_disk(out pm_disk_data_t info_disk);
+    seos_pm_result_t partition_manager_get_info_partition(uint8_t partition_id, out pm_partition_data_t info_partition);
+};

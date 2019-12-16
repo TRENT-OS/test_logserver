@@ -7,20 +7,22 @@
 
 
 
+static Log_filter_t filter_client, filter_server;
+static Log_format_t format;
+char buf[DATABUFFER_SIZE];
+
+
+
 int run()
 {
     // set up log filter layer
-    Log_filter_t filter_client, filter_server;
     Log_filter_ctor(&filter_client, Debug_LOG_LEVEL_DEBUG);
     Log_filter_ctor(&filter_server, Debug_LOG_LEVEL_DEBUG);
-    Log_format_t format;
 
     // set up log format layer
     Log_format_ctor(&format);
 
     // local Log server
-    char buf[DATABUFFER_SIZE];
-
     Local_log_server_init(buf, &filter_server, &filter_client, &format, "Local");
 
     Debug_LOG_FATAL("APP01");

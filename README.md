@@ -2,4 +2,7 @@
 
 * demo application
 * logserver library
-* Timeserver connection
+* filesystem core library
+* fat library
+* timeserver connection
+* partition manager connection

@@ -1,11 +1,17 @@
 cmake_minimum_required(VERSION 3.7.2)
 
 set(SEOS_LOG_SERVER_CONFIG_H_FILE ${CMAKE_CURRENT_LIST_DIR}/config/seos_log_server_config.h)
+set(SEOS_FS_CONFIG_H_FILE ${CMAKE_CURRENT_LIST_DIR}/config/seos_fs_config.h)
+set(SEOS_PM_CONFIG_H_FILE ${CMAKE_CURRENT_LIST_DIR}/config/seos_pm_config.h)
 
 seos_set_config_file(config/config.h)
 
 seos_use_libs(
     SEOS_LIBS
+    SEOS_PARTITION_MANAGER
+    SEOS_FILESYSTEM_CORE
+    SEOS_FILESYSTEM_FAT
+    SEOS_FILESYSTEM_SPIFFS
 )
 
 project(demo_logserver C)
@@ -18,7 +24,7 @@ DeclareCAmkESComponent(LOG_SERVER
         seos_timestamp
         config
     SOURCES
-        "components/LOG_SERVER/src/main.c"
+        "components/log_server/src/main.c"
 
         "seos_log/lib/src/log_databuffer.c"
         "seos_log/lib/src/listT.c"
@@ -32,20 +38,32 @@ DeclareCAmkESComponent(LOG_SERVER
     C_FLAGS
         -Wall
         -Werror
+        # log server
         -DSEOS_LOG_SERVER_CONFIG_H_FILE=${SEOS_LOG_SERVER_CONFIG_H_FILE}
+        # filesystem
+        -DSEOS_FS_CONFIG_H_FILE=${SEOS_FS_CONFIG_H_FILE}
+        -DSEOS_FS_BUILD_AS_LIB
+        # partition manager
+        -DSEOS_PM_CONFIG_H_FILE=${SEOS_PM_CONFIG_H_FILE}
+        -DSEOS_PARTITION_MANAGER_BUILD_AS_COMPONENT # partition manager build use as component
     LIBS
+        seos_core_api
         seos_libs
+        seos_partition_manager_api
+        seos_filesystem_core
+        seos_filesystem_fat
+        seos_filesystem_spiffs
 )
 
 # time server
 DeclareCAmkESComponent(TIME_SERVER
     INCLUDES
-        components/TIME_SERVER/include
+        components/time_server/include
         seos_timestamp
         config
     SOURCES
-        "components/TIME_SERVER/src/main.c"
-        "components/TIME_SERVER/src/time_server.c"
+        "components/time_server/src/main.c"
+        "components/time_server/src/time_server.c"
         "seos_timestamp/timestamp.c"
     C_FLAGS
         -Wall
@@ -55,14 +73,14 @@ DeclareCAmkESComponent(TIME_SERVER
 # local log server
 DeclareCAmkESComponent(APP01
     INCLUDES
-        components/APP01/include
+        components/app01/include
         seos_log/include
         seos_log/lib/include
         seos_timestamp
         config
     SOURCES
-        "components/APP01/src/local_log_server.c"
-        "components/APP01/src/main.c"
+        "components/app01/src/local_log_server.c"
+        "components/app01/src/main.c"
 
         "seos_log/lib/src/log_databuffer.c"
         "seos_log/lib/src/listT.c"
@@ -90,7 +108,7 @@ DeclareCAmkESComponent(APP02
         seos_timestamp
         config
     SOURCES
-        "components/APP02/src/main.c"
+        "components/app02/src/main.c"
 
         "seos_log/lib/src/log_databuffer.c"
         "seos_log/lib/src/log_emitter_callback.c"
@@ -114,7 +132,7 @@ DeclareCAmkESComponent(APP03
         seos_timestamp
         config
     SOURCES
-        "components/APP03/src/main.c"
+        "components/app03/src/main.c"
 
         "seos_log/lib/src/log_databuffer.c"
         "seos_log/lib/src/log_emitter_callback.c"
@@ -127,6 +145,42 @@ DeclareCAmkESComponent(APP03
         -Werror
         -DSEOS_LOG_SERVER_CONFIG_H_FILE=${SEOS_LOG_SERVER_CONFIG_H_FILE}
     LIBS
+        seos_libs
+)
+
+# PARTITION_MANAGER #
+DeclareCAmkESComponent(PARTITION_MANAGER
+    SOURCES
+        "components/partition_manager/src/main.c"
+    C_FLAGS
+        -Wall
+        -Werror
+        -DSEOS_PM_CONFIG_H_FILE=${SEOS_PM_CONFIG_H_FILE}
+        -DSEOS_PARTITION_MANAGER_BUILD_AS_COMPONENT # partition manager build use as component
+    LIBS
+        seos_libs
+        seos_partition_manager # provides sources and headers
+)
+
+# Component UartDrv #
+DeclareCAmkESComponent(UartDrv
+    SOURCES
+        "components/Uart/src/UartDrv.c"
+        "components/Uart/src/qemu_uart.c"
+    C_FLAGS
+        -Wall
+        -Werror
+)
+
+# Component ChanMux #
+DeclareCAmkESComponent(ChanMux
+    SOURCES
+        "components/ChanMux/src/instance/ChanMux_Instance.c"
+    C_FLAGS
+        -Wall
+        -Werror
+    LIBS
+        seos_core_api
         seos_libs
 )
 
