@@ -5,30 +5,30 @@
 
 
 
-static bool  ListT_has_prev(NodeT_t *current);
-static bool  ListT_has_next(NodeT_t *current);
-static void *ListT_get_prev(NodeT_t *current);
-static void *ListT_get_next(NodeT_t *current);
-static bool  ListT_insert(NodeT_t *current, NodeT_t *new_node);
-static bool  ListT_delete(NodeT_t *current);
-static void *ListT_get_first(NodeT_t *current);
-static void *ListT_get_last(NodeT_t *current);
-static bool  ListT_isInside(NodeT_t *current);
+static bool  _ListT_has_prev(NodeT_t *current);
+static bool  _ListT_has_next(NodeT_t *current);
+static void *_ListT_get_prev(NodeT_t *current);
+static void *_ListT_get_next(NodeT_t *current);
+static bool  _ListT_insert(NodeT_t *current, NodeT_t *new_node);
+static bool  _ListT_delete(NodeT_t *current);
+static void *_ListT_get_first(NodeT_t *current);
+static void *_ListT_get_last(NodeT_t *current);
+static bool  _ListT_isInside(NodeT_t *current);
 
 
 
 static const ListT_Vtable ListT_vtable =
 {
     .dtor      = ListT_dtor,
-    .has_prev  = ListT_has_prev,
-    .has_next  = ListT_has_next,
-    .get_prev  = ListT_get_prev,
-    .get_next  = ListT_get_next,
-    .insert    = ListT_insert,
-    .delete    = ListT_delete,
-    .get_first = ListT_get_first,
-    .get_last  = ListT_get_last,
-    .isInside  = ListT_isInside
+    .has_prev  = _ListT_has_prev,
+    .has_next  = _ListT_has_next,
+    .get_prev  = _ListT_get_prev,
+    .get_next  = _ListT_get_next,
+    .insert    = _ListT_insert,
+    .delete    = _ListT_delete,
+    .get_first = _ListT_get_first,
+    .get_last  = _ListT_get_last,
+    .isInside  = _ListT_isInside
 };
 
 
@@ -61,7 +61,7 @@ ListT_dtor(ListT_t *self)
 
 
 static bool
-ListT_has_prev(NodeT_t *current)
+_ListT_has_prev(NodeT_t *current)
 {
     bool retval = false;
 
@@ -79,7 +79,7 @@ ListT_has_prev(NodeT_t *current)
 
 
 static bool
-ListT_has_next(NodeT_t *current)
+_ListT_has_next(NodeT_t *current)
 {
     bool retval = false;
 
@@ -98,7 +98,7 @@ ListT_has_next(NodeT_t *current)
 
 
 static void *
-ListT_get_prev(NodeT_t *current)
+_ListT_get_prev(NodeT_t *current)
 {
     NodeT_t *prev = NULL;
 
@@ -107,7 +107,7 @@ ListT_get_prev(NodeT_t *current)
         return prev;
     }
 
-    if(ListT_has_prev(current)){
+    if(_ListT_has_prev(current)){
         prev = current->prev;
         return prev;
     }
@@ -119,7 +119,7 @@ ListT_get_prev(NodeT_t *current)
 
 
 static void *
-ListT_get_next(NodeT_t *current)
+_ListT_get_next(NodeT_t *current)
 {
     NodeT_t *next = NULL;
 
@@ -128,7 +128,7 @@ ListT_get_next(NodeT_t *current)
         return next;
     }
 
-    if(ListT_has_next(current)){
+    if(_ListT_has_next(current)){
         next = current->next;
         return next;
     }
@@ -140,7 +140,7 @@ ListT_get_next(NodeT_t *current)
 
 
 static bool
-ListT_insert(NodeT_t *current, NodeT_t *new_node)
+_ListT_insert(NodeT_t *current, NodeT_t *new_node)
 {
     bool retval = false;
 
@@ -160,8 +160,8 @@ ListT_insert(NodeT_t *current, NodeT_t *new_node)
         return true;
     }
 
-    if(ListT_has_next(current)){
-        next = ListT_get_next(current);
+    if(_ListT_has_next(current)){
+        next = _ListT_get_next(current);
         next->prev = new_node;
     }
 
@@ -179,29 +179,26 @@ ListT_insert(NodeT_t *current, NodeT_t *new_node)
 
 
 static bool
-ListT_delete(NodeT_t *current)
+_ListT_delete(NodeT_t *current)
 {
-    bool retval = false;
-
     NodeT_t *prev = NULL;
     NodeT_t *next = NULL;
 
     if(current == NULL){
         // Debug_printf
-        return retval;
+        return false;
     }
 
-    if(ListT_has_prev(current)){
-        prev = ListT_get_prev(current);
+    if(_ListT_has_prev(current)){
+        prev = _ListT_get_prev(current);
     }
 
-    if(ListT_has_next(current)){
-        next = ListT_get_next(current);
+    if(_ListT_has_next(current)){
+        next = _ListT_get_next(current);
     }
 
     if (next == NULL && prev == NULL) {
-        retval = true;
-        return retval;
+        return true;
     }
     else if(next == NULL){
         prev->next = next;
@@ -214,15 +211,16 @@ ListT_delete(NodeT_t *current)
         next->prev = prev;
     }
 
-    retval = true;
+    current->prev = NULL;
+    current->next = NULL;
 
-    return retval;
+    return true;
 }
 
 
 
 static void *
-ListT_get_first(NodeT_t *current)
+_ListT_get_first(NodeT_t *current)
 {
     NodeT_t *first = NULL;
 
@@ -231,8 +229,8 @@ ListT_get_first(NodeT_t *current)
         return first;
     }
 
-    while (ListT_has_prev(current)) {
-        first = ListT_get_prev(current);
+    while (_ListT_has_prev(current)) {
+        first = _ListT_get_prev(current);
         current = first;
     }
 
@@ -245,7 +243,7 @@ ListT_get_first(NodeT_t *current)
 
 
 static void *
-ListT_get_last(NodeT_t *current)
+_ListT_get_last(NodeT_t *current)
 {
     NodeT_t *last = NULL;
 
@@ -254,8 +252,8 @@ ListT_get_last(NodeT_t *current)
         return last;
     }
 
-    while (ListT_has_next(current)) {
-        last = ListT_get_next(current);
+    while (_ListT_has_next(current)) {
+        last = _ListT_get_next(current);
         current = last;
     }
 
@@ -268,7 +266,7 @@ ListT_get_last(NodeT_t *current)
 
 
 static bool
-ListT_isInside(NodeT_t *current)
+_ListT_isInside(NodeT_t *current)
 {
     NodeT_t *first = NULL;
     bool retval = false;
@@ -278,13 +276,13 @@ ListT_isInside(NodeT_t *current)
         return retval;
     }
 
-    while (ListT_has_next(first)) {
+    while (_ListT_has_next(first)) {
         if(first == current){
             retval = true;
             break;
         }
 
-        first = ListT_get_next(first);
+        first = _ListT_get_next(first);
     }
 
     if(first == current)

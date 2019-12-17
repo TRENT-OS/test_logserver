@@ -1,22 +1,21 @@
 #pragma once
 
 
-#include "log_observer.h"
 #include "abstract_subject.h"
+#include "log_databuffer.h"
 #include <stdbool.h>
 
 
-typedef struct
-{
+typedef struct{
     void *first;
 } Subject_node_t;
 
 
 typedef struct
 {
-    void           *data;
-    Subject_node_t subject_list;
-    Subject_t      parent;
+    Subject_node_t       node;
+    Log_info_t           log_info;
+    const Subject_Vtable *vtable;
 } Log_subject_t;
 
 
@@ -25,16 +24,16 @@ Log_subject_ctor(Log_subject_t *self);
 
 
 void
-Log_subject_dtor(Log_subject_t *self);
+Log_subject_dtor(Subject_t *self);
 
 
 bool
-Log_subject_attach(Log_subject_t *self, Log_observer_t *observer);
+Log_subject_attach(Subject_t *self, Observer_t *observer);
 
 
 bool
-Log_subject_detach(Log_subject_t *self, Log_observer_t *observer);
+Log_subject_detach(Subject_t *self, Observer_t *observer);
 
 
-bool
-Log_subject_action(Log_subject_t *self);
+void
+Log_subject_notify(Subject_t *self);

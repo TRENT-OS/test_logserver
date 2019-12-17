@@ -32,7 +32,6 @@ typedef struct
 
 struct FormatT_t
 {
-    void                 *data;
     const FormatT_Vtable *vtable;
 };
 

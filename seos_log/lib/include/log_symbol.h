@@ -36,7 +36,7 @@
 #define LOG_LEVEL_CLIENT_LENGTH         2
 #define LOG_MESSAGE_LENGTH              (DATABUFFER_SIZE - (LOG_LEVEL_SERVER_LENGTH + LOG_LEVEL_CLIENT_LENGTH))
 
-#define LOG_ID_NAME_LENGTH              512
+#define LOG_ID_NAME_LENGTH              32
 
 
 // configure log format string

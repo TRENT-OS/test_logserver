@@ -12,9 +12,9 @@
 
 bool
 Log_consumer_callback_ctor(Log_consumer_callback_t *self,
-                           Log_consumer_callbackHandlerT reg_callback,
-                           Log_consumer_emitT emit,
-                           Log_consumer_get_timestampT get_timestamp)
+                           Log_consumer_callback_callbackHandlerT reg_callback,
+                           Log_consumer_callback_emitT emit,
+                           Log_consumer_callback_get_timestampT get_timestamp)
 {
     bool nullptr = false;
 

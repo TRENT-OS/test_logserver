@@ -6,6 +6,23 @@
 
 
 
+// foreward declaration
+static void * _Log_emitter_get_buffer(void);
+static bool   _Log_emitter_wait(void);
+static bool   _Log_emitter_emit(void);
+
+
+
+static const Log_emitter_Vtable Log_emitter_vtable = {
+    .dtor            = Log_emitter_dtor,
+    .get_buffer      = _Log_emitter_get_buffer,
+    .wait            = _Log_emitter_wait,
+    .emit            = _Log_emitter_emit,
+    .emit_log        = Log_emitter_emit_log,
+};
+
+
+
 // Singleton
 static Log_emitter_t _log_emitter;
 static Log_emitter_t *this = NULL;
@@ -31,6 +48,7 @@ get_instance_Log_emitter(void *buffer,
         this = &_log_emitter;
         this->buf = buffer;
 
+        this->vtable = &Log_emitter_vtable;
         this->callback_vtable = callback_vtable;
     }
 
@@ -50,8 +68,8 @@ Log_emitter_dtor(void)
 
 
 
-void *
-Log_emitter_get_buffer(void)
+static void *
+_Log_emitter_get_buffer(void)
 {
     bool nullptr = false;
 
@@ -66,8 +84,8 @@ Log_emitter_get_buffer(void)
 }
 
 
-bool
-Log_emitter_wait(void)
+static bool
+_Log_emitter_wait(void)
 {
     bool nullptr = false;
 
@@ -86,8 +104,8 @@ Log_emitter_wait(void)
 
 
 
-bool
-Log_emitter_emit(void)
+static bool
+_Log_emitter_emit(void)
 {
     bool nullptr = false;
 
@@ -125,12 +143,12 @@ Log_emitter_emit_log(uint8_t log_level, const char *format, ...)
         return false;
     }
 
-    if(Log_filter_filtering(this->log_filter, log_level) == false){
+    if(this->log_filter->vtable->filtering(this->log_filter, log_level) == false){
         // Debug_printf -> Log filter!!!
         return false;
     }
 
-    Log_emitter_wait();
+    this->vtable->wait();
 
     va_list args;
     va_start (args, format);
@@ -144,12 +162,12 @@ Log_emitter_emit_log(uint8_t log_level, const char *format, ...)
     if(retval < 0 || retval > LOG_MESSAGE_LENGTH)
         return false;
 
-    Log_databuffer_set_log_level_client(Log_emitter_get_buffer(), log_level);
-    Log_databuffer_set_log_message(Log_emitter_get_buffer(), buf);
+    Log_databuffer_set_log_level_client(this->vtable->get_buffer(), log_level);
+    Log_databuffer_set_log_message(this->vtable->get_buffer(), buf);
 
     va_end (args);
 
-    Log_emitter_emit();
+    this->vtable->emit();
 
     return true;
 }

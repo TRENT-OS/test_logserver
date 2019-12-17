@@ -34,10 +34,16 @@ typedef struct
 Consumer_chain_Vtable;
 
 
+typedef struct
+{
+    void *first;
+} Consumer_chain_node_t;
+
+
 struct Consumer_chain_t
 {
-    ListT_t                     parent;
-    Log_consumer_t              *first;
+    ListT_t                     listT;
+    Consumer_chain_node_t       node;
     const Consumer_chain_Vtable *vtable;
 };
 

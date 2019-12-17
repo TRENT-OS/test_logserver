@@ -3,6 +3,7 @@
 
 // include headers
 #include <camkes.h>
+#include <stdio.h>
 
 
 // setup common

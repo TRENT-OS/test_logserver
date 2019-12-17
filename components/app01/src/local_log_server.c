@@ -27,7 +27,11 @@ Local_log_server_init(void *buffer,
     Log_consumer_callback_ctor(&_consumer_vtable, Local_consumer_callbackHandler, NULL, NULL);
     Log_emitter_callback_ctor(&_emitter_vtable, NULL, Local_emitter_emit);
 
-    Log_consumer_ctor(&_consumer, buffer, log_filter_server, &_consumer_vtable, log_format, name);
+    //Log_consumer_ctor(&_consumer, buffer, log_filter_server, &_consumer_vtable, log_format, name);
+    log_format = NULL;
+    name = NULL;
+    //
+
     get_instance_Log_emitter(buffer, log_filter_client, &_emitter_vtable);
 
     return true;
@@ -48,7 +52,7 @@ Local_log_server_delete(void)
 static void
 Local_emitter_emit(void)
 {
-    Log_consumer_callback_handler(&_consumer, Log_consumer_callback);
+    _consumer.vtable->callback_handler(&_consumer, _consumer.vtable->callback);
 }
 
 

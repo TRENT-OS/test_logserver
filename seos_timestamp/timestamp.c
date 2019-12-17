@@ -7,7 +7,7 @@
 
 #define ASSERT_SELF(self)               \
     if(self == NULL)                    \
-        nullptr = true;
+        nullptr = true
 
 
 
@@ -53,6 +53,14 @@ static bool _fill_time(const char *string, Time_t *tm, const char *delimiter);
 
 
 
+static const Timestamp_Vtable Timestamp_vtable = {
+    .create_timestamp = Timestamp_create_timestamp,
+    .get_time         = Timestamp_get_time,
+    .get_timestamp    = Timestamp_get_timestamp
+};
+
+
+
 static uint16_t month_table[2][13] =
 {
     // Normal years
@@ -75,6 +83,8 @@ get_instance_Timestamp(void)
     if(this == NULL){
         memset(&_timestamp, 0, sizeof (Timestamp_t));
         this = &_timestamp;
+
+        this->vtable = &Timestamp_vtable;
     }
 
     return this;
@@ -189,7 +199,7 @@ Timestamp_create_timestamp(const char *date, const char *time)
     _fill_date(date, &t, DELIMITER);
     _fill_time(time, &t, DELIMITER);
 
-    Timestamp_get_timestamp(&t, this);
+    this->vtable->get_timestamp(&t, this);
 
     return true;
 }

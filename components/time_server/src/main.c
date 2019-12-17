@@ -34,9 +34,9 @@ api_time_server_get_timestamp(void)
 
 
 void
-api_time_server_sleep(int second)
+api_time_server_sleep(unsigned int msec)
 {
-    Time_server_sleep(second);
+    Time_server_sleep(msec);
 }
 
 

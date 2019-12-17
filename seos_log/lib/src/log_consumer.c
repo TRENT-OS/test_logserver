@@ -11,9 +11,23 @@
 
 
 // foreward declaration
+static void     _Log_consumer_callback(void *data);
+static int      _Log_consumer_callback_handler(Log_consumer_t *self, Log_consumer_callbackT callback);
+static void     _Log_consumer_emit(Log_consumer_t *self);
+static uint64_t _Log_consumer_get_timestamp(Log_consumer_t *self);
 static bool    _Log_consumer_init(void *buffer, Log_filter_t *log_filter);
 static uint8_t _create_id(Log_consumer_t *self);
 static bool    _create_id_string(Log_consumer_t *self, const char *name);
+
+
+
+static const Log_consumer_Vtable Log_consumer_vtable = {
+    .dtor             = Log_consumer_dtor,
+    .callback         = _Log_consumer_callback,
+    .callback_handler = _Log_consumer_callback_handler,
+    .emit             = _Log_consumer_emit,
+    .get_timestamp    = _Log_consumer_get_timestamp,
+};
 
 
 
@@ -61,12 +75,12 @@ _create_id_string(Log_consumer_t *self, const char *name)
     if(self == NULL)
         return false;
 
-    sprintf(self->log_info.log_id_name, "%03u", _create_id(self));
+    sprintf(self->log_subject->log_info.log_id_name, "%03u", _create_id(self));
 
     if(name != NULL)
-        sprintf(self->log_info.log_id_name + 3, " %s", name);
+        sprintf(self->log_subject->log_info.log_id_name + 3, " %s", name);
 
-    self->log_info.log_id_name[strlen(self->log_info.log_id_name)] = '\0';
+    self->log_subject->log_info.log_id_name[strlen(self->log_subject->log_info.log_id_name)] = '\0';
 
     return true;
 }
@@ -78,7 +92,7 @@ Log_consumer_ctor(Log_consumer_t *self,
                   void *buffer,
                   Log_filter_t *log_filter,
                   Log_consumer_callback_t *callback_vtable,
-                  Log_format_t *log_format,
+                  Log_subject_t *log_subject,
                   const char *name)
 {
     bool nullptr = false;
@@ -92,7 +106,7 @@ Log_consumer_ctor(Log_consumer_t *self,
     }
 
     // "log_filter" can be NULL, if no log filter is installed
-    if(buffer == NULL || callback_vtable == NULL || log_format == NULL /*|| log_filter == NULL*/){
+    if(buffer == NULL || callback_vtable == NULL || log_subject == NULL/*|| log_filter == NULL*/){
         // Debug_printf
         return retval;
     }
@@ -104,8 +118,10 @@ Log_consumer_ctor(Log_consumer_t *self,
 
     self->buf = buffer;
     self->log_filter = log_filter;
+    self->log_subject = log_subject;
+
+    self->vtable = &Log_consumer_vtable;
     self->callback_vtable = callback_vtable;
-    self->log_format = log_format;
 
     retval = _create_id_string(self, name);
     if(retval == false){
@@ -128,8 +144,8 @@ Log_consumer_dtor(Log_consumer_t *self)
 
 
 
-int
-Log_consumer_callback_handler(Log_consumer_t *self, Log_consumer_callbackT callback)
+static int
+_Log_consumer_callback_handler(Log_consumer_t *self, Log_consumer_callbackT callback)
 {
     bool nullptr = false;
 
@@ -153,8 +169,8 @@ Log_consumer_callback_handler(Log_consumer_t *self, Log_consumer_callbackT callb
 
 
 
-void
-Log_consumer_emit(Log_consumer_t *self)
+static void
+_Log_consumer_emit(Log_consumer_t *self)
 {
     bool nullptr = false;
 
@@ -171,8 +187,8 @@ Log_consumer_emit(Log_consumer_t *self)
 
 
 
-uint64_t
-Log_consumer_get_timestamp(Log_consumer_t *self)
+static uint64_t
+_Log_consumer_get_timestamp(Log_consumer_t *self)
 {
     bool nullptr = false;
 
@@ -190,11 +206,9 @@ Log_consumer_get_timestamp(Log_consumer_t *self)
 }
 
 
-/**/
-#include "log_format.h"
-/**/
-void
-Log_consumer_callback(void *data)
+
+static void
+_Log_consumer_callback(void *data)
 {
     if(data == NULL){
         // Debug_printf
@@ -204,21 +218,20 @@ Log_consumer_callback(void *data)
     Log_consumer_t *consumer = (Log_consumer_t *)data;
 
     // get log level client
-    Log_databuffer_get_log_level_client(consumer->buf, &consumer->log_info.log_databuffer);
+    Log_databuffer_get_log_level_client(consumer->buf, &consumer->log_subject->log_info.log_databuffer);
 
-    if(Log_filter_filtering(consumer->log_filter, consumer->log_info.log_databuffer.log_level_client) == false){
+    if(consumer->log_filter->vtable->filtering(consumer->log_filter, consumer->log_subject->log_info.log_databuffer.log_level_client) == false){
         // Debug_printf -> Log filter!!!
         Log_databuffer_clear_databuffer(consumer->buf);
         return;
     }
 
-    Log_databuffer_get_info(consumer->buf, &consumer->log_info.log_databuffer);
+    Log_databuffer_get_info(consumer->buf, &consumer->log_subject->log_info.log_databuffer);
 
     Log_databuffer_clear_databuffer(consumer->buf);
 
-    consumer->log_info.timestamp.timestamp = Log_consumer_get_timestamp(consumer);
+    consumer->log_subject->log_info.timestamp.timestamp = consumer->vtable->get_timestamp(consumer);
 
-    // log format layer
-    consumer->log_format->parent.vtable->convert(&consumer->log_format->parent, &consumer->log_info);
-    consumer->log_format->parent.vtable->print(&consumer->log_format->parent);
+    // log subject
+    consumer->log_subject->vtable->notify((Subject_t *)consumer->log_subject);
 }

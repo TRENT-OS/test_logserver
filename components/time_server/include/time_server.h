@@ -13,7 +13,7 @@ Time_server_tick_sec(void);
 
 
 void
-Time_server_sleep(int second);
+Time_server_sleep(unsigned int msec);
 
 
 uint64_t

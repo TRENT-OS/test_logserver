@@ -3,10 +3,16 @@
 
 
 
+// foreward declaration
+static bool _Log_format_convert(FormatT_t *self, Log_info_t *log_info);
+static void _Log_format_print(FormatT_t *self);
+
+
+
 static const FormatT_Vtable Log_format_vtable = {
     .dtor    = Log_format_dtor,
-    .convert = Log_format_convert,
-    .print   = Log_format_print
+    .convert = _Log_format_convert,
+    .print   = _Log_format_print
 };
 
 
@@ -22,8 +28,8 @@ Log_format_ctor(Log_format_t *self)
         // Debug_printf
         return false;
     }
-    self->parent.vtable = &Log_format_vtable;
-    self->parent.data = (void *)self;
+
+    self->vtable = &Log_format_vtable;
 
     return true;
 }
@@ -38,8 +44,8 @@ Log_format_dtor(FormatT_t *self)
 
 
 
-bool
-Log_format_convert(FormatT_t *self, Log_info_t *log_info)
+static bool
+_Log_format_convert(FormatT_t *self, Log_info_t *log_info)
 {
     bool nullptr = false;
 
@@ -53,7 +59,7 @@ Log_format_convert(FormatT_t *self, Log_info_t *log_info)
     if(log_info == NULL)
         return false;
 
-    Log_format_t *log_format = (Log_format_t *)self->data;
+    Log_format_t *log_format = (Log_format_t *)self;
     char *buf = log_format->buffer;
     Time_t tm;
 
@@ -76,19 +82,19 @@ Log_format_convert(FormatT_t *self, Log_info_t *log_info)
 
 
 
-void
-Log_format_print(FormatT_t *self)
+static void
+_Log_format_print(FormatT_t *self)
 {
     bool nullptr = false;
 
-    ASSERT_SELF_PARENT(self);
+    ASSERT_SELF__(self);
 
     if(nullptr){
         // Debug_printf
         return;
     }
 
-    Log_format_t *log_format = (Log_format_t *)self->data;
+    Log_format_t *log_format = (Log_format_t *)self;
     char *buf = log_format->buffer;
 
     printf("%s\n", buf);

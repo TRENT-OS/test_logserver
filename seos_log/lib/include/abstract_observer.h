@@ -2,6 +2,8 @@
 
 
 #include <stdbool.h>
+#include <string.h>
+#include "log_symbol.h"
 
 
 typedef struct Observer_t Observer_t;
@@ -12,7 +14,7 @@ typedef void
 
 
 typedef bool
-(*Observer_updateT)(Observer_t *self);
+(*Observer_updateT)(Observer_t *self, void *data);
 
 
 typedef struct
@@ -25,14 +27,30 @@ Observer_Vtable;
 
 struct Observer_t
 {
-    void                  *data;
     const Observer_Vtable *vtable;
 };
 
 
-bool
-Observer_ctor(Observer_t *self, void *data);
+inline void
+Observer_dtor(Observer_t *self)
+{
+    memset(self, 0, sizeof (Observer_t));
+}
 
 
-void
-Observer_dtor(Observer_t *self);
+inline bool
+Observer_update(Observer_t *self, void *data)
+{
+    bool nullptr = false;
+
+    ASSERT_SELF__(self);
+
+    if(nullptr){
+        // Debug_printf
+        return false;
+    }
+
+    self->vtable->update(self, data);
+
+    return true;
+}

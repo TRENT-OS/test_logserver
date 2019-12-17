@@ -5,26 +5,15 @@
 
 
 // foreward declaration
-static bool _filtering(uint8_t log_level_self, uint8_t log_level);
+static bool _Log_filter_filtering(Log_filter_t *self, uint8_t log_level);
 
 
 
 static const Log_filter_Vtable Log_filter_vtable =
 {
     .dtor      = Log_filter_dtor,
-    .filtering = _filtering
+    .filtering = _Log_filter_filtering
 };
-
-
-
-static bool
-_filtering(uint8_t log_level_self, uint8_t log_level)
-{
-    if(log_level_self < log_level)
-        return false;
-
-    return true;
-}
 
 
 
@@ -56,8 +45,8 @@ Log_filter_dtor(Log_filter_t *self)
 
 
 
-bool
-Log_filter_filtering(Log_filter_t *self, uint8_t log_level)
+static bool
+_Log_filter_filtering(Log_filter_t *self, uint8_t log_level)
 {
     bool nullptr = false;
 
@@ -70,5 +59,8 @@ Log_filter_filtering(Log_filter_t *self, uint8_t log_level)
         return true;
     }
 
-    return self->vtable->filtering(self->log_level, log_level);
+    if(self->log_level < log_level)
+        return false;
+
+    return true;
 }

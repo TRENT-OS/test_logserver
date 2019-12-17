@@ -10,11 +10,13 @@
 
 
 
+Log_filter_t filter;
+Log_emitter_callback_t reg;
+
+
+
 int run()
 {
-    Log_filter_t filter;
-    Log_emitter_callback_t reg;
-
     // set up registered functions layer
     Log_emitter_callback_ctor(&reg, logServer_ready_wait, dataAvailable_emit);
 

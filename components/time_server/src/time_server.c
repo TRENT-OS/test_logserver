@@ -78,7 +78,7 @@ Time_server_init()
 void
 Time_server_tick_sec(void)
 {
-    ttc_set_timeout(&_ttc_TTC0_TIMER1, (DELAY_OFFSET_MSEC + 1000) * NS_IN_MSEC, false);
+    ttc_set_timeout(&_ttc_TTC0_TIMER1, DELAY_OFFSET_MSEC * NS_IN_MSEC, false);
 
     ttc_start(&_ttc_TTC0_TIMER1);
 
@@ -89,9 +89,9 @@ Time_server_tick_sec(void)
 
 
 void
-Time_server_sleep(int second)
+Time_server_sleep(unsigned int msec)
 {
-    ttc_set_timeout(&_ttc_TTC0_TIMER2, (uint64_t)second * (DELAY_OFFSET_MSEC + 1000) * NS_IN_MSEC, false);
+    ttc_set_timeout(&_ttc_TTC0_TIMER2, ((uint64_t)msec + DELAY_OFFSET_MSEC) * NS_IN_MSEC, false);
 
     ttc_start(&_ttc_TTC0_TIMER2);
 

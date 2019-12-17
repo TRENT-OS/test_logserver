@@ -28,7 +28,7 @@ get_instance_Consumer_chain(void)
         this = &_consumer_chain;
         this->vtable = &Consumer_chain_vtable;
 
-        retval = ListT_ctor(&this->parent);
+        retval = ListT_ctor(&this->listT);
         if(retval == false)
             return NULL;
     }
@@ -53,7 +53,7 @@ Consumer_chain_append(Log_consumer_t *consumer)
     bool nullptr = false;
     bool retval = false;
 
-    ASSERT_SELF(this);
+    ASSERT_SELF__(this);
 
     if(nullptr){
         // Debug_printf
@@ -65,12 +65,12 @@ Consumer_chain_append(Log_consumer_t *consumer)
         return retval;
     }
 
-    if(this->first == NULL){
-        this->first = consumer;
+    if(this->node.first == NULL){
+        this->node.first = consumer;
         return true;
     }
 
-    retval = this->parent.vtable->insert(this->parent.vtable->get_last(&this->first->node), &consumer->node);
+    retval = this->listT.vtable->insert(this->listT.vtable->get_last((NodeT_t *)&(((Log_consumer_t *)(this->node.first))->node)), &consumer->node);
 
     return retval;
 }
@@ -83,7 +83,7 @@ Consumer_chain_remove(Log_consumer_t *consumer)
     bool nullptr = false;
     bool retval = false;
 
-    ASSERT_SELF(this);
+    ASSERT_SELF__(this);
 
     if(nullptr){
         // Debug_printf
@@ -95,14 +95,14 @@ Consumer_chain_remove(Log_consumer_t *consumer)
         return false;
     }
 
-    if(this->first == consumer){
-        this->first = this->parent.vtable->get_next(&consumer->node);
+    if(this->node.first == consumer){
+        this->node.first = this->listT.vtable->get_next(&consumer->node);
 
-        if(this->first == consumer)
-            this->first = NULL;
+        if(this->node.first == consumer)
+            this->node.first = NULL;
     }
 
-    retval = this->parent.vtable->delete(&consumer->node);
+    retval = this->listT.vtable->delete(&consumer->node);
 
     return retval;
 }
@@ -115,32 +115,32 @@ Consumer_chain_poll(void)
     bool nullptr = false;
     Log_consumer_t *next;
 
-    ASSERT_SELF(this);
+    ASSERT_SELF__(this);
 
     if(nullptr){
         // Debug_printf
         return false;
     }
 
-    if(this->first == NULL)
+    if(this->node.first == NULL)
         return false;
 
-    next = this->first;
+    next = this->node.first;
 
     while (1) {
-        if(Log_consumer_callback_handler(next, Log_consumer_callback) >= 0){
-            Log_consumer_emit(next);
+        if(next->vtable->callback_handler(next, next->vtable->callback) >= 0){
+            next->vtable->emit(next);
         }
 
-        while (this->parent.vtable->has_next(&next->node)) {
-            next = this->parent.vtable->get_next(&next->node);
+        while (this->listT.vtable->has_next(&next->node)) {
+            next = this->listT.vtable->get_next(&next->node);
 
-            if(Log_consumer_callback_handler(next, Log_consumer_callback) >= 0){
-                Log_consumer_emit(next);
+            if(next->vtable->callback_handler(next, next->vtable->callback) >= 0){
+                next->vtable->emit(next);
             }
         }
 
-        next = this->first;
+        next = this->node.first;
     }
 
     return true;

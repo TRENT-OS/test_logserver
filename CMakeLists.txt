@@ -26,13 +26,15 @@ DeclareCAmkESComponent(LOG_SERVER
     SOURCES
         "components/log_server/src/main.c"
 
-        "seos_log/lib/src/log_databuffer.c"
-        "seos_log/lib/src/listT.c"
-        "seos_log/lib/src/log_consumer_callback.c"
-        "seos_log/lib/src/log_consumer.c"
         "seos_log/lib/src/consumer_chain.c"
+        "seos_log/lib/src/listT.c"
+        "seos_log/lib/src/log_consumer.c"
+        "seos_log/lib/src/log_consumer_callback.c"
+        "seos_log/lib/src/log_databuffer.c"
         "seos_log/lib/src/log_filter.c"
         "seos_log/lib/src/log_format.c"
+        "seos_log/lib/src/log_output.c"
+        "seos_log/lib/src/log_subject.c"
 
         "seos_timestamp/timestamp.c"
     C_FLAGS
