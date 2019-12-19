@@ -7,7 +7,7 @@
 
 
 // setup common
-#define DATABUFFER_SIZE                 PAGE_SIZE
+#define DATABUFFER_SIZE                 400 // PAGE_SIZE
 
 
 // setup dataports

@@ -4,21 +4,22 @@
 #include "abstract_log_output.h"
 #include "log_format.h"
 #include "seos_fs.h"
-#include "SeosFileStream.h"
 #include "listT.h"
 #include <stdbool.h>
 
 
 typedef struct
 {
-    char           filename[LOG_ID_NAME_LENGTH];
-    hPartition_t   phandle;
-    SeosFileStream file_stream;
+    char         filename[LOG_ID_NAME_LENGTH];
+    hPartition_t phandle;
+    hFile_t      fhandle;
+    uint32_t     file_offset;
 } Log_output_filesystem_t;
 
 
 typedef struct
 {
+
     NodeT_t                 node;
     ListT_t                 listT;
     Log_output_filesystem_t fs;

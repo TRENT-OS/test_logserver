@@ -26,4 +26,8 @@
 
 // setup dataports, if filesystem build as component
 #define GET_PROPERTY_FS_DATAPORT_BUFFER     (void *)fs_dataport_buf
-#define DATABUFFER_SIZE                     PAGE_SIZE
+
+
+#ifndef DATABUFFER_SIZE
+    #define DATABUFFER_SIZE                     PAGE_SIZE
+#endif

@@ -34,4 +34,8 @@
 
 // setup dataports, if build partition manager as component
 #define GET_PROPERTY_PM_DATAPORT_BUFFER         (void *)pm_dataport_buf
-#define DATABUFFER_SIZE                         PAGE_SIZE
+
+
+#ifndef DATABUFFER_SIZE
+    #define DATABUFFER_SIZE                     PAGE_SIZE
+#endif

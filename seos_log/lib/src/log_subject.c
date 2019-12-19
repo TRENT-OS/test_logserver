@@ -152,12 +152,12 @@ Log_subject_notify(Subject_t *self)
     }
 
     if(first != NULL){
-        first->vtable->parent.update((Observer_t *)first, &log_subject->log_info);
+        first->vtable->parent.update((Observer_t *)first, (void *)&log_subject->log_info);
 
         while (first->listT.vtable->has_next(&first->node)) {
             next = first->listT.vtable->get_next(&first->node);
 
-            next->vtable->parent.update((Observer_t *)next, &log_subject->log_info);
+            next->vtable->parent.update((Observer_t *)next, (void *)&log_subject->log_info);
 
             first = next;
         }

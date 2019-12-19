@@ -44,7 +44,8 @@ DeclareCAmkESComponent(LOG_SERVER
         -DSEOS_LOG_SERVER_CONFIG_H_FILE=${SEOS_LOG_SERVER_CONFIG_H_FILE}
         # filesystem
         -DSEOS_FS_CONFIG_H_FILE=${SEOS_FS_CONFIG_H_FILE}
-        -DSEOS_FS_BUILD_AS_LIB
+        #-DSEOS_FS_BUILD_AS_LIB
+        -DSEOS_FS_BUILD_AS_LIB_BASIC_HANDLE
         # partition manager
         -DSEOS_PM_CONFIG_H_FILE=${SEOS_PM_CONFIG_H_FILE}
         -DSEOS_PARTITION_MANAGER_BUILD_AS_COMPONENT # partition manager build use as component
