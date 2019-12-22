@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.7.2)
 
-set(SEOS_LOG_SERVER_CONFIG_H_FILE ${CMAKE_CURRENT_LIST_DIR}/config/seos_log_server_config.h)
+set(LOGGER_CONFIG_H_FILE ${CMAKE_CURRENT_LIST_DIR}/config/seos_log_server_config.h)
 set(SEOS_FS_CONFIG_H_FILE ${CMAKE_CURRENT_LIST_DIR}/config/seos_fs_config.h)
 set(SEOS_PM_CONFIG_H_FILE ${CMAKE_CURRENT_LIST_DIR}/config/seos_pm_config.h)
 
@@ -41,7 +41,7 @@ DeclareCAmkESComponent(LOG_SERVER
         -Wall
         -Werror
         # log server
-        -DSEOS_LOG_SERVER_CONFIG_H_FILE=${SEOS_LOG_SERVER_CONFIG_H_FILE}
+        -DLOGGER_CONFIG_H_FILE=${LOGGER_CONFIG_H_FILE}
         # filesystem
         -DSEOS_FS_CONFIG_H_FILE=${SEOS_FS_CONFIG_H_FILE}
         #-DSEOS_FS_BUILD_AS_LIB
@@ -76,29 +76,23 @@ DeclareCAmkESComponent(TIME_SERVER
 # local log server
 DeclareCAmkESComponent(APP01
     INCLUDES
-        components/app01/include
         seos_log/include
         seos_log/lib/include
         seos_timestamp
         config
     SOURCES
-        "components/app01/src/local_log_server.c"
         "components/app01/src/main.c"
 
         "seos_log/lib/src/log_databuffer.c"
-        "seos_log/lib/src/listT.c"
-        "seos_log/lib/src/log_consumer_callback.c"
-        "seos_log/lib/src/log_consumer.c"
         "seos_log/lib/src/log_emitter_callback.c"
         "seos_log/lib/src/log_emitter.c"
         "seos_log/lib/src/log_filter.c"
-        "seos_log/lib/src/log_format.c"
 
         "seos_timestamp/timestamp.c"
     C_FLAGS
         -Wall
         -Werror
-        -DSEOS_LOG_SERVER_CONFIG_H_FILE=${SEOS_LOG_SERVER_CONFIG_H_FILE}
+        -DLOGGER_CONFIG_H_FILE=${LOGGER_CONFIG_H_FILE}
     LIBS
         seos_libs
 )
@@ -122,7 +116,7 @@ DeclareCAmkESComponent(APP02
     C_FLAGS
         -Wall
         -Werror
-        -DSEOS_LOG_SERVER_CONFIG_H_FILE=${SEOS_LOG_SERVER_CONFIG_H_FILE}
+        -DLOGGER_CONFIG_H_FILE=${LOGGER_CONFIG_H_FILE}
     LIBS
         seos_libs
 )
@@ -146,7 +140,7 @@ DeclareCAmkESComponent(APP03
     C_FLAGS
         -Wall
         -Werror
-        -DSEOS_LOG_SERVER_CONFIG_H_FILE=${SEOS_LOG_SERVER_CONFIG_H_FILE}
+        -DLOGGER_CONFIG_H_FILE=${LOGGER_CONFIG_H_FILE}
     LIBS
         seos_libs
 )

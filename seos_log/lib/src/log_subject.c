@@ -1,6 +1,7 @@
 #include "log_subject.h"
 #include "log_output.h"
 #include "log_symbol.h"
+#include "log_databuffer.h"
 #include <string.h>
 #include <stddef.h>
 
@@ -125,12 +126,11 @@ Log_subject_detach(Subject_t *self, Observer_t *observer)
 
 
 void
-Log_subject_notify(Subject_t *self)
+Log_subject_notify(Subject_t *self, void *data)
 {
     bool nullptr = false;
     Log_subject_t *log_subject;
-    Log_output_t *first = NULL;
-    Log_output_t *next = NULL;
+    Log_output_t *log_output;
 
     ASSERT_SELF__(self);
 
@@ -139,27 +139,24 @@ Log_subject_notify(Subject_t *self)
         return;
     }
 
+    if(data == NULL){
+        // Debug_printf
+        return;
+    }
+
     log_subject = (Log_subject_t *)self;
 
     // traverse list
-    first = log_subject->node.first;
+    log_output = log_subject->node.first;
 
-    ASSERT_SELF__(first);
+    ASSERT_SELF__(log_output);
 
     if(nullptr){
         // Debug_printf
         return;
     }
 
-    if(first != NULL){
-        first->vtable->parent.update((Observer_t *)first, (void *)&log_subject->log_info);
-
-        while (first->listT.vtable->has_next(&first->node)) {
-            next = first->listT.vtable->get_next(&first->node);
-
-            next->vtable->parent.update((Observer_t *)next, (void *)&log_subject->log_info);
-
-            first = next;
-        }
-    }
+    do{
+        log_output->vtable->parent.update((Observer_t *)log_output, data);
+    } while ( (log_output = log_output->listT.vtable->get_next(&log_output->node)) != NULL );
 }

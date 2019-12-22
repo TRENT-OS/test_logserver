@@ -1,4 +1,5 @@
 #include "log_format.h"
+#include "timestamp.h"
 #include <stdio.h>
 
 
@@ -48,6 +49,9 @@ static bool
 _Log_format_convert(FormatT_t *self, Log_info_t *log_info)
 {
     bool nullptr = false;
+    Log_format_t *log_format;
+    char *buf;
+    Time_t tm;
 
     ASSERT_SELF__(self);
 
@@ -56,12 +60,13 @@ _Log_format_convert(FormatT_t *self, Log_info_t *log_info)
         return false;
     }
 
-    if(log_info == NULL)
+    if(log_info == NULL){
+        // Debug_printf
         return false;
+    }
 
-    Log_format_t *log_format = (Log_format_t *)self;
-    char *buf = log_format->buffer;
-    Time_t tm;
+    log_format = (Log_format_t *)self;
+    buf = log_format->buffer;
 
     Timestamp_get_time(&log_info->timestamp, 0, &tm);
 

@@ -2,7 +2,13 @@
 
 
 #include "log_consumer.h"
+#include "log_symbol.h"
 #include <stdbool.h>
+
+
+#if !defined (API_LOG_SERVER_EMIT)
+    #define API_LOG_SERVER_EMIT     log_server_interface_emit
+#endif
 
 
 typedef struct Consumer_chain_t Consumer_chain_t;
@@ -20,7 +26,7 @@ typedef bool
 (*Consumer_chain_removeT)(Log_consumer_t *consumer);
 
 
-typedef bool
+typedef void
 (*Consumer_chain_pollT)(void);
 
 
@@ -64,5 +70,9 @@ bool
 Consumer_chain_remove(Log_consumer_t *consumer);
 
 
-bool
+void
 Consumer_chain_poll(void);
+
+
+void
+API_LOG_SERVER_EMIT(void);

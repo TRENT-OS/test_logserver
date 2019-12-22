@@ -7,23 +7,23 @@
 
 
 typedef void
-(*Log_emitter_callback_waitT)(void);
+(*Log_emitter_callback_emitT)(void);
 
 
 typedef void
-(*Log_emitter_callback_emitT)(void);
+(*Log_emitter_callback_waitT)(void);
 
 
 typedef struct
 {
-    Log_emitter_callback_waitT server_wait;
     Log_emitter_callback_emitT client_emit;
+    Log_emitter_callback_waitT client_wait;
 } Log_emitter_callback_t;
 
 
 bool
 Log_emitter_callback_ctor(Log_emitter_callback_t *self,
-                          Log_emitter_callback_waitT server_wait,
+                          Log_emitter_callback_waitT client_wait,
                           Log_emitter_callback_emitT client_emit);
 
 

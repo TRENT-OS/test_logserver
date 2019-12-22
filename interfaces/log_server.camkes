@@ -1,0 +1,3 @@
+procedure LogSrvInf {
+    void emit(void);
+};

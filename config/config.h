@@ -23,8 +23,7 @@
 #define Debug_Config_INCLUDE_LEVEL_IN_MSG
 #define Debug_Config_LOG_WITH_FILE_LINE
 
-// print console
-//#define Debug_Config_PRINT_2_TERMINAL
+// enable log server
 #define Debug_Config_PRINT_2_LOG_SERVER
 
 

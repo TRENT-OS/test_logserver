@@ -1,6 +1,8 @@
 #include "Debug.h"
 
 #include "log_symbol.h"
+#include "log_emitter_callback.h"
+#include "log_filter.h"
 
 #if !defined (Debug_Config_PRINT_2_LOG_SERVER)
     #include "log_emitter.h"
@@ -10,15 +12,15 @@
 
 
 
-Log_filter_t filter;
-Log_emitter_callback_t reg;
+static Log_filter_t filter;
+static Log_emitter_callback_t reg;
 
 
 
 int run()
 {
     // set up registered functions layer
-    Log_emitter_callback_ctor(&reg, logServer_ready_wait, dataAvailable_emit);
+    Log_emitter_callback_ctor(&reg, logServer_ready_wait, log_server_interface_emit);
 
     // set up log filter layer
     Log_filter_ctor(&filter, Debug_LOG_LEVEL_DEBUG);

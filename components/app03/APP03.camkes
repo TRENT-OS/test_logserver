@@ -1,10 +1,14 @@
+import "../../interfaces/log_server.camkes";
+
+
 component APP03 {
     control;
 
     //-------------------------------------------------
     // interface to log server
     dataport Buf                dataport_buf;
-    emits    DataAvailableEvent dataAvailable;
 
     consumes DataAvailableEvent logServer_ready;
+
+    uses     LogSrvInf          log_server_interface;
 }

@@ -111,6 +111,7 @@ Timestamp_get_time(Timestamp_t *t_stamp, uint8_t hours, Time_t *tm)
     uint16_t *ip = NULL, year = 0;
     uint32_t hours_off = hours * SEC_PER_HOUR;
     uint8_t month = 0;
+    int64_t yy = 0;
 
     day = t_stamp->timestamp / SEC_PER_DAY;
 
@@ -137,8 +138,16 @@ Timestamp_get_time(Timestamp_t *t_stamp, uint8_t hours, Time_t *tm)
     // first year was 1970
     year = (uint16_t)(START_YEAR + day / 365 - (day % 365 < 0));
 
-    while (day < 0 || day >= 365)
-        day -= ((year - START_YEAR) * 365 + LEAPS_THRU_END_OF(year - 1) - LEAPS_THRU_END_OF(START_YEAR - 1));
+    yy = year;
+    while(day < 0 || day >= (IS_LEAP(year) ? 366 : 365)){
+        int64_t yg = yy + day / 365 - (day % 365 < 0);
+
+        /* Adjust DAYS and Y to match the guessed year.  */
+        day -= ((yg - yy) * 365
+            + LEAPS_THRU_END_OF (yg - 1)
+            - LEAPS_THRU_END_OF (yy - 1));
+        yy = yg;
+    }
 
     tm->year = (uint16_t)year;
 
@@ -160,15 +169,6 @@ Timestamp_get_time(Timestamp_t *t_stamp, uint8_t hours, Time_t *tm)
 bool
 Timestamp_get_timestamp(Time_t *tm, Timestamp_t *t_stamp)
 {
-    bool nullptr = false;
-
-    ASSERT_SELF(this);
-
-    if(nullptr){
-        // Debug_printf
-        return false;
-    }
-
     if(tm == NULL || t_stamp == NULL)
         return false;
 
@@ -191,6 +191,15 @@ Timestamp_get_timestamp(Time_t *tm, Timestamp_t *t_stamp)
 bool
 Timestamp_create_timestamp(const char *date, const char *time)
 {
+    bool nullptr = false;
+
+    ASSERT_SELF(this);
+
+    if(nullptr){
+        // Debug_printf
+        return false;
+    }
+
     if(date == NULL || time == NULL)
         return false;
 

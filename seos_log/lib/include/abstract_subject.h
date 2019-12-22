@@ -24,7 +24,7 @@ typedef bool
 
 
 typedef void
-(*Subject_notifyT)(Subject_t *self);
+(*Subject_notifyT)(Subject_t *self, void *data);
 
 
 typedef struct
@@ -93,7 +93,7 @@ Subject_detach(Subject_t *self, Observer_t *observer)
 
 
 inline void
-Subject_notify(Subject_t *self)
+Subject_notify(Subject_t *self, void *data)
 {
     bool nullptr = false;
 
@@ -104,5 +104,5 @@ Subject_notify(Subject_t *self)
         return;
     }
 
-    self->vtable->notify(self);
+    self->vtable->notify(self, data);
 }

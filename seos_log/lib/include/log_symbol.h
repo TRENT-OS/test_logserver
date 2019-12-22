@@ -16,10 +16,10 @@
 
 
 // include parameter for configuration file
-#if !defined(SEOS_LOG_SERVER_CONFIG_H_FILE)
+#if !defined(LOGGER_CONFIG_H_FILE)
     #error "a configuration file must be provided! See seos_log_server_config.h.example"
 #else
-    #include STR(SEOS_LOG_SERVER_CONFIG_H_FILE)
+    #include STR(LOGGER_CONFIG_H_FILE)
 #endif
 
 
@@ -36,11 +36,11 @@
 #define LOG_LEVEL_CLIENT_LENGTH         2
 #define LOG_MESSAGE_LENGTH              (DATABUFFER_SIZE - (LOG_LEVEL_SERVER_LENGTH + LOG_LEVEL_CLIENT_LENGTH))
 
-#define LOG_ID_NAME_LENGTH              32
+#define LOG_ID_NAME_LENGTH              15
 
 
 // configure log format string
-#define FORMAT_ID_LENGTH                15
+#define FORMAT_ID_LENGTH                LOG_ID_NAME_LENGTH
 #define FORMAT_TIMESTAMP_LENTGH         20
 #define FORMAT_LOG_LEVEL_SERVER_LENGTH  2
 #define FORMAT_LOG_LEVEL_CLIENT_LENGTH  2

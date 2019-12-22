@@ -39,13 +39,6 @@
 #error make a choice!
 #endif
 
-#if defined (Debug_Config_PRINT_2_TERMINAL) && \
-    defined (Debug_Config_PRINT_2_LOG_SERVER) || \
-    !defined (Debug_Config_PRINT_2_TERMINAL) && \
-    !defined (Debug_Config_PRINT_2_LOG_SERVER)
-#error make a choice!
-#endif
-
 /* Macro hacks ---------------------------------------------------------------*/
 
 #define Debug_STRINGIZE(x) Debug_STRINGIZE2(x)
@@ -68,7 +61,7 @@
 #define Debug_PRINT(LEVEL, ...)  \
     Debug_PRINT__(LEVEL, __VA_ARGS__)
 
-#if defined (Debug_Config_PRINT_2_TERMINAL)
+#if !defined (Debug_Config_PRINT_2_LOG_SERVER)
     #include <stdio.h>
     #define Debug_PRINT__(LEVEL, ...)   \
         do                              \
@@ -76,9 +69,7 @@
             printf(__VA_ARGS__);        \
             printf("\n");               \
         } while (0)
-#endif
-
-#if defined (Debug_Config_PRINT_2_LOG_SERVER)
+#else
     #include "log_emitter.h"
 
     #define Debug_PRINT__(LEVEL, ...)               \

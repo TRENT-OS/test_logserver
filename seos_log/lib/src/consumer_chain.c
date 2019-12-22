@@ -109,39 +109,47 @@ Consumer_chain_remove(Log_consumer_t *consumer)
 
 
 
-bool
-Consumer_chain_poll(void)
-{
+void
+Consumer_chain_poll(void){
     bool nullptr = false;
-    Log_consumer_t *next;
+    Log_consumer_t *log_consumer;
 
     ASSERT_SELF__(this);
 
     if(nullptr){
         // Debug_printf
-        return false;
+        return;
+    }
+
+    log_consumer = this->node.first;
+    log_consumer->vtable->emit(log_consumer);
+}
+
+
+
+void
+API_LOG_SERVER_EMIT(void)
+{bool nullptr = false;
+    Log_consumer_t *log_consumer;
+
+    ASSERT_SELF__(this);
+
+    if(nullptr){
+        // Debug_printf
+        return;
     }
 
     if(this->node.first == NULL)
-        return false;
+        return;
 
-    next = this->node.first;
+    log_consumer = this->node.first;
 
-    while (1) {
-        if(next->vtable->callback_handler(next, next->vtable->callback) >= 0){
-            next->vtable->emit(next);
+    do {
+        if(log_consumer->id == log_consumer->callback_vtable->get_sender_id()){
+            log_consumer->vtable->process((void *)log_consumer);
+            break;
         }
+    } while ( (log_consumer = this->listT.vtable->get_next(&log_consumer->node)) != NULL );
 
-        while (this->listT.vtable->has_next(&next->node)) {
-            next = this->listT.vtable->get_next(&next->node);
-
-            if(next->vtable->callback_handler(next, next->vtable->callback) >= 0){
-                next->vtable->emit(next);
-            }
-        }
-
-        next = this->node.first;
-    }
-
-    return true;
+    ((Log_consumer_t *)(this->node.first))->vtable->emit((Log_consumer_t *)(this->node.first));
 }

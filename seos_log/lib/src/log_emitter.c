@@ -84,6 +84,7 @@ _Log_emitter_get_buffer(void)
 }
 
 
+
 static bool
 _Log_emitter_wait(void)
 {
@@ -96,8 +97,8 @@ _Log_emitter_wait(void)
         return false;
     }
 
-    if(this->callback_vtable->server_wait != NULL)
-        this->callback_vtable->server_wait();
+    if(this->callback_vtable->client_wait != NULL)
+        this->callback_vtable->client_wait();
 
     return true;
 }
@@ -143,12 +144,12 @@ Log_emitter_emit_log(uint8_t log_level, const char *format, ...)
         return false;
     }
 
+    this->vtable->wait();
+
     if(this->log_filter->vtable->filtering(this->log_filter, log_level) == false){
         // Debug_printf -> Log filter!!!
         return false;
     }
-
-    this->vtable->wait();
 
     va_list args;
     va_start (args, format);

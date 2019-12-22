@@ -5,6 +5,7 @@
 #include "log_filter.h"
 #include "log_consumer_callback.h"
 #include "log_subject.h"
+#include "log_databuffer.h"
 
 
 typedef struct Log_consumer_t Log_consumer_t;
@@ -14,8 +15,8 @@ typedef void
 (*Log_consumer_dtorT)(Log_consumer_t *self);
 
 
-typedef int
-(*Log_consumer_callbackHandlerT)(Log_consumer_t *self, Log_consumer_callbackT callback);
+typedef void
+(*Log_consumer_processT)(void *data);
 
 
 typedef void
@@ -28,11 +29,10 @@ typedef uint64_t
 
 typedef struct
 {
-    Log_consumer_dtorT            dtor;
-    Log_consumer_callbackT        callback;
-    Log_consumer_callbackHandlerT callback_handler;
-    Log_consumer_emitT            emit;
-    Log_consumer_get_timestampT   get_timestamp;
+    Log_consumer_dtorT          dtor;
+    Log_consumer_processT       process;
+    Log_consumer_emitT          emit;
+    Log_consumer_get_timestampT get_timestamp;
 } Log_consumer_Vtable;
 
 
@@ -40,6 +40,8 @@ struct Log_consumer_t
 {
     NodeT_t                   node;
     void                      *buf;
+    uint32_t                  id;
+    Log_info_t                log_info;
     Log_filter_t              *log_filter;
     Log_subject_t             *log_subject;
     Log_consumer_callback_t   *callback_vtable;
@@ -53,6 +55,7 @@ Log_consumer_ctor(Log_consumer_t *self,
                   Log_filter_t *log_filter,
                   Log_consumer_callback_t *callback_vtable,
                   Log_subject_t *log_subject,
+                  uint32_t id,
                   const char *name);
 
 

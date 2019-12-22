@@ -6,7 +6,7 @@
 
 bool
 Log_emitter_callback_ctor(Log_emitter_callback_t *self,
-                          Log_emitter_callback_waitT server_wait,
+                          Log_emitter_callback_waitT client_wait,
                           Log_emitter_callback_emitT client_emit)
 {
     bool nullptr = false;
@@ -24,8 +24,8 @@ Log_emitter_callback_ctor(Log_emitter_callback_t *self,
         return false;
     }
 
-    self->server_wait = server_wait;
     self->client_emit = client_emit;
+    self->client_wait = client_wait;
 
     return true;
 }

@@ -11,22 +11,19 @@
 
 
 // foreward declaration
-static void     _Log_consumer_callback(void *data);
-static int      _Log_consumer_callback_handler(Log_consumer_t *self, Log_consumer_callbackT callback);
-static void     _Log_consumer_emit(Log_consumer_t *self);
+static void     _Log_consumer_process(void *data);
 static uint64_t _Log_consumer_get_timestamp(Log_consumer_t *self);
-static bool    _Log_consumer_init(void *buffer, Log_filter_t *log_filter);
-static uint8_t _create_id(Log_consumer_t *self);
-static bool    _create_id_string(Log_consumer_t *self, const char *name);
+static bool     _Log_consumer_init(void *buffer, Log_filter_t *log_filter);
+static bool     _create_id_string(Log_consumer_t *self, uint32_t id, const char *name);
+static void     _Log_consumer_emit(Log_consumer_t *self);
 
 
 
 static const Log_consumer_Vtable Log_consumer_vtable = {
-    .dtor             = Log_consumer_dtor,
-    .callback         = _Log_consumer_callback,
-    .callback_handler = _Log_consumer_callback_handler,
-    .emit             = _Log_consumer_emit,
-    .get_timestamp    = _Log_consumer_get_timestamp,
+    .dtor          = Log_consumer_dtor,
+    .process       = _Log_consumer_process,
+    .emit          = _Log_consumer_emit,
+    .get_timestamp = _Log_consumer_get_timestamp,
 };
 
 
@@ -49,38 +46,18 @@ _Log_consumer_init(void *buffer, Log_filter_t *log_filter)
 
 
 
-static uint8_t
-_create_id(Log_consumer_t *self)
-{
-    if(self == NULL)
-        return 0;
-
-    static uint8_t i = 0;
-
-    if( OVERFLOW( i, 1, UINT8_MAX ) ){
-        // Debug_printf
-        return 0;
-    }
-
-    i++;
-
-    return i;
-}
-
-
-
 static bool
-_create_id_string(Log_consumer_t *self, const char *name)
+_create_id_string(Log_consumer_t *self, uint32_t id, const char *name)
 {
     if(self == NULL)
         return false;
 
-    sprintf(self->log_subject->log_info.log_id_name, "%03u", _create_id(self));
+    sprintf(self->log_info.log_id_name, "%06u", id);
 
     if(name != NULL)
-        sprintf(self->log_subject->log_info.log_id_name + 3, " %s", name);
+        sprintf(self->log_info.log_id_name + 6, " %s", name);
 
-    self->log_subject->log_info.log_id_name[strlen(self->log_subject->log_info.log_id_name)] = '\0';
+    self->log_info.log_id_name[strlen(self->log_info.log_id_name)] = '\0';
 
     return true;
 }
@@ -93,6 +70,7 @@ Log_consumer_ctor(Log_consumer_t *self,
                   Log_filter_t *log_filter,
                   Log_consumer_callback_t *callback_vtable,
                   Log_subject_t *log_subject,
+                  uint32_t id,
                   const char *name)
 {
     bool nullptr = false;
@@ -117,13 +95,14 @@ Log_consumer_ctor(Log_consumer_t *self,
     }
 
     self->buf = buffer;
+    self->id = id;
     self->log_filter = log_filter;
     self->log_subject = log_subject;
 
     self->vtable = &Log_consumer_vtable;
     self->callback_vtable = callback_vtable;
 
-    retval = _create_id_string(self, name);
+    retval = _create_id_string(self, id, name);
     if(retval == false){
          // Debug_printf
          return false;
@@ -144,31 +123,6 @@ Log_consumer_dtor(Log_consumer_t *self)
 
 
 
-static int
-_Log_consumer_callback_handler(Log_consumer_t *self, Log_consumer_callbackT callback)
-{
-    bool nullptr = false;
-
-    ASSERT_SELF__(self);
-
-    if(nullptr){
-        // Debug_printf
-        return -1;
-    }
-
-    if(callback == NULL){
-        // Debug_printf
-        return -2;
-    }
-
-    if(self->callback_vtable->reg_callback != NULL)
-        return self->callback_vtable->reg_callback(callback, self);
-
-    return -3;
-}
-
-
-
 static void
 _Log_consumer_emit(Log_consumer_t *self)
 {
@@ -181,8 +135,8 @@ _Log_consumer_emit(Log_consumer_t *self)
         return;
     }
 
-    if(self->callback_vtable->emit != NULL)
-        self->callback_vtable->emit();
+    if(self->callback_vtable->server_emit != NULL)
+        self->callback_vtable->server_emit();
 }
 
 
@@ -208,7 +162,7 @@ _Log_consumer_get_timestamp(Log_consumer_t *self)
 
 
 static void
-_Log_consumer_callback(void *data)
+_Log_consumer_process(void *data)
 {
     if(data == NULL){
         // Debug_printf
@@ -218,20 +172,20 @@ _Log_consumer_callback(void *data)
     Log_consumer_t *consumer = (Log_consumer_t *)data;
 
     // get log level client
-    Log_databuffer_get_log_level_client(consumer->buf, &consumer->log_subject->log_info.log_databuffer);
+    Log_databuffer_get_log_level_client(consumer->buf, &consumer->log_info.log_databuffer);
 
-    if(consumer->log_filter->vtable->filtering(consumer->log_filter, consumer->log_subject->log_info.log_databuffer.log_level_client) == false){
+    if(consumer->log_filter->vtable->filtering(consumer->log_filter, consumer->log_info.log_databuffer.log_level_client) == false){
         // Debug_printf -> Log filter!!!
         Log_databuffer_clear_databuffer(consumer->buf);
         return;
     }
 
-    Log_databuffer_get_info(consumer->buf, &consumer->log_subject->log_info.log_databuffer);
+    Log_databuffer_get_info(consumer->buf, &consumer->log_info.log_databuffer);
 
     Log_databuffer_clear_databuffer(consumer->buf);
 
-    consumer->log_subject->log_info.timestamp.timestamp = consumer->vtable->get_timestamp(consumer);
+    consumer->log_info.timestamp.timestamp = consumer->vtable->get_timestamp(consumer);
 
     // log subject
-    consumer->log_subject->vtable->notify((Subject_t *)consumer->log_subject);
+    consumer->log_subject->vtable->notify((Subject_t *)consumer->log_subject, (void *)consumer);
 }

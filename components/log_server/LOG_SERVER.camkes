@@ -1,21 +1,16 @@
 import "../../interfaces/time_server.camkes";
+import "../../interfaces/log_server.camkes";
 import "../../interfaces/partition_manager.camkes";
 
 
 component LOG_SERVER {
-    control;
-
     dataport Buf                     dataport_buf_app01;
     dataport Buf                     dataport_buf_app02;
     dataport Buf                     dataport_buf_app03;
 
-    consumes DataAvailableEvent      dataAvailable_app01;
-    consumes DataAvailableEvent      dataAvailable_app02;
-    consumes DataAvailableEvent      dataAvailable_app03;
+    emits    DataAvailableEvent      logServer_ready;
 
-    emits    DataAvailableEvent      logServer_ready_app01;
-    emits    DataAvailableEvent      logServer_ready_app02;
-    emits    DataAvailableEvent      logServer_ready_app03;
+    provides LogSrvInf               log_server_interface;
 
     uses     time_server_inf         api_time_server;
 
