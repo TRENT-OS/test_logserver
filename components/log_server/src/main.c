@@ -7,6 +7,7 @@
 #include "log_format.h"
 #include "log_subject.h"
 #include "log_output.h"
+#include "log_file.h"
 
 #include "seos_fs.h"
 #include "seos_pm.h"
@@ -26,12 +27,14 @@ uint32_t API_LOG_SERVER_GET_SENDER_ID(void);
 
 
 
-static Log_filter_t filter_01, filter_02, filter_03;
-static Log_consumer_t log_consumer_01, log_consumer_02, log_consumer_03;
-static Log_consumer_callback_t reg_01, reg_02, reg_03;
+static Consumer_chain_t *consumer_chain;
+static Log_filter_t filter_01, filter_02, filter_03, filter_0x;
+static Log_consumer_t log_consumer_01, log_consumer_02, log_consumer_03, log_consumer_0x;
+static Log_consumer_callback_t log_consumer_callback;
 static Log_format_t format_01, format_02;
 static Log_subject_t subject;
 static Log_output_t filesystem, console;
+static Log_file_t log_file;
 
 
 
@@ -102,7 +105,7 @@ void log_server_interface__init(){
     }
 
     // set up consumer chain
-    get_instance_Consumer_chain();
+    consumer_chain = get_instance_Consumer_chain();
 
     // set up log format layer
     Log_format_ctor(&format_01);
@@ -111,8 +114,11 @@ void log_server_interface__init(){
     // register objects to observe
     Log_subject_ctor(&subject);
 
+    // set up log file
+    Log_file_ctor(&log_file, PARTITION_ID, LOG_FILENAME);
+
     // set up backend
-    Log_output_filesystem_ctor(&filesystem, &format_01, PARTITION_ID, LOG_FILENAME);
+    Log_output_filesystem_ctor(&filesystem, &format_01, &log_file.log_file_info);
     Log_output_console_ctor(&console, &format_02);
 
     // attach observed object to subject
@@ -123,22 +129,71 @@ void log_server_interface__init(){
     Log_filter_ctor(&filter_01, Debug_LOG_LEVEL_DEBUG);
     Log_filter_ctor(&filter_02, Debug_LOG_LEVEL_DEBUG);
     Log_filter_ctor(&filter_03, Debug_LOG_LEVEL_DEBUG);
+    Log_filter_ctor(&filter_0x, Debug_LOG_LEVEL_DEBUG);
 
     // set up registered functions layer
-    Log_consumer_callback_ctor(&reg_01, logServer_ready_emit, log_server_interface_get_sender_id, api_time_server_get_timestamp);
-    Log_consumer_callback_ctor(&reg_02, logServer_ready_emit, log_server_interface_get_sender_id, api_time_server_get_timestamp);
-    Log_consumer_callback_ctor(&reg_03, logServer_ready_emit, log_server_interface_get_sender_id, api_time_server_get_timestamp);
+    Log_consumer_callback_ctor(&log_consumer_callback, LOG_SERVER_EMIT, API_LOG_SERVER_GET_SENDER_ID, API_TIME_SERVER_GET_TIMESTAMP);
 
     // set up log consumer layer
-    Log_consumer_ctor(&log_consumer_01, DATABUFFER_SERVER_01, &filter_01, &reg_01, &subject, CLIENT_APP01_ID, "APP01");
-    Log_consumer_ctor(&log_consumer_02, DATABUFFER_SERVER_02, &filter_02, &reg_02, &subject, CLIENT_APP02_ID, NULL);
-    Log_consumer_ctor(&log_consumer_03, DATABUFFER_SERVER_03, &filter_03, &reg_03, &subject, CLIENT_APP03_ID, "APP03");
+    Log_consumer_ctor(&log_consumer_01, DATABUFFER_SERVER_01, &filter_01, &log_consumer_callback, &subject, &log_file, CLIENT_APP01_ID, "APP01");
+    Log_consumer_ctor(&log_consumer_02, DATABUFFER_SERVER_02, &filter_02, &log_consumer_callback, &subject, &log_file, CLIENT_APP02_ID, NULL);
+    Log_consumer_ctor(&log_consumer_03, DATABUFFER_SERVER_03, &filter_03, &log_consumer_callback, &subject, &log_file, CLIENT_APP03_ID, "APP03");
+    Log_consumer_ctor(&log_consumer_0x, DATABUFFER_SERVER_0x, &filter_0x, &log_consumer_callback, &subject, &log_file, CLIENT_APP0x_ID, "APP0x");
 
     // set up consumer chain layer
     Consumer_chain_append(&log_consumer_01);
     Consumer_chain_append(&log_consumer_02);
     Consumer_chain_append(&log_consumer_03);
+    Consumer_chain_append(&log_consumer_0x);
 
     // start polling
     Consumer_chain_poll();
+}
+
+
+
+int
+run(void)
+{
+    int finish = 1;
+
+    while (1){
+        api_time_server_sleep(1000);
+
+        if(finish == 20)
+            break;
+
+        finish++;
+    }
+
+    printf("demo finish\n");
+
+    logServer_finish_emit();
+
+//    // destruction
+//    Consumer_chain_dtor();
+
+//    Log_consumer_callback_dtor(&log_consumer_callback);
+
+//    Log_filter_dtor(&filter_01);
+//    Log_filter_dtor(&filter_02);
+//    Log_filter_dtor(&filter_03);
+//    Log_filter_dtor(&filter_0x);
+
+//    Log_format_dtor((Format_t *)&format_01);
+//    Log_format_dtor((Format_t *)&format_02);
+
+//    Log_file_dtor(&log_file);
+
+//    Log_output_filesystem_dtor((Output_t *)&filesystem);
+//    Log_output_console_dtor((Output_t *)&console);
+
+//    Log_subject_dtor((Subject_t *)&subject);
+
+//    Log_consumer_dtor(&log_consumer_01);
+//    Log_consumer_dtor(&log_consumer_02);
+//    Log_consumer_dtor(&log_consumer_03);
+//    Log_consumer_dtor(&log_consumer_0x);
+
+    return 0;
 }

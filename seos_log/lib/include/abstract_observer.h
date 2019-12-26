@@ -34,6 +34,15 @@ struct Observer_t
 inline void
 Observer_dtor(Observer_t *self)
 {
+    bool nullptr = false;
+
+    ASSERT_SELF__(self);
+
+    if(nullptr){
+        // Debug_printf
+        return;
+    }
+
     memset(self, 0, sizeof (Observer_t));
 }
 

@@ -31,6 +31,7 @@ DeclareCAmkESComponent(LOG_SERVER
         "seos_log/lib/src/log_consumer.c"
         "seos_log/lib/src/log_consumer_callback.c"
         "seos_log/lib/src/log_databuffer.c"
+        "seos_log/lib/src/log_file.c"
         "seos_log/lib/src/log_filter.c"
         "seos_log/lib/src/log_format.c"
         "seos_log/lib/src/log_output.c"
@@ -137,6 +138,33 @@ DeclareCAmkESComponent(APP03
         "seos_log/lib/src/log_filter.c"
 
         "seos_timestamp/timestamp.c"
+    C_FLAGS
+        -Wall
+        -Werror
+        -DLOGGER_CONFIG_H_FILE=${LOGGER_CONFIG_H_FILE}
+    LIBS
+        seos_libs
+)
+
+# app 0x
+DeclareCAmkESComponent(APP0x
+    INCLUDES
+        seos_log/include
+        seos_log/lib/include
+        seos_timestamp
+        config
+    SOURCES
+        "components/app0x/src/main.c"
+
+        "seos_log/lib/src/log_databuffer.c"
+        "seos_log/lib/src/log_emitter_callback.c"
+        "seos_log/lib/src/log_emitter.c"
+        "seos_log/lib/src/log_filter.c"
+
+        "seos_timestamp/timestamp.c"
+
+        "seos_log/lib/src/log_file_client.c"
+        "seos_log/lib/src/log_file_client_callback.c"
     C_FLAGS
         -Wall
         -Werror

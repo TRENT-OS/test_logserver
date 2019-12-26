@@ -5,8 +5,8 @@
 
 
 // foreward declaration
-static bool _Log_format_convert(FormatT_t *self, Log_info_t *log_info);
-static void _Log_format_print(FormatT_t *self);
+static bool _Log_format_convert(Format_t *self, Log_info_t *log_info);
+static void _Log_format_print(Format_t *self);
 
 
 
@@ -38,15 +38,24 @@ Log_format_ctor(Log_format_t *self)
 
 
 void
-Log_format_dtor(FormatT_t *self)
+Log_format_dtor(Format_t *self)
 {
+    bool nullptr = false;
+
+    ASSERT_SELF__(self);
+
+    if(nullptr){
+        // Debug_printf
+        return;
+    }
+
     memset(self, 0, sizeof (Log_format_t));
 }
 
 
 
 static bool
-_Log_format_convert(FormatT_t *self, Log_info_t *log_info)
+_Log_format_convert(Format_t *self, Log_info_t *log_info)
 {
     bool nullptr = false;
     Log_format_t *log_format;
@@ -75,7 +84,7 @@ _Log_format_convert(FormatT_t *self, Log_info_t *log_info)
     if(msg_len > LOG_MESSAGE_LENGTH)
         msg_len = LOG_MESSAGE_LENGTH;
 
-    sprintf(buf, "%*s %02d.%02d.%04d-%02d:%02d:%02d%*d%*d %-*s",
+    sprintf(buf, "%*s %02d.%02d.%04d-%02d:%02d:%02d%*d%*d %-*s\n",
                 FORMAT_ID_LENGTH, log_info->log_id_name,
                 tm.day, tm.month, tm.year, tm.hour, tm.min, tm.sec,
                 FORMAT_LOG_LEVEL_SERVER_LENGTH, log_info->log_databuffer.log_level_srv,
@@ -88,7 +97,7 @@ _Log_format_convert(FormatT_t *self, Log_info_t *log_info)
 
 
 static void
-_Log_format_print(FormatT_t *self)
+_Log_format_print(Format_t *self)
 {
     bool nullptr = false;
 
@@ -102,5 +111,5 @@ _Log_format_print(FormatT_t *self)
     Log_format_t *log_format = (Log_format_t *)self;
     char *buf = log_format->buffer;
 
-    printf("%s\n", buf);
+    printf("%s", buf);
 }

@@ -3,12 +3,19 @@
 
 
 
+#if !defined (API_LOG_SERVER_EMIT)
+    #define API_LOG_SERVER_EMIT     log_server_interface_emit
+#endif
+
+
+
 static const Consumer_chain_Vtable Consumer_chain_vtable =
 {
-    .dtor   = Consumer_chain_dtor,
-    .append = Consumer_chain_append,
-    .remove = Consumer_chain_remove,
-    .poll   = Consumer_chain_poll
+    .dtor       = Consumer_chain_dtor,
+    .append     = Consumer_chain_append,
+    .remove     = Consumer_chain_remove,
+    .get_sender = Consumer_chain_get_sender,
+    .poll       = Consumer_chain_poll
 };
 
 
@@ -110,7 +117,8 @@ Consumer_chain_remove(Log_consumer_t *consumer)
 
 
 void
-Consumer_chain_poll(void){
+Consumer_chain_poll(void)
+{
     bool nullptr = false;
     Log_consumer_t *log_consumer;
 
@@ -127,9 +135,40 @@ Consumer_chain_poll(void){
 
 
 
+Log_consumer_t *
+Consumer_chain_get_sender(void)
+{
+    bool nullptr = false;
+    Log_consumer_t *log_consumer;
+
+    ASSERT_SELF__(this);
+
+    if(nullptr){
+        // Debug_printf
+        return NULL;
+    }
+
+    if(this->node.first == NULL)
+        return NULL;
+
+    log_consumer = this->node.first;
+
+    do {
+        if(log_consumer->id == log_consumer->callback_vtable->get_sender_id()){
+            return log_consumer;
+            break;
+        }
+    } while ( (log_consumer = this->listT.vtable->get_next(&log_consumer->node)) != NULL );
+
+    return NULL;
+}
+
+
+
 void
 API_LOG_SERVER_EMIT(void)
-{bool nullptr = false;
+{
+    bool nullptr = false;
     Log_consumer_t *log_consumer;
 
     ASSERT_SELF__(this);
@@ -139,17 +178,13 @@ API_LOG_SERVER_EMIT(void)
         return;
     }
 
-    if(this->node.first == NULL)
+    log_consumer = Consumer_chain_get_sender();
+    if(log_consumer == NULL){
+        // Debug_printf
         return;
+    }
 
-    log_consumer = this->node.first;
-
-    do {
-        if(log_consumer->id == log_consumer->callback_vtable->get_sender_id()){
-            log_consumer->vtable->process((void *)log_consumer);
-            break;
-        }
-    } while ( (log_consumer = this->listT.vtable->get_next(&log_consumer->node)) != NULL );
+    log_consumer->vtable->process((void *)log_consumer);
 
     ((Log_consumer_t *)(this->node.first))->vtable->emit((Log_consumer_t *)(this->node.first));
 }

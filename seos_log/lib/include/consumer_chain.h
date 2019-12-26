@@ -6,11 +6,6 @@
 #include <stdbool.h>
 
 
-#if !defined (API_LOG_SERVER_EMIT)
-    #define API_LOG_SERVER_EMIT     log_server_interface_emit
-#endif
-
-
 typedef struct Consumer_chain_t Consumer_chain_t;
 
 
@@ -26,16 +21,21 @@ typedef bool
 (*Consumer_chain_removeT)(Log_consumer_t *consumer);
 
 
+typedef Log_consumer_t *
+(*Consumer_chain_get_senderT)(void);
+
+
 typedef void
 (*Consumer_chain_pollT)(void);
 
 
 typedef struct
 {
-    Consumer_chain_dtorT   dtor;
-    Consumer_chain_appendT append;
-    Consumer_chain_removeT remove;
-    Consumer_chain_pollT   poll;
+    Consumer_chain_dtorT       dtor;
+    Consumer_chain_appendT     append;
+    Consumer_chain_removeT     remove;
+    Consumer_chain_get_senderT get_sender;
+    Consumer_chain_pollT       poll;
 }
 Consumer_chain_Vtable;
 
@@ -70,9 +70,9 @@ bool
 Consumer_chain_remove(Log_consumer_t *consumer);
 
 
+Log_consumer_t *
+Consumer_chain_get_sender(void);
+
+
 void
 Consumer_chain_poll(void);
-
-
-void
-API_LOG_SERVER_EMIT(void);

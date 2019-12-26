@@ -44,5 +44,14 @@ Log_consumer_callback_ctor(Log_consumer_callback_t *self,
 void
 Log_consumer_callback_dtor(Log_consumer_callback_t *self)
 {
+    bool nullptr = false;
+
+    ASSERT_SELF__(self);
+
+    if(nullptr){
+        // Debug_printf
+        return;
+    }
+
     memset(self, 0, sizeof (Log_consumer_callback_t));
 }

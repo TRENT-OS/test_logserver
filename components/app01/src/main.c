@@ -20,7 +20,7 @@ static Log_emitter_callback_t reg;
 int run()
 {
     // set up registered functions layer
-    Log_emitter_callback_ctor(&reg, logServer_ready_wait, log_server_interface_emit);
+    Log_emitter_callback_ctor(&reg, CLIENT_WAIT, API_LOG_SERVER_EMIT);
 
     // set up log filter layer
     Log_filter_ctor(&filter, Debug_LOG_LEVEL_DEBUG);

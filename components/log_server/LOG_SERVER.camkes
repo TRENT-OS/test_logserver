@@ -4,11 +4,16 @@ import "../../interfaces/partition_manager.camkes";
 
 
 component LOG_SERVER {
+    control;
+
     dataport Buf                     dataport_buf_app01;
     dataport Buf                     dataport_buf_app02;
     dataport Buf                     dataport_buf_app03;
+    dataport Buf                     dataport_buf_app0x;
 
     emits    DataAvailableEvent      logServer_ready;
+
+    emits    DataAvailableEvent      logServer_finish;
 
     provides LogSrvInf               log_server_interface;
 

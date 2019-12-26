@@ -46,6 +46,15 @@ struct Subject_t
 inline void
 Subject_dtor(Subject_t *self)
 {
+    bool nullptr = false;
+
+    ASSERT_SELF__(self);
+
+    if(nullptr){
+        // Debug_printf
+        return;
+    }
+
     memset(self, 0, sizeof (Subject_t));
 }
 

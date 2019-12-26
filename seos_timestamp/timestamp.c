@@ -136,7 +136,7 @@ Timestamp_get_time(Timestamp_t *t_stamp, uint8_t hours, Time_t *tm)
     tm->sec = tmp % 60;
 
     // first year was 1970
-    year = (uint16_t)(START_YEAR + day / 365 - (day % 365 < 0));
+    year = (uint16_t)(START_YEAR + day / 365 - (day % 365 > 0));
 
     yy = year;
     while(day < 0 || day >= (IS_LEAP(year) ? 366 : 365)){
@@ -169,17 +169,26 @@ Timestamp_get_time(Timestamp_t *t_stamp, uint8_t hours, Time_t *tm)
 bool
 Timestamp_get_timestamp(Time_t *tm, Timestamp_t *t_stamp)
 {
+    bool nullptr = false;
+
+    ASSERT_SELF(this);
+
+    if(nullptr){
+        // Debug_printf
+        return false;
+    }
+
     if(tm == NULL || t_stamp == NULL)
         return false;
 
     uint64_t tmp_timestamp = 0;
 
     tmp_timestamp += tm->sec;
-    tmp_timestamp += tm->min * SEC_PER_MIN;
-    tmp_timestamp += tm->hour * SEC_PER_HOUR;
+    tmp_timestamp += (tm->min * SEC_PER_MIN);
+    tmp_timestamp += (tm->hour * SEC_PER_HOUR);
     tmp_timestamp += ((month_table[IS_LEAP(tm->year)][tm->month-1] + tm->day - 1) * SEC_PER_DAY);
-    tmp_timestamp += (tm->year - START_YEAR) * SEC_PER_YEAR;
-    tmp_timestamp += (LEAPS_THRU_END_OF(tm->year - 1) - LEAPS_THRU_END_OF(START_YEAR - 1)) * SEC_PER_DAY;
+    tmp_timestamp += ((tm->year - START_YEAR) * SEC_PER_YEAR);
+    tmp_timestamp += ((LEAPS_THRU_END_OF(tm->year - 1) - LEAPS_THRU_END_OF(START_YEAR - 1)) * SEC_PER_DAY);
 
     t_stamp->timestamp = tmp_timestamp;
 
@@ -261,6 +270,10 @@ _fill_date(const char *string, Time_t *tm, const char *delimiter)
 
         if(i == 3)
             break;
+    }
+
+    if(tm->year < START_YEAR){
+        tm->year += 2000;
     }
 
     return true;

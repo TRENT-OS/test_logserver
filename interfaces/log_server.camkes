@@ -1,3 +1,6 @@
 procedure LogSrvInf {
-    void emit(void);
+    include "stdint.h";
+
+    void    emit(void);
+    int64_t read_log_file(uint64_t offset, uint64_t len, out int64_t log_file_size);
 };

@@ -40,6 +40,15 @@ Log_filter_ctor(Log_filter_t *self, uint8_t log_level)
 void
 Log_filter_dtor(Log_filter_t *self)
 {
+    bool nullptr = false;
+
+    ASSERT_SELF__(self);
+
+    if(nullptr){
+        // Debug_printf
+        return;
+    }
+
     memset(self, 0, sizeof (Log_filter_t));
 }
 

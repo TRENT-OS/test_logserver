@@ -36,6 +36,15 @@ struct Output_t
 inline void
 Output_dtor(Output_t *self)
 {
+    bool nullptr = false;
+
+    ASSERT_SELF__(self);
+
+    if(nullptr){
+        // Debug_printf
+        return;
+    }
+
     memset(self, 0, sizeof (Output_t));
 }
 

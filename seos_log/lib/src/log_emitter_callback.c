@@ -35,5 +35,14 @@ Log_emitter_callback_ctor(Log_emitter_callback_t *self,
 void
 Log_emitter_callback_dtor(Log_emitter_callback_t *self)
 {
+    bool nullptr = false;
+
+    ASSERT_SELF__(self);
+
+    if(nullptr){
+        // Debug_printf
+        return;
+    }
+
     memset(self, 0, sizeof (Log_emitter_callback_t));
 }

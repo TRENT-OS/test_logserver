@@ -55,6 +55,15 @@ ListT_ctor(ListT_t *self)
 void
 ListT_dtor(ListT_t *self)
 {
+    bool nullptr = false;
+
+    ASSERT_SELF__(self);
+
+    if(nullptr){
+        // Debug_printf
+        return;
+    }
+
     memset(self, 0, sizeof (ListT_t));
 }
 

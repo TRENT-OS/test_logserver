@@ -70,6 +70,7 @@ Log_consumer_ctor(Log_consumer_t *self,
                   Log_filter_t *log_filter,
                   Log_consumer_callback_t *callback_vtable,
                   Log_subject_t *log_subject,
+                  Log_file_t *log_file,
                   uint32_t id,
                   const char *name)
 {
@@ -84,7 +85,7 @@ Log_consumer_ctor(Log_consumer_t *self,
     }
 
     // "log_filter" can be NULL, if no log filter is installed
-    if(buffer == NULL || callback_vtable == NULL || log_subject == NULL/*|| log_filter == NULL*/){
+    if(buffer == NULL || callback_vtable == NULL || log_subject == NULL || log_file == NULL /*|| log_filter == NULL*/){
         // Debug_printf
         return retval;
     }
@@ -98,6 +99,7 @@ Log_consumer_ctor(Log_consumer_t *self,
     self->id = id;
     self->log_filter = log_filter;
     self->log_subject = log_subject;
+    self->log_file = log_file;
 
     self->vtable = &Log_consumer_vtable;
     self->callback_vtable = callback_vtable;
@@ -118,6 +120,15 @@ Log_consumer_ctor(Log_consumer_t *self,
 void
 Log_consumer_dtor(Log_consumer_t *self)
 {
+    bool nullptr = false;
+
+    ASSERT_SELF__(self);
+
+    if(nullptr){
+        // Debug_printf
+        return;
+    }
+
     memset(self, 0, sizeof (Log_consumer_t));
 }
 

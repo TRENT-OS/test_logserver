@@ -5,6 +5,7 @@
 #include "log_filter.h"
 #include "log_consumer_callback.h"
 #include "log_subject.h"
+#include "log_file.h"
 #include "log_databuffer.h"
 
 
@@ -44,6 +45,7 @@ struct Log_consumer_t
     Log_info_t                log_info;
     Log_filter_t              *log_filter;
     Log_subject_t             *log_subject;
+    Log_file_t                *log_file;
     Log_consumer_callback_t   *callback_vtable;
     const Log_consumer_Vtable *vtable;
 };
@@ -55,6 +57,7 @@ Log_consumer_ctor(Log_consumer_t *self,
                   Log_filter_t *log_filter,
                   Log_consumer_callback_t *callback_vtable,
                   Log_subject_t *log_subject,
+                  Log_file_t *log_file,
                   uint32_t id,
                   const char *name);
 

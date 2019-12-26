@@ -1,7 +1,7 @@
 #pragma once
 
 
-#include "formatT.h"
+#include "abstract_format.h"
 
 
 typedef struct
@@ -16,4 +16,4 @@ Log_format_ctor(Log_format_t *self);
 
 
 void
-Log_format_dtor(FormatT_t *self);
+Log_format_dtor(Format_t *self);

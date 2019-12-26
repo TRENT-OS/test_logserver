@@ -6,6 +6,7 @@ import "components/time_server/TIME_SERVER.camkes";
 import "components/app01/APP01.camkes";
 import "components/app02/APP02.camkes";
 import "components/app03/APP03.camkes";
+import "components/app0x/APP0x.camkes";
 import "components/partition_manager/PARTITION_MANAGER.camkes";
 import "components/ChanMux/ChanMux.camkes";
 import "components/Uart/Uart.camkes";
@@ -19,6 +20,7 @@ assembly {
         component APP01             app01;
         component APP02             app02;
         component APP03             app03;
+        component APP0x             app0x;
         component PARTITION_MANAGER partition_manager;
         component ChanMux	    chanMux;
         component UartDev	    uartDev;
@@ -42,14 +44,18 @@ assembly {
         connection  seL4RPCCall         conn_rpc_logServer2app01(from app01.log_server_interface, to log_server.log_server_interface);
         connection  seL4RPCCall         conn_rpc_logServer2app02(from app02.log_server_interface, to log_server.log_server_interface);
         connection  seL4RPCCall         conn_rpc_logServer2app03(from app03.log_server_interface, to log_server.log_server_interface);
+        connection  seL4RPCCall         conn_rpc_logServer2app0x(from app0x.log_server_interface, to log_server.log_server_interface);
 
         connection  seL4Notification    conn_dataAvailable_logServer2app01(from log_server.logServer_ready, to app01.logServer_ready);
         connection  seL4Notification    conn_dataAvailable_logServer2app02(from log_server.logServer_ready, to app02.logServer_ready);
         connection  seL4Notification    conn_dataAvailable_logServer2app03(from log_server.logServer_ready, to app03.logServer_ready);
 
+        connection  seL4Notification    conn_dataAvailable_logServer2app0x_finish(from log_server.logServer_finish, to app0x.logServer_finish);
+
         connection  seL4SharedData      conn_dataConnection_app01(from app01.dataport_buf, to log_server.dataport_buf_app01);
         connection  seL4SharedData      conn_dataConnection_app02(from app02.dataport_buf, to log_server.dataport_buf_app02);
         connection  seL4SharedData      conn_dataConnection_app03(from app03.dataport_buf, to log_server.dataport_buf_app03);
+        connection  seL4SharedData      conn_dataConnection_app0x(from app0x.dataport_buf, to log_server.dataport_buf_app0x);
 
         //----------------------------------------------------------------------
         // PARTITION MANAGER connections
@@ -76,6 +82,7 @@ assembly {
         app01.log_server_interface_attributes = 10;
         app02.log_server_interface_attributes = 200;
         app03.log_server_interface_attributes = 3000;
+        app0x.log_server_interface_attributes = 40000;
 
         // timer
         timebase.reg_paddr = 0xF8001000;    // paddr of mmio registers

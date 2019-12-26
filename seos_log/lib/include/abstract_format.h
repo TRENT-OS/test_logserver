@@ -7,19 +7,19 @@
 #include <string.h>
 
 
-typedef struct FormatT_t FormatT_t;
+typedef struct Format_t Format_t;
 
 
 typedef void
-(*FormatT_dtorT)(FormatT_t *self);
+(*FormatT_dtorT)(Format_t *self);
 
 
 typedef bool
-(*FormatT_convertT)(FormatT_t *self, Log_info_t *log_info);
+(*FormatT_convertT)(Format_t *self, Log_info_t *log_info);
 
 
 typedef void
-(*FormatT_printT)(FormatT_t *self);
+(*FormatT_printT)(Format_t *self);
 
 
 typedef struct
@@ -30,21 +30,30 @@ typedef struct
 } FormatT_Vtable;
 
 
-struct FormatT_t
+struct Format_t
 {
     const FormatT_Vtable *vtable;
 };
 
 
 inline void
-FormatT_dtor(FormatT_t *self)
+FormatT_dtor(Format_t *self)
 {
-    memset(self, 0, sizeof (FormatT_t));
+    bool nullptr = false;
+
+    ASSERT_SELF__(self);
+
+    if(nullptr){
+        // Debug_printf
+        return;
+    }
+
+    memset(self, 0, sizeof (Format_t));
 }
 
 
 inline bool
-FormatT_convert(FormatT_t *self, Log_info_t *log_info)
+FormatT_convert(Format_t *self, Log_info_t *log_info)
 {
     bool nullptr = false;
 
@@ -65,7 +74,7 @@ FormatT_convert(FormatT_t *self, Log_info_t *log_info)
 
 
 inline void
-FormatT_print(FormatT_t *self)
+FormatT_print(Format_t *self)
 {
     bool nullptr = false;
 

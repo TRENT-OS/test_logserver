@@ -44,6 +44,15 @@ Log_subject_ctor(Log_subject_t *self)
 void
 Log_subject_dtor(Subject_t *self)
 {
+    bool nullptr = false;
+
+    ASSERT_SELF__(self);
+
+    if(nullptr){
+        // Debug_printf
+        return;
+    }
+
     memset(self, 0, sizeof (Log_subject_t));
 }
 
