@@ -1,14 +1,14 @@
-#include "Debug.h"
+#include "LibDebug/Debug.h"
+
+#include "seos_logger.h"
 
 #include <camkes.h>
 
-#include "log_symbol.h"
-#include "log_file_client.h"
-#include "log_file_client_callback.h"
 
-#include <stdint.h>
-#include <string.h>
-#include <stdio.h>
+
+#if !defined (DATABUFFER_CLIENT)
+    #define DATABUFFER_CLIENT       (void *)dataport_buf
+#endif
 
 
 

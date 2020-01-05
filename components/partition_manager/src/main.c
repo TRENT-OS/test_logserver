@@ -11,6 +11,18 @@
 #include "ProxyNVM.h"               // needs seos libs
 #include "ChanMux/ChanMuxClient.h"  // needs seos libs
 
+#include <camkes.h>
+
+
+
+#ifndef GET_PROPERTY_CHANMUX_DATAPORT_BUFFER
+    #define GET_PROPERTY_CHANMUX_DATAPORT_BUFFER    (void *)chanMuxDataPort
+#endif
+
+#ifndef GET_PROPERTY_CHANMUX_CHANNEL
+    #define GET_PROPERTY_CHANMUX_CHANNEL            6
+#endif
+
 
 
 void api_pm_component__init(void){

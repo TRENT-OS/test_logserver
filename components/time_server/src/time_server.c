@@ -1,5 +1,4 @@
 #include "time_server.h"
-#include "seos_timeserver_config.h"
 #include <platsupport/plat/timer.h>
 #include <sel4utils/sel4_zf_logif.h>
 
@@ -9,8 +8,11 @@
 
 
 
-#define NS_IN_SECOND        1000000000ULL
-#define NS_IN_MSEC          1000000ULL
+#define NS_IN_SECOND                1000000000ULL
+#define NS_IN_MSEC                  1000000ULL
+
+#define DATABUFFER_TIME_SERVER      (void *)reg
+#define DELAY_OFFSET_MSEC           0
 
 
 

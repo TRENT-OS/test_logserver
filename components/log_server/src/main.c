@@ -1,13 +1,6 @@
-#include "Debug.h"
+#include "LibDebug/Debug.h"
 
-#include "log_symbol.h"
-#include "log_filter.h"
-#include "log_consumer.h"
-#include "consumer_chain.h"
-#include "log_format.h"
-#include "log_subject.h"
-#include "log_output.h"
-#include "log_file.h"
+#include "seos_log_server.h"
 
 #include "seos_fs.h"
 #include "seos_pm.h"
@@ -18,8 +11,22 @@
 
 
 
-#define PARTITION_ID    0
-#define LOG_FILENAME    "log.txt"
+#define DATABUFFER_SERVER_01    (void *)dataport_buf_app01
+#define DATABUFFER_SERVER_02    (void *)dataport_buf_app02
+#define DATABUFFER_SERVER_03    (void *)dataport_buf_app03
+#define DATABUFFER_SERVER_0x    (void *)dataport_buf_app0x
+
+// log server id
+#define LOG_SERVER_ID           0
+
+// client id's
+#define CLIENT_APP01_ID         10
+#define CLIENT_APP02_ID         200
+#define CLIENT_APP03_ID         3000
+#define CLIENT_APP0x_ID         40000
+
+#define PARTITION_ID            0
+#define LOG_FILENAME            "log.txt"
 
 
 
@@ -27,14 +34,20 @@ uint32_t API_LOG_SERVER_GET_SENDER_ID(void);
 
 
 
-static Consumer_chain_t *consumer_chain;
 static Log_filter_t filter_01, filter_02, filter_03, filter_0x;
 static Log_consumer_t log_consumer_01, log_consumer_02, log_consumer_03, log_consumer_0x;
 static Log_consumer_callback_t log_consumer_callback;
-static Log_format_t format_01, format_02;
+static Log_format_t format;
 static Log_subject_t subject;
 static Log_output_t filesystem, console;
 static Log_file_t log_file;
+static Log_emitter_callback_t emitter_callback;
+// Emitter configuration
+static Log_filter_t filter_log_server;
+static Log_consumer_t log_consumer_log_server;
+static Log_subject_t subject_log_server;
+static Log_output_t console_log_server;
+static char buf_log_server[DATABUFFER_SIZE];
 
 
 
@@ -97,54 +110,73 @@ filesystem_init(void)
 
 
 void log_server_interface__init(){
-    bool ret;
-    ret = filesystem_init();
-    if(!ret){
-        printf("Fail to init filesystem!\n");
-        return;
-    }
-
     // set up consumer chain
-    consumer_chain = get_instance_Consumer_chain();
+    get_instance_Consumer_chain();
 
     // set up log format layer
-    Log_format_ctor(&format_01);
-    Log_format_ctor(&format_02);
+    Log_format_ctor(&format);
 
     // register objects to observe
     Log_subject_ctor(&subject);
+    // Emitter configuration
+    Log_subject_ctor(&subject_log_server);
 
     // set up log file
     Log_file_ctor(&log_file, PARTITION_ID, LOG_FILENAME);
 
     // set up backend
-    Log_output_filesystem_ctor(&filesystem, &format_01, &log_file.log_file_info);
-    Log_output_console_ctor(&console, &format_02);
+    Log_output_filesystem_ctor(&filesystem, &format, &log_file.log_file_info);
+    Log_output_console_ctor(&console, &format);
+    // Emitter configuration
+    Log_output_console_ctor(&console_log_server, &format);
 
     // attach observed object to subject
     Log_subject_attach((Subject_t *)&subject, (Observer_t *)&filesystem);
     Log_subject_attach((Subject_t *)&subject, (Observer_t *)&console);
+    // Emitter configuration
+    Log_subject_attach((Subject_t *)&subject_log_server, (Observer_t *)&console_log_server);
+
+    // Emitter configuration: set up registered functions layer
+    Log_emitter_callback_ctor(&emitter_callback, NULL, API_LOG_SERVER_EMIT);
 
     // set up log filter layer
     Log_filter_ctor(&filter_01, Debug_LOG_LEVEL_DEBUG);
     Log_filter_ctor(&filter_02, Debug_LOG_LEVEL_DEBUG);
     Log_filter_ctor(&filter_03, Debug_LOG_LEVEL_DEBUG);
     Log_filter_ctor(&filter_0x, Debug_LOG_LEVEL_DEBUG);
+    // Emitter configuration
+    Log_filter_ctor(&filter_log_server, Debug_LOG_LEVEL_DEBUG);
 
     // set up registered functions layer
-    Log_consumer_callback_ctor(&log_consumer_callback, LOG_SERVER_EMIT, API_LOG_SERVER_GET_SENDER_ID, API_TIME_SERVER_GET_TIMESTAMP);
+    Log_consumer_callback_ctor(&log_consumer_callback, logServer_ready_emit, API_LOG_SERVER_GET_SENDER_ID, api_time_server_get_timestamp);
 
     // set up log consumer layer
     Log_consumer_ctor(&log_consumer_01, DATABUFFER_SERVER_01, &filter_01, &log_consumer_callback, &subject, &log_file, CLIENT_APP01_ID, "APP01");
     Log_consumer_ctor(&log_consumer_02, DATABUFFER_SERVER_02, &filter_02, &log_consumer_callback, &subject, &log_file, CLIENT_APP02_ID, NULL);
     Log_consumer_ctor(&log_consumer_03, DATABUFFER_SERVER_03, &filter_03, &log_consumer_callback, &subject, &log_file, CLIENT_APP03_ID, "APP03");
     Log_consumer_ctor(&log_consumer_0x, DATABUFFER_SERVER_0x, &filter_0x, &log_consumer_callback, &subject, &log_file, CLIENT_APP0x_ID, "APP0x");
+    // Emitter configuration
+    Log_consumer_ctor(&log_consumer_log_server, buf_log_server, &filter_log_server, &log_consumer_callback, &subject_log_server, &log_file, LOG_SERVER_ID, "LOG-SERVER");
+
+    // Emitter configuration: set up log emitter layer
+    get_instance_Log_emitter(buf_log_server, &filter_log_server, &emitter_callback);
 
     // set up consumer chain layer
     Consumer_chain_append(&log_consumer_01);
     Consumer_chain_append(&log_consumer_02);
     Consumer_chain_append(&log_consumer_03);
     Consumer_chain_append(&log_consumer_0x);
+    // Emitter configuration
+    Consumer_chain_append(&log_consumer_log_server);
+
+    // create filesystem
+    if(filesystem_init() == false){
+        printf("Fail to init filesystem!\n");
+        return;
+    }
+
+    // create log file
+    Log_file_create_log_file(&log_file);
 
     // start polling
     Consumer_chain_poll();
@@ -153,7 +185,7 @@ void log_server_interface__init(){
 
 
 int
-run(void)
+run()
 {
     int finish = 1;
 
@@ -169,31 +201,6 @@ run(void)
     printf("demo finish\n");
 
     logServer_finish_emit();
-
-//    // destruction
-//    Consumer_chain_dtor();
-
-//    Log_consumer_callback_dtor(&log_consumer_callback);
-
-//    Log_filter_dtor(&filter_01);
-//    Log_filter_dtor(&filter_02);
-//    Log_filter_dtor(&filter_03);
-//    Log_filter_dtor(&filter_0x);
-
-//    Log_format_dtor((Format_t *)&format_01);
-//    Log_format_dtor((Format_t *)&format_02);
-
-//    Log_file_dtor(&log_file);
-
-//    Log_output_filesystem_dtor((Output_t *)&filesystem);
-//    Log_output_console_dtor((Output_t *)&console);
-
-//    Log_subject_dtor((Subject_t *)&subject);
-
-//    Log_consumer_dtor(&log_consumer_01);
-//    Log_consumer_dtor(&log_consumer_02);
-//    Log_consumer_dtor(&log_consumer_03);
-//    Log_consumer_dtor(&log_consumer_0x);
 
     return 0;
 }

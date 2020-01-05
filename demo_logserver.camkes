@@ -49,7 +49,7 @@ assembly {
         connection  seL4Notification    conn_dataAvailable_logServer2app01(from log_server.logServer_ready, to app01.logServer_ready);
         connection  seL4Notification    conn_dataAvailable_logServer2app02(from log_server.logServer_ready, to app02.logServer_ready);
         connection  seL4Notification    conn_dataAvailable_logServer2app03(from log_server.logServer_ready, to app03.logServer_ready);
-
+        // seL4Notification unused in application app0x
         connection  seL4Notification    conn_dataAvailable_logServer2app0x_finish(from log_server.logServer_finish, to app0x.logServer_finish);
 
         connection  seL4SharedData      conn_dataConnection_app01(from app01.dataport_buf, to log_server.dataport_buf_app01);
@@ -97,15 +97,5 @@ assembly {
         uartDev.uartRegBase_paddr  = 0xE0000000;
         uartDev.uartRegBase_size   = 0x1000;
         uartDrv.inputDataPort       = "R";
-
-        // partition manager
-        partition_manager.disk_information = { "disk_size" : 0x6025800, "block_size_default" : 512 };
-        partition_manager.chanmux_ch = {"channel" : 6};
-        partition_manager.partition_conf = { "partition" : [
-                                                {   "partition_name" : "",
-                                                    "partition_size" : 0x200C800
-                                                }
-                                            ]
-                                         };
     }
 }

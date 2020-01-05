@@ -1,14 +1,14 @@
-#include "Debug.h"
+#include "LibDebug/Debug.h"
 
-#include "log_symbol.h"
-#include "log_emitter_callback.h"
-#include "log_filter.h"
-
-#if !defined (Debug_Config_PRINT_2_LOG_SERVER)
-    #include "log_emitter.h"
-#endif
+#include "seos_logger.h"
 
 #include <camkes.h>
+
+
+
+#if !defined (DATABUFFER_CLIENT)
+    #define DATABUFFER_CLIENT       (void *)dataport_buf
+#endif
 
 
 
@@ -20,7 +20,7 @@ static Log_emitter_callback_t reg;
 int run()
 {
     // set up registered functions layer
-    Log_emitter_callback_ctor(&reg, CLIENT_WAIT, API_LOG_SERVER_EMIT);
+    Log_emitter_callback_ctor(&reg, logServer_ready_wait, API_LOG_SERVER_EMIT);
 
     // set up log filter layer
     Log_filter_ctor(&filter, Debug_LOG_LEVEL_DEBUG);
