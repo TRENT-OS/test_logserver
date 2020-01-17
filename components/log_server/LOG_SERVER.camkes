@@ -10,6 +10,7 @@ component LOG_SERVER {
     dataport Buf                     dataport_buf_app02;
     dataport Buf                     dataport_buf_app03;
     dataport Buf                     dataport_buf_app0x;
+    dataport Buf                     dataport_buf_app_filesystem;
 
     emits    DataAvailableEvent      logServer_ready;
 

@@ -5,9 +5,10 @@ import "../../interfaces/partition_manager.camkes";
 component PARTITION_MANAGER {
     provides  partition_manager_interface api_pm_component;
 
-    dataport  Buf                   chanMuxDataPort;
-    uses      ChanMuxInInf          ChanMuxRpc;
-    consumes  DataAvailableEvent    ChanMuxSignal_dataAvailable;
+    dataport  Buf                    chanMuxDataPort;
+    uses      ChanMuxInInf           ChanMuxRpc;
+    consumes  DataAvailableEvent     ChanMuxSignal_dataAvailable;
 
-    dataport  Buf                   pm_dataport_buf;
+    dataport  Buf                    pm_dataport_buf_log_server;
+    dataport  Buf                    pm_dataport_buf_app_filesystem;
 }

@@ -34,17 +34,6 @@
 
 
 //-----------------------------------------------------------------------------
-// Logs
-//-----------------------------------------------------------------------------
-#define Logs_Config_LOG_STRING_SIZE             128
-#define Logs_Config_INCLUDE_LEVEL_IN_MSG        1
-#define Logs_Config_SYSLOG_LEVEL                Log_TRACE
-
-
-
-
-
-//-----------------------------------------------------------------------------
 // COMMON
 //-----------------------------------------------------------------------------
 #define DATABUFFER_SIZE                         4096
@@ -78,12 +67,14 @@ typedef struct
 
 typedef struct
 {
-    Partition_config_t partition[1];
+    Partition_config_t partition[2];
 } Partition_cat_t;
 
 static const Partition_cat_t partition_conf = {
     .partition[0].partition_name = "",
-    .partition[0].partition_size = 0x200C800
+    .partition[0].partition_size = 0x200C800,   // FAT32
+    .partition[1].partition_name = "",
+    .partition[1].partition_size = 0x200800     // FAT16
 };
 
 // internal defines

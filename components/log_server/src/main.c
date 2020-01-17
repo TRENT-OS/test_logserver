@@ -11,22 +11,24 @@
 
 
 
-#define DATABUFFER_SERVER_01    (void *)dataport_buf_app01
-#define DATABUFFER_SERVER_02    (void *)dataport_buf_app02
-#define DATABUFFER_SERVER_03    (void *)dataport_buf_app03
-#define DATABUFFER_SERVER_0x    (void *)dataport_buf_app0x
+#define DATABUFFER_SERVER_01        (void *)dataport_buf_app01
+#define DATABUFFER_SERVER_02        (void *)dataport_buf_app02
+#define DATABUFFER_SERVER_03        (void *)dataport_buf_app03
+#define DATABUFFER_SERVER_0x        (void *)dataport_buf_app0x
+#define DATABUFFER_SERVER_APP_FS    (void *)dataport_buf_app_filesystem
 
 // log server id
-#define LOG_SERVER_ID           0
+#define LOG_SERVER_ID               0
 
 // client id's
-#define CLIENT_APP01_ID         10
-#define CLIENT_APP02_ID         200
-#define CLIENT_APP03_ID         3000
-#define CLIENT_APP0x_ID         40000
+#define CLIENT_APP01_ID             10
+#define CLIENT_APP02_ID             200
+#define CLIENT_APP03_ID             3000
+#define CLIENT_APP0x_ID             40000
+#define CLIENT_APP_FS_ID            40001
 
-#define PARTITION_ID            0
-#define LOG_FILENAME            "log.txt"
+#define PARTITION_ID                1
+#define LOG_FILENAME                "log.txt"
 
 
 
@@ -34,8 +36,8 @@ uint32_t API_LOG_SERVER_GET_SENDER_ID(void);
 
 
 
-static Log_filter_t filter_01, filter_02, filter_03, filter_0x;
-static Log_consumer_t log_consumer_01, log_consumer_02, log_consumer_03, log_consumer_0x;
+static Log_filter_t filter_01, filter_02, filter_03, filter_0x, filter_app_fs;
+static Log_consumer_t log_consumer_01, log_consumer_02, log_consumer_03, log_consumer_0x, log_consumer_app_fs;
 static Log_consumer_callback_t log_consumer_callback;
 static Log_format_t format;
 static Log_subject_t subject;
@@ -84,7 +86,7 @@ filesystem_init(void)
 
     if(partition_fs_create(
                 phandle,
-                FS_TYPE_FAT32,
+                FS_TYPE_FAT16,
                 pm_partition_data.partition_size,
                 0,  // default value: size of sector:   512
                 0,  // default value: size of cluster:  512
@@ -144,6 +146,7 @@ void log_server_interface__init(){
     Log_filter_ctor(&filter_02, Debug_LOG_LEVEL_DEBUG);
     Log_filter_ctor(&filter_03, Debug_LOG_LEVEL_DEBUG);
     Log_filter_ctor(&filter_0x, Debug_LOG_LEVEL_DEBUG);
+    Log_filter_ctor(&filter_app_fs, Debug_LOG_LEVEL_DEBUG);
     // Emitter configuration
     Log_filter_ctor(&filter_log_server, Debug_LOG_LEVEL_DEBUG);
 
@@ -155,6 +158,7 @@ void log_server_interface__init(){
     Log_consumer_ctor(&log_consumer_02, DATABUFFER_SERVER_02, &filter_02, &log_consumer_callback, &subject, &log_file, CLIENT_APP02_ID, NULL);
     Log_consumer_ctor(&log_consumer_03, DATABUFFER_SERVER_03, &filter_03, &log_consumer_callback, &subject, &log_file, CLIENT_APP03_ID, "APP03");
     Log_consumer_ctor(&log_consumer_0x, DATABUFFER_SERVER_0x, &filter_0x, &log_consumer_callback, &subject, &log_file, CLIENT_APP0x_ID, "APP0x");
+    Log_consumer_ctor(&log_consumer_app_fs, DATABUFFER_SERVER_APP_FS, &filter_app_fs, &log_consumer_callback, &subject, &log_file, CLIENT_APP_FS_ID, "APP_FS");
     // Emitter configuration
     Log_consumer_ctor(&log_consumer_log_server, buf_log_server, &filter_log_server, &log_consumer_callback, &subject_log_server, &log_file, LOG_SERVER_ID, "LOG-SERVER");
 
@@ -166,6 +170,7 @@ void log_server_interface__init(){
     Consumer_chain_append(&log_consumer_02);
     Consumer_chain_append(&log_consumer_03);
     Consumer_chain_append(&log_consumer_0x);
+    Consumer_chain_append(&log_consumer_app_fs);
     // Emitter configuration
     Consumer_chain_append(&log_consumer_log_server);
 
@@ -192,7 +197,7 @@ run()
     while (1){
         api_time_server_sleep(1000);
 
-        if(finish == 20)
+        if(finish == 50)
             break;
 
         finish++;

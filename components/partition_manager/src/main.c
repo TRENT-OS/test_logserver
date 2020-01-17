@@ -25,11 +25,14 @@
 
 
 
+static ChanMuxClient chanmux;
+static ProxyNVM proxy_NVM;
+static char proxy_NVM_message[PAGE_SIZE] = {0};
+
+
+
 void api_pm_component__init(void){
     seos_pm_result_t pm_stat;
-    static ChanMuxClient chanmux;
-    static ProxyNVM proxy_NVM;
-    static char proxy_NVM_message[PAGE_SIZE] = {0};
 
     if (!ChanMuxClient_ctor(&chanmux, GET_PROPERTY_CHANMUX_CHANNEL, GET_PROPERTY_CHANMUX_DATAPORT_BUFFER))
     {

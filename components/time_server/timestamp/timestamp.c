@@ -156,6 +156,12 @@ Timestamp_get_time(Timestamp_t *t_stamp, uint8_t hours, Time_t *tm)
     for (month = 11; day < (int64_t) ip[month]; --month)
         continue;
 
+    if(IS_LEAP(year) == 0){
+        if(day < ip[2]){
+            day++;
+        }
+    }
+
     day -= ip[month];
 
     tm->month = (uint8_t)month + 1;

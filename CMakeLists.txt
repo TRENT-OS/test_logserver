@@ -96,6 +96,27 @@ DeclareCAmkESComponent(APP0x
         seos_logger
 )
 
+# app_filesystem
+DeclareCAmkESComponent(APP_FILESYSTEM
+    SOURCES
+        "components/app_filesystem/src/main.c"
+    C_FLAGS
+        # filesystem
+        -DSEOS_FS_BUILD_AS_LIB_BASIC_HANDLE
+        # partition manager
+        -DSEOS_PARTITION_MANAGER_BUILD_AS_COMPONENT
+        -Wall
+        -Werror
+    LIBS
+        seos_core_api
+        seos_libs
+        seos_partition_manager_api
+        seos_filesystem_core
+        seos_filesystem_fat
+        seos_filesystem_spiffs
+        seos_logger
+)
+
 # PARTITION_MANAGER #
 DeclareCAmkESComponent(PARTITION_MANAGER
     SOURCES

@@ -22,7 +22,7 @@ int run()
     // wait until log server is finished
     logServer_finish_wait();
 
-    char buf[DATABUFFER_SIZE];
+    char buf[DATABUFFER_SIZE * 2];
     bool retval;
 
     // set up log file client callback

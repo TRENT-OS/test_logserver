@@ -7,6 +7,7 @@ import "components/app01/APP01.camkes";
 import "components/app02/APP02.camkes";
 import "components/app03/APP03.camkes";
 import "components/app0x/APP0x.camkes";
+import "components/app_filesystem/APP_FILESYSTEM.camkes";
 import "components/partition_manager/PARTITION_MANAGER.camkes";
 import "components/ChanMux/ChanMux.camkes";
 import "components/Uart/Uart.camkes";
@@ -21,6 +22,7 @@ assembly {
         component APP02             app02;
         component APP03             app03;
         component APP0x             app0x;
+        component APP_FILESYSTEM    app_filesystem;
         component PARTITION_MANAGER partition_manager;
         component ChanMux	    chanMux;
         component UartDev	    uartDev;
@@ -45,10 +47,12 @@ assembly {
         connection  seL4RPCCall         conn_rpc_logServer2app02(from app02.log_server_interface, to log_server.log_server_interface);
         connection  seL4RPCCall         conn_rpc_logServer2app03(from app03.log_server_interface, to log_server.log_server_interface);
         connection  seL4RPCCall         conn_rpc_logServer2app0x(from app0x.log_server_interface, to log_server.log_server_interface);
+        connection  seL4RPCCall         conn_rpc_logServer2app_filesystem(from app_filesystem.log_server_interface, to log_server.log_server_interface);
 
         connection  seL4Notification    conn_dataAvailable_logServer2app01(from log_server.logServer_ready, to app01.logServer_ready);
         connection  seL4Notification    conn_dataAvailable_logServer2app02(from log_server.logServer_ready, to app02.logServer_ready);
         connection  seL4Notification    conn_dataAvailable_logServer2app03(from log_server.logServer_ready, to app03.logServer_ready);
+        connection  seL4Notification    conn_dataAvailable_logServer2app_filesystem(from log_server.logServer_ready, to app_filesystem.logServer_ready);
         // seL4Notification unused in application app0x
         connection  seL4Notification    conn_dataAvailable_logServer2app0x_finish(from log_server.logServer_finish, to app0x.logServer_finish);
 
@@ -56,12 +60,16 @@ assembly {
         connection  seL4SharedData      conn_dataConnection_app02(from app02.dataport_buf, to log_server.dataport_buf_app02);
         connection  seL4SharedData      conn_dataConnection_app03(from app03.dataport_buf, to log_server.dataport_buf_app03);
         connection  seL4SharedData      conn_dataConnection_app0x(from app0x.dataport_buf, to log_server.dataport_buf_app0x);
+        connection  seL4SharedData      conn_dataConnection_app_filesystem(from app_filesystem.dataport_buf, to log_server.dataport_buf_app_filesystem);
 
         //----------------------------------------------------------------------
         // PARTITION MANAGER connections
         //----------------------------------------------------------------------
         connection  seL4RPCCall     interface_partition_manager2log_server(from log_server.api_pm_component, to partition_manager.api_pm_component);
-        connection  seL4SharedData  dataport_interface_partition_manager2log_server(from log_server.pm_dataport_buf, to partition_manager.pm_dataport_buf);
+        connection  seL4SharedData  dataport_interface_partition_manager2log_server(from log_server.pm_dataport_buf, to partition_manager.pm_dataport_buf_log_server);
+
+        connection  seL4RPCCall     interface_partition_manager2app_filesystem(from app_filesystem.api_pm_component, to partition_manager.api_pm_component);
+        connection  seL4SharedData  dataport_interface_partition_manager2app_filesystem(from app_filesystem.pm_dataport_buf, to partition_manager.pm_dataport_buf_app_filesystem);
 
         //----------------------------------------------------------------------
         // ChanMux, UART connections
@@ -83,6 +91,7 @@ assembly {
         app02.log_server_interface_attributes = 200;
         app03.log_server_interface_attributes = 3000;
         app0x.log_server_interface_attributes = 40000;
+        app_filesystem.log_server_interface_attributes = 40001;
 
         // timer
         timebase.reg_paddr = 0xF8001000;    // paddr of mmio registers
