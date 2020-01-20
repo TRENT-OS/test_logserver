@@ -78,7 +78,11 @@ filesystem_init(void)
         return false;
     }
 
+#if defined (SEOS_FS_BUILD_AS_LIB)
+    if( (phandle = partition_open(pm_partition_data.partition_id)) == NULL)
+#else
     if( (phandle = partition_open(pm_partition_data.partition_id)) < 0)
+#endif
     {
         printf("Fail to open partition: %d!\n", pm_partition_data.partition_id);
         return false;
