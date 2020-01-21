@@ -18,7 +18,7 @@
 
 
 
-#define IS_LEAP(year)           ((year) % 4 == 0 && ((year) % 100 != 0 || (year) % 400 == 0))
+#define IS_LEAP(year)           (((((year) % 4) == 0) && (((year) % 100) != 0)) || (((year) % 400) == 0))
 #define DIV(a, b)               ((a) / (b) - ((a) % (b) < 0))
 #define LEAPS_THRU_END_OF(y)    (DIV (y, 4) - DIV (y, 100) + DIV (y, 400))
 
@@ -136,7 +136,7 @@ Timestamp_get_time(Timestamp_t *t_stamp, uint8_t hours, Time_t *tm)
     tm->sec = tmp % 60;
 
     // first year was 1970
-    year = (uint16_t)(START_YEAR + day / 365 - (day % 365 > 0));
+    year = (uint16_t)(START_YEAR + day / 365 - (day % 365 <= 0));
 
     yy = year;
     while(day < 0 || day >= (IS_LEAP(year) ? 366 : 365)){
@@ -156,7 +156,7 @@ Timestamp_get_time(Timestamp_t *t_stamp, uint8_t hours, Time_t *tm)
     for (month = 11; day < (int64_t) ip[month]; --month)
         continue;
 
-    if(IS_LEAP(year) == 0){
+    if(IS_LEAP(year) == 1){
         if(day < ip[2]){
             day++;
         }
