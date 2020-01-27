@@ -91,6 +91,8 @@ static const Partition_cat_t partition_conf = {
 #define GET_PROPERTY_PARTITION_NAME(x)          GET_PROPERTY_PARTITION_NAME_AT(x)
 #define GET_PROPERTY_PARTITION_SIZE(x)          GET_PROPERTY_PARTITION_SIZE_AT(x)
 
+#define GET_PROPERTY_PM_DATAPORT_BUFFER         (void *)pm_dataport_buf
+
 
 //-----------------------------------------------------------------------------
 // LOGGER

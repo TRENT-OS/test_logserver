@@ -28,7 +28,8 @@
 #define CLIENT_APP_FS_ID            40001
 
 #define PARTITION_ID                1
-#define LOG_FILENAME                "log.txt"
+#define LOG_FILENAME_01             "log_01.txt"
+#define LOG_FILENAME_02             "log_02.txt"
 
 
 
@@ -42,7 +43,7 @@ static Log_consumer_callback_t log_consumer_callback;
 static Log_format_t format;
 static Log_subject_t subject;
 static Log_output_t filesystem, console;
-static Log_file_t log_file;
+static Log_file_t log_file_01, log_file_02;
 static Log_emitter_callback_t emitter_callback;
 // Emitter configuration
 static Log_filter_t filter_log_server;
@@ -128,10 +129,11 @@ void log_server_interface__init(){
     Log_subject_ctor(&subject_log_server);
 
     // set up log file
-    Log_file_ctor(&log_file, PARTITION_ID, LOG_FILENAME);
+    Log_file_ctor(&log_file_01, PARTITION_ID, LOG_FILENAME_01);
+    Log_file_ctor(&log_file_02, PARTITION_ID, LOG_FILENAME_02);
 
     // set up backend
-    Log_output_filesystem_ctor(&filesystem, &format, &log_file.log_file_info);
+    Log_output_filesystem_ctor(&filesystem, &format);
     Log_output_console_ctor(&console, &format);
     // Emitter configuration
     Log_output_console_ctor(&console_log_server, &format);
@@ -158,13 +160,13 @@ void log_server_interface__init(){
     Log_consumer_callback_ctor(&log_consumer_callback, logServer_ready_emit, API_LOG_SERVER_GET_SENDER_ID, api_time_server_get_timestamp);
 
     // set up log consumer layer
-    Log_consumer_ctor(&log_consumer_01, DATABUFFER_SERVER_01, &filter_01, &log_consumer_callback, &subject, &log_file, CLIENT_APP01_ID, "APP01");
-    Log_consumer_ctor(&log_consumer_02, DATABUFFER_SERVER_02, &filter_02, &log_consumer_callback, &subject, &log_file, CLIENT_APP02_ID, NULL);
-    Log_consumer_ctor(&log_consumer_03, DATABUFFER_SERVER_03, &filter_03, &log_consumer_callback, &subject, &log_file, CLIENT_APP03_ID, "APP03");
-    Log_consumer_ctor(&log_consumer_0x, DATABUFFER_SERVER_0x, &filter_0x, &log_consumer_callback, &subject, &log_file, CLIENT_APP0x_ID, "APP0x");
-    Log_consumer_ctor(&log_consumer_app_fs, DATABUFFER_SERVER_APP_FS, &filter_app_fs, &log_consumer_callback, &subject, &log_file, CLIENT_APP_FS_ID, "APP_FS");
+    Log_consumer_ctor(&log_consumer_01, DATABUFFER_SERVER_01, &filter_01, &log_consumer_callback, &subject, &log_file_01, CLIENT_APP01_ID, "APP01");
+    Log_consumer_ctor(&log_consumer_02, DATABUFFER_SERVER_02, &filter_02, &log_consumer_callback, &subject, NULL, CLIENT_APP02_ID, NULL);
+    Log_consumer_ctor(&log_consumer_03, DATABUFFER_SERVER_03, &filter_03, &log_consumer_callback, &subject, &log_file_02, CLIENT_APP03_ID, "APP03");
+    Log_consumer_ctor(&log_consumer_0x, DATABUFFER_SERVER_0x, &filter_0x, &log_consumer_callback, &subject, NULL, CLIENT_APP0x_ID, "APP0x");
+    Log_consumer_ctor(&log_consumer_app_fs, DATABUFFER_SERVER_APP_FS, &filter_app_fs, &log_consumer_callback, &subject, &log_file_02, CLIENT_APP_FS_ID, "APP_FS");
     // Emitter configuration
-    Log_consumer_ctor(&log_consumer_log_server, buf_log_server, &filter_log_server, &log_consumer_callback, &subject_log_server, &log_file, LOG_SERVER_ID, "LOG-SERVER");
+    Log_consumer_ctor(&log_consumer_log_server, buf_log_server, &filter_log_server, &log_consumer_callback, &subject_log_server, NULL, LOG_SERVER_ID, "LOG-SERVER");
 
     // Emitter configuration: set up log emitter layer
     get_instance_Log_emitter(buf_log_server, &filter_log_server, &emitter_callback);
@@ -185,7 +187,8 @@ void log_server_interface__init(){
     }
 
     // create log file
-    Log_file_create_log_file(&log_file);
+    Log_file_create_log_file(&log_file_01);
+    Log_file_create_log_file(&log_file_02);
 
     // start polling
     Consumer_chain_poll();

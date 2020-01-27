@@ -24,7 +24,7 @@ static uint64_t _timestamp_relative;
 
 
 
-// foreward declaration
+// forward declaration
 static void _set_timestamp_relative(void);
 
 

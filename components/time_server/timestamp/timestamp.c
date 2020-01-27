@@ -46,7 +46,7 @@
 
 
 
-// foreward devlaration
+// forward devlaration
 static bool _get_number(const char *string, uint8_t *val);
 static bool _fill_date(const char *string, Time_t *tm, const char *delimiter);
 static bool _fill_time(const char *string, Time_t *tm, const char *delimiter);
