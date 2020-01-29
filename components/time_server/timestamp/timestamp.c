@@ -5,12 +5,6 @@
 
 
 
-#define ASSERT_SELF(self)               \
-    if(self == NULL)                    \
-        nullptr = true
-
-
-
 #define SEC_PER_MIN             60
 #define SEC_PER_HOUR            (SEC_PER_MIN * SEC_PER_MIN)
 #define SEC_PER_DAY             (SEC_PER_HOUR * 24)
@@ -175,11 +169,8 @@ Timestamp_get_time(Timestamp_t *t_stamp, uint8_t hours, Time_t *tm)
 bool
 Timestamp_get_timestamp(Time_t *tm, Timestamp_t *t_stamp)
 {
-    bool nullptr = false;
-
-    ASSERT_SELF(this);
-
-    if(nullptr){
+    if(NULL == this)
+    {
         // Debug_printf
         return false;
     }
@@ -206,11 +197,8 @@ Timestamp_get_timestamp(Time_t *tm, Timestamp_t *t_stamp)
 bool
 Timestamp_create_timestamp(const char *date, const char *time)
 {
-    bool nullptr = false;
-
-    ASSERT_SELF(this);
-
-    if(nullptr){
+    if(NULL == this)
+    {
         // Debug_printf
         return false;
     }
