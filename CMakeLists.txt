@@ -24,12 +24,12 @@ DeclareCAmkESComponent(LOG_SERVER
         -DSEOS_PARTITION_MANAGER_BUILD_AS_COMPONENT
     LIBS
         seos_core_api
+        seos_log_server_backend_filesystem
         seos_libs
         seos_partition_manager_api
         seos_filesystem_core
         seos_filesystem_fat
         seos_filesystem_spiffs
-        seos_log_server
 )
 
 # time server

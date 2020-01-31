@@ -1,6 +1,6 @@
 #include "LibDebug/Debug.h"
 
-#include "seos_log_server.h"
+#include "seos_log_server_backend_filesystem.h"
 
 #include "seos_fs.h"
 #include "seos_pm.h"
