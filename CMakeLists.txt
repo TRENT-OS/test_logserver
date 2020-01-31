@@ -20,9 +20,7 @@ DeclareCAmkESComponent(LOG_SERVER
     C_FLAGS
         -Wall
         -Werror
-        # filesystem
         -DSEOS_FS_BUILD_AS_LIB_BASIC_HANDLE
-        # partition manager
         -DSEOS_PARTITION_MANAGER_BUILD_AS_COMPONENT
     LIBS
         seos_core_api
@@ -56,8 +54,9 @@ DeclareCAmkESComponent(APP01
         -Wall
         -Werror
     LIBS
-        seos_libs
+        seos_core_api
         seos_logger
+        seos_libs
 )
 
 # app02
@@ -68,8 +67,9 @@ DeclareCAmkESComponent(APP02
         -Wall
         -Werror
     LIBS
-        seos_libs
+        seos_core_api
         seos_logger
+        seos_libs
 )
 
 # app03
@@ -80,8 +80,9 @@ DeclareCAmkESComponent(APP03
         -Wall
         -Werror
     LIBS
-        seos_libs
+        seos_core_api
         seos_logger
+        seos_libs
 )
 
 # app0x
@@ -92,8 +93,9 @@ DeclareCAmkESComponent(APP0x
         -Wall
         -Werror
     LIBS
-        seos_libs
+        seos_core_api
         seos_logger
+        seos_libs
 )
 
 # app_filesystem
@@ -101,23 +103,21 @@ DeclareCAmkESComponent(APP_FILESYSTEM
     SOURCES
         "components/app_filesystem/src/main.c"
     C_FLAGS
-        # filesystem
         -DSEOS_FS_BUILD_AS_LIB_BASIC_HANDLE
-        # partition manager
         -DSEOS_PARTITION_MANAGER_BUILD_AS_COMPONENT
         -Wall
         -Werror
     LIBS
         seos_core_api
+        seos_logger
         seos_libs
         seos_partition_manager_api
         seos_filesystem_core
         seos_filesystem_fat
         seos_filesystem_spiffs
-        seos_logger
 )
 
-# PARTITION_MANAGER #
+# PARTITION_MANAGER
 DeclareCAmkESComponent(PARTITION_MANAGER
     SOURCES
         "components/partition_manager/src/main.c"
@@ -126,12 +126,13 @@ DeclareCAmkESComponent(PARTITION_MANAGER
         -Werror
         -DSEOS_PARTITION_MANAGER_BUILD_AS_COMPONENT
     LIBS
+        seos_core_api
+        seos_logger
         seos_libs
         seos_partition_manager
-        seos_logger
 )
 
-# UartDrv #
+# UartDrv
 DeclareCAmkESComponent(UartDrv
     SOURCES
         "components/Uart/src/UartDrv.c"
@@ -140,10 +141,12 @@ DeclareCAmkESComponent(UartDrv
         -Wall
         -Werror
     LIBS
+        seos_core_api
         seos_logger
+        seos_libs
 )
 
-# ChanMux #
+# ChanMux
 DeclareCAmkESComponent(ChanMux
     SOURCES
         "components/ChanMux/src/instance/ChanMux_Instance.c"
@@ -152,8 +155,8 @@ DeclareCAmkESComponent(ChanMux
         -Werror
     LIBS
         seos_core_api
-        seos_libs
         seos_logger
+        seos_libs
 )
 
 DeclareCAmkESRootserver(demo_logserver.camkes)
