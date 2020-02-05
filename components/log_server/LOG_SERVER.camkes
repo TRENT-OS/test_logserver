@@ -6,9 +6,28 @@ import "../../interfaces/partition_manager.camkes";
 component LOG_SERVER {
     control;
 
-    dataport Buf                     dataport_buf_app01;
-    dataport Buf                     dataport_buf_app02;
-    dataport Buf                     dataport_buf_app03;
+    dataport Buf                     dataport_buf_lvl_none;
+    dataport Buf                     dataport_buf_lvl_assert;
+    dataport Buf                     dataport_buf_lvl_fatal;
+    dataport Buf                     dataport_buf_lvl_error;
+    dataport Buf                     dataport_buf_lvl_warning;
+    dataport Buf                     dataport_buf_lvl_info;
+    dataport Buf                     dataport_buf_lvl_debug;
+    dataport Buf                     dataport_buf_lvl_trace;
+    dataport Buf                     dataport_buf_lvl_custom;
+
+    dataport Buf                     dataport_buf_no_filters;
+
+    dataport Buf                     dataport_buf_cl_filter_none;
+    dataport Buf                     dataport_buf_cl_filter_assert;
+    dataport Buf                     dataport_buf_cl_filter_fatal;
+    dataport Buf                     dataport_buf_cl_filter_error;
+    dataport Buf                     dataport_buf_cl_filter_warning;
+    dataport Buf                     dataport_buf_cl_filter_info;
+    dataport Buf                     dataport_buf_cl_filter_debug;
+    dataport Buf                     dataport_buf_cl_filter_trace;
+    dataport Buf                     dataport_buf_cl_filter_custom;
+
     dataport Buf                     dataport_buf_app0x;
     dataport Buf                     dataport_buf_app_filesystem;
 

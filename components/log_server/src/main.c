@@ -1,58 +1,136 @@
 #include "LibDebug/Debug.h"
 
 #include "seos_log_server_backend_filesystem.h"
+#include "custom_format.h"
 
 #include "seos_fs.h"
 #include "seos_pm.h"
 
 #include <stdio.h>
-
 #include <camkes.h>
 
-
-
-#define DATABUFFER_SERVER_01        (void *)dataport_buf_app01
-#define DATABUFFER_SERVER_02        (void *)dataport_buf_app02
-#define DATABUFFER_SERVER_03        (void *)dataport_buf_app03
-#define DATABUFFER_SERVER_0x        (void *)dataport_buf_app0x
-#define DATABUFFER_SERVER_APP_FS    (void *)dataport_buf_app_filesystem
-
 // log server id
-#define LOG_SERVER_ID               0
+#define LOG_SERVER_ID  0u
 
-// client id's
-#define CLIENT_APP01_ID             10
-#define CLIENT_APP02_ID             200
-#define CLIENT_APP03_ID             3000
-#define CLIENT_APP0x_ID             40000
-#define CLIENT_APP_FS_ID            40001
+#define NO_FILTER_ID_FIRST 0xCAFE
+#define NO_FILTER_ID_LAST  (NO_FILTER_ID_FIRST + Debug_LOG_LEVEL_CUSTOM)
 
-#define PARTITION_ID                1
-#define LOG_FILENAME_01             "log_01.txt"
-#define LOG_FILENAME_02             "log_02.txt"
+static const uint8_t  PARTITION_ID  = 1u;
 
+#define LOG_FILENAME_01 "log_01.txt"
+#define LOG_FILENAME_02 "log_02.txt"
 
+static Log_file_t log_file_01, log_file_02;
+
+static char buf_log_server[DATABUFFER_SIZE];
+
+typedef struct ClientConfig
+{
+    Log_consumer_t consumer;
+    void*          buffer;
+    Log_filter_t   log_filter;
+    uint8_t        log_level;
+    Log_file_t*    log_file;
+    uint32_t       id;
+    const char*    name;
+} ClientConfig_t;
+
+static ClientConfig_t clientConfigs[] =
+{
+    { .name = "LOG-SERVER",   .log_level = Debug_LOG_LEVEL_DEBUG,   .log_file = NULL,         .id = LOG_SERVER_ID },
+
+    { .name = "LVL_NONE",     .log_level = Debug_LOG_LEVEL_NONE,    .log_file = NULL,         .id = 10u },
+    { .name = NULL,           .log_level = Debug_LOG_LEVEL_ASSERT,  .log_file = NULL,         .id = 200u },
+    { .name = "LVL_FATAL",    .log_level = Debug_LOG_LEVEL_FATAL,   .log_file = &log_file_01, .id = 3000u },
+    { .name = "LVL_ERROR",    .log_level = Debug_LOG_LEVEL_ERROR,   .log_file = &log_file_02, .id = 40000u },
+    { .name = "LVL_WARNING",  .log_level = Debug_LOG_LEVEL_WARNING, .log_file = NULL,         .id = 500000u },
+    { .name = "LVL_INFO",     .log_level = Debug_LOG_LEVEL_INFO,    .log_file = NULL,         .id = 6000000u },
+    { .name = "LVL_DEBUG",    .log_level = Debug_LOG_LEVEL_DEBUG,   .log_file = NULL,         .id = 0xFFFFu - 1 },
+    { .name = "LVL_TRACE",    .log_level = Debug_LOG_LEVEL_TRACE,   .log_file = NULL,         .id = 0xFFFFu },
+    { .name = "LVL_CUSTOM",   .log_level = Debug_LOG_LEVEL_CUSTOM,  .log_file = NULL,         .id = 0xFFFFFFFu - 1 },
+
+    { .name = "FILTER_NULL",                                        .log_file = NULL,         .id = NO_FILTER_ID_FIRST },
+
+    { .name = "CL_FILTER_NONE",                                     .log_file = NULL,         .id = NO_FILTER_ID_FIRST + 1 },
+    { .name = "CL_FILTER_ASSERT",                                   .log_file = NULL,         .id = NO_FILTER_ID_FIRST + 2 },
+    { .name = "CL_FILTER_FATAL",                                    .log_file = NULL,         .id = NO_FILTER_ID_FIRST + 3 },
+    { .name = "CL_FILTER_ERROR",                                    .log_file = NULL,         .id = NO_FILTER_ID_FIRST + 4 },
+    { .name = "CL_FILTER_WARNIN",                                   .log_file = NULL,         .id = NO_FILTER_ID_FIRST + 5 },
+    { .name = "CL_FILTER_INFO",                                     .log_file = NULL,         .id = NO_FILTER_ID_FIRST + 6 },
+    { .name = "CL_FILTER_DEBUG",                                    .log_file = NULL,         .id = NO_FILTER_ID_FIRST + 7 },
+    { .name = "CL_FILTER_TRACE",                                    .log_file = NULL,         .id = NO_FILTER_ID_FIRST + 8 },
+    { .name = "CL_FILTER_CUSTOM",                                   .log_file = NULL,         .id = NO_FILTER_ID_LAST },
+
+    { .name = "APP0x",        .log_level = Debug_LOG_LEVEL_DEBUG,   .log_file = NULL,         .id = 40001u },
+    { .name = "APP_FS",       .log_level = Debug_LOG_LEVEL_DEBUG,   .log_file = &log_file_02, .id = 40002u }
+};
+
+static const size_t CLIENT_CONFIGS_COUNT = sizeof(clientConfigs)
+                                         / sizeof(*clientConfigs);
 
 uint32_t API_LOG_SERVER_GET_SENDER_ID(void);
 
+static Log_consumer_callback_t  log_consumer_callback;
+static Log_format_t             format;
+static Log_subject_t            subject;
+static Log_output_t             filesystem, console;
+static Log_emitter_callback_t   emitter_callback;
 
-
-static Log_filter_t filter_01, filter_02, filter_03, filter_0x, filter_app_fs;
-static Log_consumer_t log_consumer_01, log_consumer_02, log_consumer_03, log_consumer_0x, log_consumer_app_fs;
-static Log_consumer_callback_t log_consumer_callback;
-static Log_format_t format;
-static Log_subject_t subject;
-static Log_output_t filesystem, console;
-static Log_file_t log_file_01, log_file_02;
-static Log_emitter_callback_t emitter_callback;
 // Emitter configuration
-static Log_filter_t filter_log_server;
-static Log_consumer_t log_consumer_log_server;
-static Log_subject_t subject_log_server;
-static Log_output_t console_log_server;
-static char buf_log_server[DATABUFFER_SIZE];
+static Log_subject_t  subject_log_server;
+static Log_output_t   console_log_server;
 
+static void mapClientConfigsDataPorts();
+static void initLogFiles();
+static void initLogTargetsAndSubjects();
+static void initClients();
+static bool filesystem_init(void);
 
+#define LOG_SUCCESS() Debug_LOG_DEBUG("%s => SUCCESS!", __func__)
+
+void log_server_interface__init()
+{
+    // set up consumer chain
+    get_instance_Consumer_chain();
+
+    initLogTargetsAndSubjects();
+    initClients();
+
+    // create filesystem
+    if(!filesystem_init())
+    {
+        printf("Fail to init filesystem!\n");
+        return;
+    }
+
+    initLogFiles();
+
+    // start polling
+    Consumer_chain_poll();
+
+    LOG_SUCCESS();
+}
+
+int
+run()
+{
+    const int demo_time_sec = 75;
+    const int one_sec       = 1000;
+
+    for(
+        int time_passed_sec = 0;
+        time_passed_sec < demo_time_sec;
+        ++time_passed_sec)
+    {
+        api_time_server_sleep(one_sec);
+    }
+
+    printf("logServer finish\n");
+
+    logServer_finish_emit();
+
+    return 0;
+}
 
 static bool
 filesystem_init(void)
@@ -67,9 +145,12 @@ filesystem_init(void)
         return false;
     }
 
-    if(partition_manager_get_info_partition(PARTITION_ID, &pm_partition_data) != SEOS_PM_SUCCESS)
+    if(partition_manager_get_info_partition(PARTITION_ID, &pm_partition_data)
+        != SEOS_PM_SUCCESS)
     {
-        printf("Fail to get partition info: %d!\n", pm_partition_data.partition_id);
+        printf(
+            "Fail to get partition info: %d!\n",
+            pm_partition_data.partition_id);
         return false;
     }
 
@@ -87,129 +168,153 @@ filesystem_init(void)
     }
 
     if(partition_fs_create(
-                phandle,
-                FS_TYPE_FAT16,
-                pm_partition_data.partition_size,
-                0,  // default value: size of sector:   512
-                0,  // default value: size of cluster:  512
-                0,  // default value: reserved sectors count: FAT12/FAT16 = 1; FAT32 = 3
-                0,  // default value: count file/dir entries: FAT12/FAT16 = 16; FAT32 = 0
-                0,  // default value: count header sectors: 512
-                FS_PARTITION_OVERWRITE_CREATE)
+            phandle,
+            FS_TYPE_FAT16,
+            pm_partition_data.partition_size,
+            0,  // default value: size of sector:   512
+            0,  // default value: size of cluster:  512
+            0,  // default value: reserved sectors count: FAT12/FAT16 = 1; FAT32 = 3
+            0,  // default value: count file/dir entries: FAT12/FAT16 = 16; FAT32 = 0
+            0,  // default value: count header sectors: 512
+            FS_PARTITION_OVERWRITE_CREATE)
         != SEOS_FS_SUCCESS)
     {
-        printf("Fail to create filesystem on partition: %d!\n", pm_partition_data.partition_id);
+        printf(
+            "Fail to create filesystem on partition: %d!\n",
+            pm_partition_data.partition_id);
         return false;
     }
 
     if(partition_close(phandle) != SEOS_FS_SUCCESS)
     {
-        printf("Fail to close partition: %d!\n", pm_partition_data.partition_id);
+        printf("Fail to close partition: %d!\n",
+        pm_partition_data.partition_id);
         return false;
     }
+
+    LOG_SUCCESS();
 
     return true;
 }
 
+/** Unfortunately needs to be evaluated at runtime i.e. they are not defined at
+ *  compile time. */
+void mapClientConfigsDataPorts()
+{
+    ClientConfig_t* clientConfig = &clientConfigs[0];
 
+    (clientConfig)++->buffer = buf_log_server;
 
-void log_server_interface__init(){
-    // set up consumer chain
-    get_instance_Consumer_chain();
+    (clientConfig)++->buffer = dataport_buf_lvl_none;
+    (clientConfig)++->buffer = dataport_buf_lvl_assert;
+    (clientConfig)++->buffer = dataport_buf_lvl_fatal;
+    (clientConfig)++->buffer = dataport_buf_lvl_error;
+    (clientConfig)++->buffer = dataport_buf_lvl_warning;
+    (clientConfig)++->buffer = dataport_buf_lvl_info;
+    (clientConfig)++->buffer = dataport_buf_lvl_debug;
+    (clientConfig)++->buffer = dataport_buf_lvl_trace;
+    (clientConfig)++->buffer = dataport_buf_lvl_custom;
 
-    // set up log format layer
+    (clientConfig)++->buffer = dataport_buf_no_filters;
+
+    (clientConfig)++->buffer = dataport_buf_cl_filter_none;
+    (clientConfig)++->buffer = dataport_buf_cl_filter_assert;
+    (clientConfig)++->buffer = dataport_buf_cl_filter_fatal;
+    (clientConfig)++->buffer = dataport_buf_cl_filter_error;
+    (clientConfig)++->buffer = dataport_buf_cl_filter_warning;
+    (clientConfig)++->buffer = dataport_buf_cl_filter_info;
+    (clientConfig)++->buffer = dataport_buf_cl_filter_debug;
+    (clientConfig)++->buffer = dataport_buf_cl_filter_trace;
+    (clientConfig)++->buffer = dataport_buf_cl_filter_custom;
+
+    (clientConfig)++->buffer = dataport_buf_app0x;
+    (clientConfig)++->buffer = dataport_buf_app_filesystem;
+
+    // If the manipulated pointer does not point to the end of clientConfigs
+    // array, then data ports got misconfigured.
+    assert(clientConfig == &clientConfigs[CLIENT_CONFIGS_COUNT]);
+}
+
+void initLogFiles()
+{
+    Log_file_ctor(&log_file_01, PARTITION_ID, LOG_FILENAME_01);
+    Log_file_ctor(&log_file_02, PARTITION_ID, LOG_FILENAME_02);
+    Log_file_create_log_file(&log_file_01);
+    Log_file_create_log_file(&log_file_02);
+}
+
+void initLogTargetsAndSubjects()
+{
     Log_format_ctor(&format);
 
     // register objects to observe
     Log_subject_ctor(&subject);
+
     // Emitter configuration
     Log_subject_ctor(&subject_log_server);
-
-    // set up log file
-    Log_file_ctor(&log_file_01, PARTITION_ID, LOG_FILENAME_01);
-    Log_file_ctor(&log_file_02, PARTITION_ID, LOG_FILENAME_02);
 
     // set up backend
     Log_output_filesystem_ctor(&filesystem, &format);
     Log_output_console_ctor(&console, &format);
+
     // Emitter configuration
-    Log_output_console_ctor(&console_log_server, &format);
+    Log_output_console_ctor(&console_log_server, &custom_format);
 
     // attach observed object to subject
     Log_subject_attach((Subject_t *)&subject, (Observer_t *)&filesystem);
     Log_subject_attach((Subject_t *)&subject, (Observer_t *)&console);
     // Emitter configuration
-    Log_subject_attach((Subject_t *)&subject_log_server, (Observer_t *)&console_log_server);
+    Log_subject_attach(
+        (Subject_t *)&subject_log_server,
+        (Observer_t *)&console_log_server);
 
     // Emitter configuration: set up registered functions layer
     Log_emitter_callback_ctor(&emitter_callback, NULL, API_LOG_SERVER_EMIT);
-
-    // set up log filter layer
-    Log_filter_ctor(&filter_01, Debug_LOG_LEVEL_DEBUG);
-    Log_filter_ctor(&filter_02, Debug_LOG_LEVEL_DEBUG);
-    Log_filter_ctor(&filter_03, Debug_LOG_LEVEL_DEBUG);
-    Log_filter_ctor(&filter_0x, Debug_LOG_LEVEL_DEBUG);
-    Log_filter_ctor(&filter_app_fs, Debug_LOG_LEVEL_DEBUG);
-    // Emitter configuration
-    Log_filter_ctor(&filter_log_server, Debug_LOG_LEVEL_DEBUG);
-
-    // set up registered functions layer
-    Log_consumer_callback_ctor(&log_consumer_callback, logServer_ready_emit, API_LOG_SERVER_GET_SENDER_ID, api_time_server_get_timestamp);
-
-    // set up log consumer layer
-    Log_consumer_ctor(&log_consumer_01, DATABUFFER_SERVER_01, &filter_01, &log_consumer_callback, &subject, &log_file_01, CLIENT_APP01_ID, "APP01");
-    Log_consumer_ctor(&log_consumer_02, DATABUFFER_SERVER_02, &filter_02, &log_consumer_callback, &subject, NULL, CLIENT_APP02_ID, NULL);
-    Log_consumer_ctor(&log_consumer_03, DATABUFFER_SERVER_03, &filter_03, &log_consumer_callback, &subject, &log_file_02, CLIENT_APP03_ID, "APP03");
-    Log_consumer_ctor(&log_consumer_0x, DATABUFFER_SERVER_0x, &filter_0x, &log_consumer_callback, &subject, NULL, CLIENT_APP0x_ID, "APP0x");
-    Log_consumer_ctor(&log_consumer_app_fs, DATABUFFER_SERVER_APP_FS, &filter_app_fs, &log_consumer_callback, &subject, &log_file_02, CLIENT_APP_FS_ID, "APP_FS");
-    // Emitter configuration
-    Log_consumer_ctor(&log_consumer_log_server, buf_log_server, &filter_log_server, &log_consumer_callback, &subject_log_server, NULL, LOG_SERVER_ID, "LOG-SERVER");
-
-    // Emitter configuration: set up log emitter layer
-    get_instance_Log_emitter(buf_log_server, &filter_log_server, &emitter_callback);
-
-    // set up consumer chain layer
-    Consumer_chain_append(&log_consumer_01);
-    Consumer_chain_append(&log_consumer_02);
-    Consumer_chain_append(&log_consumer_03);
-    Consumer_chain_append(&log_consumer_0x);
-    Consumer_chain_append(&log_consumer_app_fs);
-    // Emitter configuration
-    Consumer_chain_append(&log_consumer_log_server);
-
-    // create filesystem
-    if(filesystem_init() == false){
-        printf("Fail to init filesystem!\n");
-        return;
-    }
-
-    // create log file
-    Log_file_create_log_file(&log_file_01);
-    Log_file_create_log_file(&log_file_02);
-
-    // start polling
-    Consumer_chain_poll();
 }
 
-
-
-int
-run()
+void initClients()
 {
-    int finish = 1;
+    // set up registered functions layer
+    Log_consumer_callback_ctor(
+        &log_consumer_callback,
+        logServer_ready_emit,
+        API_LOG_SERVER_GET_SENDER_ID,
+        api_time_server_get_timestamp);
 
-    while (1){
-        api_time_server_sleep(1000);
+    mapClientConfigsDataPorts();
 
-        if(finish == 50)
-            break;
+    // Emitter configuration: set up log emitter layer
+    get_instance_Log_emitter(
+        clientConfigs[LOG_SERVER_ID].buffer,
+        &clientConfigs[LOG_SERVER_ID].log_filter,
+        &emitter_callback);
 
-        finish++;
+    for(size_t i = 0; i < CLIENT_CONFIGS_COUNT; ++i)
+    {
+        Log_filter_ctor(
+            &clientConfigs[i].log_filter,
+             clientConfigs[i].log_level);
+
+        bool isFilterNull = (NO_FILTER_ID_FIRST <= clientConfigs[i].id)
+                         && (NO_FILTER_ID_LAST  >= clientConfigs[i].id);
+
+        Log_filter_t* const pFilter = isFilterNull ?
+                                        NULL : &clientConfigs[i].log_filter;
+
+        const bool isLogServer  = (LOG_SERVER_ID == clientConfigs[i].id);
+        Log_subject_t* pSubject = isLogServer ? &subject_log_server : &subject;
+
+        Log_consumer_ctor(
+            &clientConfigs[i].consumer,
+            clientConfigs[i].buffer,
+            pFilter,
+            &log_consumer_callback,
+            pSubject,
+            clientConfigs[i].log_file,
+            clientConfigs[i].id,
+            clientConfigs[i].name
+        );
+
+        Consumer_chain_append(&clientConfigs[i].consumer);
     }
-
-    printf("demo finish\n");
-
-    logServer_finish_emit();
-
-    return 0;
 }

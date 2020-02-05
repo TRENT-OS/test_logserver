@@ -3,9 +3,7 @@ import <std_connector.camkes>;
 
 import "components/log_server/LOG_SERVER.camkes";
 import "components/time_server/TIME_SERVER.camkes";
-import "components/app01/APP01.camkes";
-import "components/app02/APP02.camkes";
-import "components/app03/APP03.camkes";
+import "components/log_client/LOG_CLIENT.camkes";
 import "components/app0x/APP0x.camkes";
 import "components/app_filesystem/APP_FILESYSTEM.camkes";
 import "components/partition_manager/PARTITION_MANAGER.camkes";
@@ -18,9 +16,29 @@ assembly {
         component LOG_SERVER        log_server;
         component TIMEBASE          timebase;
         component TIME_SERVER       time_server;
-        component APP01             app01;
-        component APP02             app02;
-        component APP03             app03;
+
+        component LOG_CLIENT        app_lvl_none;
+        component LOG_CLIENT        app_lvl_assert;
+        component LOG_CLIENT        app_lvl_fatal;
+        component LOG_CLIENT        app_lvl_error;
+        component LOG_CLIENT        app_lvl_warning;
+        component LOG_CLIENT        app_lvl_info;
+        component LOG_CLIENT        app_lvl_debug;
+        component LOG_CLIENT        app_lvl_trace;
+        component LOG_CLIENT        app_lvl_custom;
+
+        component LOG_CLIENT        app_no_filters;
+
+        component LOG_CLIENT        app_cl_filter_none;
+        component LOG_CLIENT        app_cl_filter_assert;
+        component LOG_CLIENT        app_cl_filter_fatal;
+        component LOG_CLIENT        app_cl_filter_error;
+        component LOG_CLIENT        app_cl_filter_warning;
+        component LOG_CLIENT        app_cl_filter_info;
+        component LOG_CLIENT        app_cl_filter_debug;
+        component LOG_CLIENT        app_cl_filter_trace;
+        component LOG_CLIENT        app_cl_filter_custom;
+
         component APP0x             app0x;
         component APP_FILESYSTEM    app_filesystem;
         component PARTITION_MANAGER partition_manager;
@@ -43,22 +61,82 @@ assembly {
         //----------------------------------------------------------------------
         // LOG SERVER connections
         //----------------------------------------------------------------------
-        connection  seL4RPCCall         conn_rpc_logServer2app01(from app01.log_server_interface, to log_server.log_server_interface);
-        connection  seL4RPCCall         conn_rpc_logServer2app02(from app02.log_server_interface, to log_server.log_server_interface);
-        connection  seL4RPCCall         conn_rpc_logServer2app03(from app03.log_server_interface, to log_server.log_server_interface);
-        connection  seL4RPCCall         conn_rpc_logServer2app0x(from app0x.log_server_interface, to log_server.log_server_interface);
+
+        // seL4RPCCall
+        connection  seL4RPCCall         conn_rpc_logServer2app_lvl_none(   from app_lvl_none.log_server_interface,    to log_server.log_server_interface);
+        connection  seL4RPCCall         conn_rpc_logServer2app_lvl_assert( from app_lvl_assert.log_server_interface,  to log_server.log_server_interface);
+        connection  seL4RPCCall         conn_rpc_logServer2app_lvl_fatal(  from app_lvl_fatal.log_server_interface,   to log_server.log_server_interface);
+        connection  seL4RPCCall         conn_rpc_logServer2app_lvl_error(  from app_lvl_error.log_server_interface,   to log_server.log_server_interface);
+        connection  seL4RPCCall         conn_rpc_logServer2app_lvl_warning(from app_lvl_warning.log_server_interface, to log_server.log_server_interface);
+        connection  seL4RPCCall         conn_rpc_logServer2app_lvl_info(   from app_lvl_info.log_server_interface,    to log_server.log_server_interface);
+        connection  seL4RPCCall         conn_rpc_logServer2app_lvl_debug(  from app_lvl_debug.log_server_interface,   to log_server.log_server_interface);
+        connection  seL4RPCCall         conn_rpc_logServer2app_lvl_trace(  from app_lvl_trace.log_server_interface,   to log_server.log_server_interface);
+        connection  seL4RPCCall         conn_rpc_logServer2app_lvl_custom( from app_lvl_custom.log_server_interface,  to log_server.log_server_interface);
+
+        connection  seL4RPCCall         conn_rpc_logServer2app_no_filters( from app_no_filters.log_server_interface,       to log_server.log_server_interface);
+
+        connection  seL4RPCCall         conn_rpc_logServer2app_cl_filter_none(   from app_cl_filter_none.log_server_interface,    to log_server.log_server_interface);
+        connection  seL4RPCCall         conn_rpc_logServer2app_cl_filter_assert( from app_cl_filter_assert.log_server_interface,  to log_server.log_server_interface);
+        connection  seL4RPCCall         conn_rpc_logServer2app_cl_filter_fatal(  from app_cl_filter_fatal.log_server_interface,   to log_server.log_server_interface);
+        connection  seL4RPCCall         conn_rpc_logServer2app_cl_filter_error(  from app_cl_filter_error.log_server_interface,   to log_server.log_server_interface);
+        connection  seL4RPCCall         conn_rpc_logServer2app_cl_filter_warning(from app_cl_filter_warning.log_server_interface, to log_server.log_server_interface);
+        connection  seL4RPCCall         conn_rpc_logServer2app_cl_filter_info(   from app_cl_filter_info.log_server_interface,    to log_server.log_server_interface);
+        connection  seL4RPCCall         conn_rpc_logServer2app_cl_filter_debug(  from app_cl_filter_debug.log_server_interface,   to log_server.log_server_interface);
+        connection  seL4RPCCall         conn_rpc_logServer2app_cl_filter_trace(  from app_cl_filter_trace.log_server_interface,   to log_server.log_server_interface);
+        connection  seL4RPCCall         conn_rpc_logServer2app_cl_filter_custom( from app_cl_filter_custom.log_server_interface,  to log_server.log_server_interface);
+
+        connection  seL4RPCCall         conn_rpc_logServer2app0x(         from app0x.log_server_interface,          to log_server.log_server_interface);
         connection  seL4RPCCall         conn_rpc_logServer2app_filesystem(from app_filesystem.log_server_interface, to log_server.log_server_interface);
 
-        connection  seL4Notification    conn_dataAvailable_logServer2app01(from log_server.logServer_ready, to app01.logServer_ready);
-        connection  seL4Notification    conn_dataAvailable_logServer2app02(from log_server.logServer_ready, to app02.logServer_ready);
-        connection  seL4Notification    conn_dataAvailable_logServer2app03(from log_server.logServer_ready, to app03.logServer_ready);
-        connection  seL4Notification    conn_dataAvailable_logServer2app_filesystem(from log_server.logServer_ready, to app_filesystem.logServer_ready);
-        // seL4Notification unused in application app0x
-        connection  seL4Notification    conn_dataAvailable_logServer2app0x_finish(from log_server.logServer_finish, to app0x.logServer_finish);
+        // seL4Notification
+        connection  seL4Notification    conn_dataAvailable_logServer2app_lvl_none(   from log_server.logServer_ready, to app_lvl_none.logServer_ready);
+        connection  seL4Notification    conn_dataAvailable_logServer2app_lvl_assert( from log_server.logServer_ready, to app_lvl_assert.logServer_ready);
+        connection  seL4Notification    conn_dataAvailable_logServer2app_lvl_fatal(  from log_server.logServer_ready, to app_lvl_fatal.logServer_ready);
+        connection  seL4Notification    conn_dataAvailable_logServer2app_lvl_error(  from log_server.logServer_ready, to app_lvl_error.logServer_ready);
+        connection  seL4Notification    conn_dataAvailable_logServer2app_lvl_warning(from log_server.logServer_ready, to app_lvl_warning.logServer_ready);
+        connection  seL4Notification    conn_dataAvailable_logServer2app_lvl_info(   from log_server.logServer_ready, to app_lvl_info.logServer_ready);
+        connection  seL4Notification    conn_dataAvailable_logServer2app_lvl_debug(  from log_server.logServer_ready, to app_lvl_debug.logServer_ready);
+        connection  seL4Notification    conn_dataAvailable_logServer2app_lvl_trace(  from log_server.logServer_ready, to app_lvl_trace.logServer_ready);
+        connection  seL4Notification    conn_dataAvailable_logServer2app_lvl_custom( from log_server.logServer_ready, to app_lvl_custom.logServer_ready);
 
-        connection  seL4SharedData      conn_dataConnection_app01(from app01.dataport_buf, to log_server.dataport_buf_app01);
-        connection  seL4SharedData      conn_dataConnection_app02(from app02.dataport_buf, to log_server.dataport_buf_app02);
-        connection  seL4SharedData      conn_dataConnection_app03(from app03.dataport_buf, to log_server.dataport_buf_app03);
+        connection  seL4Notification    conn_dataAvailable_logServer2app_no_filters( from log_server.logServer_ready, to app_no_filters.logServer_ready);
+
+        connection  seL4Notification    conn_dataAvailable_logServer2app_cl_filter_none(   from log_server.logServer_ready, to app_cl_filter_none.logServer_ready);
+        connection  seL4Notification    conn_dataAvailable_logServer2app_cl_filter_assert( from log_server.logServer_ready, to app_cl_filter_assert.logServer_ready);
+        connection  seL4Notification    conn_dataAvailable_logServer2app_cl_filter_fatal(  from log_server.logServer_ready, to app_cl_filter_fatal.logServer_ready);
+        connection  seL4Notification    conn_dataAvailable_logServer2app_cl_filter_error(  from log_server.logServer_ready, to app_cl_filter_error.logServer_ready);
+        connection  seL4Notification    conn_dataAvailable_logServer2app_cl_filter_warning(from log_server.logServer_ready, to app_cl_filter_warning.logServer_ready);
+        connection  seL4Notification    conn_dataAvailable_logServer2app_cl_filter_info(   from log_server.logServer_ready, to app_cl_filter_info.logServer_ready);
+        connection  seL4Notification    conn_dataAvailable_logServer2app_cl_filter_debug(  from log_server.logServer_ready, to app_cl_filter_debug.logServer_ready);
+        connection  seL4Notification    conn_dataAvailable_logServer2app_cl_filter_trace(  from log_server.logServer_ready, to app_cl_filter_trace.logServer_ready);
+        connection  seL4Notification    conn_dataAvailable_logServer2app_cl_filter_custom( from log_server.logServer_ready, to app_cl_filter_custom.logServer_ready);
+
+        connection  seL4Notification    conn_dataAvailable_logServer2app_filesystem(from log_server.logServer_ready,  to app_filesystem.logServer_ready);
+        connection  seL4Notification    conn_dataAvailable_logServer2app0x_finish(  from log_server.logServer_finish, to app0x.logServer_finish);
+
+        // seL4SharedData
+        connection  seL4SharedData      conn_dataConnection_app_lvl_none(   from app_lvl_none.logServer_buf,    to log_server.dataport_buf_lvl_none);
+        connection  seL4SharedData      conn_dataConnection_app_lvl_assert( from app_lvl_assert.logServer_buf,  to log_server.dataport_buf_lvl_assert);
+        connection  seL4SharedData      conn_dataConnection_app_lvl_fatal(  from app_lvl_fatal.logServer_buf,   to log_server.dataport_buf_lvl_fatal);
+        connection  seL4SharedData      conn_dataConnection_app_lvl_error(  from app_lvl_error.logServer_buf,   to log_server.dataport_buf_lvl_error);
+        connection  seL4SharedData      conn_dataConnection_app_lvl_warning(from app_lvl_warning.logServer_buf, to log_server.dataport_buf_lvl_warning);
+        connection  seL4SharedData      conn_dataConnection_app_lvl_info(   from app_lvl_info.logServer_buf,    to log_server.dataport_buf_lvl_info);
+        connection  seL4SharedData      conn_dataConnection_app_lvl_debug(  from app_lvl_debug.logServer_buf,   to log_server.dataport_buf_lvl_debug);
+        connection  seL4SharedData      conn_dataConnection_app_lvl_trace(  from app_lvl_trace.logServer_buf,   to log_server.dataport_buf_lvl_trace);
+        connection  seL4SharedData      conn_dataConnection_app_lvl_custom( from app_lvl_custom.logServer_buf,  to log_server.dataport_buf_lvl_custom);
+
+        connection  seL4SharedData      conn_dataConnection_app_no_filters( from app_no_filters.logServer_buf,  to log_server.dataport_buf_no_filters);
+
+        connection  seL4SharedData      conn_dataConnection_app_cl_filter_none(   from app_cl_filter_none.logServer_buf,    to log_server.dataport_buf_cl_filter_none);
+        connection  seL4SharedData      conn_dataConnection_app_cl_filter_assert( from app_cl_filter_assert.logServer_buf,  to log_server.dataport_buf_cl_filter_assert);
+        connection  seL4SharedData      conn_dataConnection_app_cl_filter_fatal(  from app_cl_filter_fatal.logServer_buf,   to log_server.dataport_buf_cl_filter_fatal);
+        connection  seL4SharedData      conn_dataConnection_app_cl_filter_error(  from app_cl_filter_error.logServer_buf,   to log_server.dataport_buf_cl_filter_error);
+        connection  seL4SharedData      conn_dataConnection_app_cl_filter_warning(from app_cl_filter_warning.logServer_buf, to log_server.dataport_buf_cl_filter_warning);
+        connection  seL4SharedData      conn_dataConnection_app_cl_filter_info(   from app_cl_filter_info.logServer_buf,    to log_server.dataport_buf_cl_filter_info);
+        connection  seL4SharedData      conn_dataConnection_app_cl_filter_debug(  from app_cl_filter_debug.logServer_buf,   to log_server.dataport_buf_cl_filter_debug);
+        connection  seL4SharedData      conn_dataConnection_app_cl_filter_trace(  from app_cl_filter_trace.logServer_buf,   to log_server.dataport_buf_cl_filter_trace);
+        connection  seL4SharedData      conn_dataConnection_app_cl_filter_custom( from app_cl_filter_custom.logServer_buf,  to log_server.dataport_buf_cl_filter_custom);
+
         connection  seL4SharedData      conn_dataConnection_app0x(from app0x.dataport_buf, to log_server.dataport_buf_app0x);
         connection  seL4SharedData      conn_dataConnection_app_filesystem(from app_filesystem.dataport_buf, to log_server.dataport_buf_app_filesystem);
 
@@ -86,12 +164,53 @@ assembly {
         connection  seL4HardwareMMIO uart_memio(from uartDrv.uartRegBase, to uartDev.uartRegBase);
     }
     configuration {
-        // client id's
-        app01.log_server_interface_attributes = 10;
-        app02.log_server_interface_attributes = 200;
-        app03.log_server_interface_attributes = 3000;
-        app0x.log_server_interface_attributes = 40000;
-        app_filesystem.log_server_interface_attributes = 40001;
+
+        app_lvl_none.log_server_interface_attributes          = 10;
+        app_lvl_assert.log_server_interface_attributes        = 200;
+        app_lvl_fatal.log_server_interface_attributes         = 3000;
+        app_lvl_error.log_server_interface_attributes         = 40000;
+        app_lvl_warning.log_server_interface_attributes       = 500000;
+        app_lvl_info.log_server_interface_attributes          = 6000000;
+        app_lvl_debug.log_server_interface_attributes         = 0xFFFF - 1;
+        app_lvl_trace.log_server_interface_attributes         = 0xFFFF;
+        app_lvl_custom.log_server_interface_attributes        = 0xFFFFFFF - 1;
+
+        app_no_filters.log_server_interface_attributes        = 0xCAFE;
+
+        app_cl_filter_none.log_server_interface_attributes    = 0xCAFE + 1;
+        app_cl_filter_assert.log_server_interface_attributes  = 0xCAFE + 2;
+        app_cl_filter_fatal.log_server_interface_attributes   = 0xCAFE + 3;
+        app_cl_filter_error.log_server_interface_attributes   = 0xCAFE + 4;
+        app_cl_filter_warning.log_server_interface_attributes = 0xCAFE + 5;
+        app_cl_filter_info.log_server_interface_attributes    = 0xCAFE + 6;
+        app_cl_filter_debug.log_server_interface_attributes   = 0xCAFE + 7;
+        app_cl_filter_trace.log_server_interface_attributes   = 0xCAFE + 8;
+        app_cl_filter_custom.log_server_interface_attributes  = 0xCAFE + 9;
+
+        app_lvl_none.log_lvl    = -1;
+        app_lvl_assert.log_lvl  = -1;
+        app_lvl_fatal.log_lvl   = -1;
+        app_lvl_error.log_lvl   = -1;
+        app_lvl_warning.log_lvl = -1;
+        app_lvl_info.log_lvl    = -1;
+        app_lvl_debug.log_lvl   = -1;
+        app_lvl_trace.log_lvl   = -1;
+        app_lvl_custom.log_lvl  = -1;
+
+        app_no_filters.log_lvl  = -1;
+
+        app_cl_filter_none.log_lvl    = 0;
+        app_cl_filter_assert.log_lvl  = 1;
+        app_cl_filter_fatal.log_lvl   = 2;
+        app_cl_filter_error.log_lvl   = 3;
+        app_cl_filter_warning.log_lvl = 4;
+        app_cl_filter_info.log_lvl    = 5;
+        app_cl_filter_debug.log_lvl   = 6;
+        app_cl_filter_trace.log_lvl   = 7;
+        app_cl_filter_custom.log_lvl  = 9;
+
+        app0x.log_server_interface_attributes = 40001;
+        app_filesystem.log_server_interface_attributes = 40002;
 
         // timer
         timebase.reg_paddr = 0xF8001000;    // paddr of mmio registers

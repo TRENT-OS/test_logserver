@@ -34,7 +34,11 @@ static char proxy_NVM_message[PAGE_SIZE] = {0};
 void api_pm_component__init(void){
     seos_pm_result_t pm_stat;
 
-    if (!ChanMuxClient_ctor(&chanmux, GET_PROPERTY_CHANMUX_CHANNEL, GET_PROPERTY_CHANMUX_DATAPORT_BUFFER))
+    if (!ChanMuxClient_ctor(
+            &chanmux,
+            GET_PROPERTY_CHANMUX_CHANNEL,
+            GET_PROPERTY_CHANMUX_DATAPORT_BUFFER,
+            GET_PROPERTY_CHANMUX_DATAPORT_BUFFER))
     {
         Debug_LOG_ERROR("Failed to construct testChanMuxClient!");
         return;

@@ -16,6 +16,7 @@ project(demo_logserver C)
 # log server
 DeclareCAmkESComponent(LOG_SERVER
     SOURCES
+        "components/log_server/src/custom_format.c"
         "components/log_server/src/main.c"
     C_FLAGS
         -Wall
@@ -46,36 +47,10 @@ DeclareCAmkESComponent(TIME_SERVER
         -Werror
 )
 
-# app01
-DeclareCAmkESComponent(APP01
+# log_client
+DeclareCAmkESComponent(LOG_CLIENT
     SOURCES
-        "components/app01/src/main.c"
-    C_FLAGS
-        -Wall
-        -Werror
-    LIBS
-        seos_core_api
-        seos_logger
-        seos_libs
-)
-
-# app02
-DeclareCAmkESComponent(APP02
-    SOURCES
-        "components/app02/src/main.c"
-    C_FLAGS
-        -Wall
-        -Werror
-    LIBS
-        seos_core_api
-        seos_logger
-        seos_libs
-)
-
-# app03
-DeclareCAmkESComponent(APP03
-    SOURCES
-        "components/app03/src/main.c"
+        "components/log_client/src/main.c"
     C_FLAGS
         -Wall
         -Werror

@@ -1,14 +1,15 @@
 import "../../interfaces/log_server.camkes";
 
 
-component APP01 {
+component LOG_CLIENT {
     control;
 
     //-------------------------------------------------
     // interface to log server
-    dataport Buf                dataport_buf;
-
+    dataport Buf                logServer_buf;
     consumes DataAvailableEvent logServer_ready;
 
     uses     LogSrvInf          log_server_interface;
+
+    attribute int log_lvl;
 }

@@ -27,7 +27,7 @@ int run()
     // wait until log server is finished
     logServer_finish_wait();
 
-    char buf[DATABUFFER_SIZE * 2];
+    char buf[DATABUFFER_SIZE * 3];
     bool retval;
 
     // set up log file client callback
@@ -52,7 +52,10 @@ int run()
         return 0;
     }
 
-    printf("log file 02 content:\n%s", buf);
+    printf("log file 02 content:\n"
+           "%s"
+           "demo finished successfully\n",
+                buf);
 
     // destruction
     Log_file_client_callback_dtor(&log_file_client_callback);

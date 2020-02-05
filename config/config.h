@@ -19,13 +19,9 @@
 #   define Debug_Config_NO_ASSERT_SELF_PTR
 #endif
 
-#define Debug_Config_LOG_LEVEL                  Debug_LOG_LEVEL_DEBUG
+#define Debug_Config_LOG_LEVEL                  Debug_LOG_LEVEL_CUSTOM
 #define Debug_Config_INCLUDE_LEVEL_IN_MSG
 #define Debug_Config_LOG_WITH_FILE_LINE
-
-// enable log server
-#define Debug_Config_PRINT_2_LOG_SERVER
-
 
 //-----------------------------------------------------------------------------
 // Memory
@@ -101,3 +97,5 @@ static const Partition_cat_t partition_conf = {
 #define API_LOG_SERVER_EMIT                     log_server_interface_emit
 #define API_LOG_SERVER_GET_SENDER_ID            log_server_interface_get_sender_id
 #define API_LOG_SERVER_READ_LOG_FILE            log_server_interface_read_log_file
+
+#define Debug_LOG_LEVEL_CUSTOM                  9
