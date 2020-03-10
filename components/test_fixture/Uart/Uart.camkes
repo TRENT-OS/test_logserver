@@ -1,4 +1,4 @@
-import "../../interfaces/UartInf.camkes";
+import "../../../interfaces/UartInf.camkes";
 
 component UartDev {
     hardware;

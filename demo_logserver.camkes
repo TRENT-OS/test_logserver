@@ -1,21 +1,25 @@
 import <std_connector.camkes>;
 
+// Clients
+import "components/log_clients/app_filesystem/APP_FILESYSTEM.camkes";
+import "components/log_clients/app0x/APP0x.camkes";
+import "components/log_clients/log_client/LOG_CLIENT.camkes";
 
+// Server
 import "components/log_server/LOG_SERVER.camkes";
-import "components/time_server/TIME_SERVER.camkes";
-import "components/log_client/LOG_CLIENT.camkes";
-import "components/app0x/APP0x.camkes";
-import "components/app_filesystem/APP_FILESYSTEM.camkes";
-import "components/partition_manager/PARTITION_MANAGER.camkes";
-import "components/ChanMux/ChanMux.camkes";
-import "components/Uart/Uart.camkes";
 
+// Test Fixture
+import "components/test_fixture/time_server/TIME_SERVER.camkes";
+import "components/test_fixture/partition_manager/PARTITION_MANAGER.camkes";
+import "components/test_fixture/ChanMux/ChanMux.camkes";
+import "components/test_fixture/Uart/Uart.camkes";
 
 assembly {
     composition {
-        component LOG_SERVER        log_server;
-        component TIMEBASE          timebase;
-        component TIME_SERVER       time_server;
+
+        // Clients
+        component APP_FILESYSTEM    app_filesystem;
+        component APP0x             app0x;
 
         component LOG_CLIENT        app_lvl_none;
         component LOG_CLIENT        app_lvl_assert;
@@ -39,12 +43,16 @@ assembly {
         component LOG_CLIENT        app_cl_filter_trace;
         component LOG_CLIENT        app_cl_filter_custom;
 
-        component APP0x             app0x;
-        component APP_FILESYSTEM    app_filesystem;
+        // Server
+        component LOG_SERVER        log_server;
+
+        // Test Fixture
+        component TIMEBASE          timebase;
+        component TIME_SERVER       time_server;
         component PARTITION_MANAGER partition_manager;
-        component ChanMux	    chanMux;
-        component UartDev	    uartDev;
-        component UartDrv	    uartDrv;
+        component ChanMux	        chanMux;
+        component UartDev	        uartDev;
+        component UartDrv	        uartDrv;
 
         //----------------------------------------------------------------------
         // TIME SERVER configuration

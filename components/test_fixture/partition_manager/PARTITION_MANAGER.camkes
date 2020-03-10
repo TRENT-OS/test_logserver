@@ -1,5 +1,5 @@
-import "../../interfaces/ChanMuxInf.camkes";
-import "../../interfaces/partition_manager.camkes";
+import "../../../interfaces/ChanMuxInf.camkes";
+import "../../../interfaces/partition_manager.camkes";
 
 
 component PARTITION_MANAGER {

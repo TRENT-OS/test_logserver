@@ -1,4 +1,4 @@
-import "../../interfaces/time_server.camkes";
+import "../../../interfaces/time_server.camkes";
 
 
 component TIMEBASE{

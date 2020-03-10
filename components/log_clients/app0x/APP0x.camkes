@@ -1,4 +1,4 @@
-import "../../interfaces/log_server.camkes";
+import "../../../interfaces/log_server.camkes";
 
 
 component APP0x {

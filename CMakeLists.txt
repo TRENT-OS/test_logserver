@@ -36,12 +36,12 @@ DeclareCAmkESComponent(LOG_SERVER
 # time server
 DeclareCAmkESComponent(TIME_SERVER
     INCLUDES
-        components/time_server/include
-        components/time_server/timestamp
+        components/test_fixture/time_server/include
+        components/test_fixture/time_server/timestamp
     SOURCES
-        "components/time_server/src/main.c"
-        "components/time_server/src/time_server.c"
-        "components/time_server/timestamp/timestamp.c"
+        "components/test_fixture/time_server/src/main.c"
+        "components/test_fixture/time_server/src/time_server.c"
+        "components/test_fixture/time_server/timestamp/timestamp.c"
     C_FLAGS
         -Wall
         -Werror
@@ -50,7 +50,7 @@ DeclareCAmkESComponent(TIME_SERVER
 # log_client
 DeclareCAmkESComponent(LOG_CLIENT
     SOURCES
-        "components/log_client/src/main.c"
+        "components/log_clients/log_client/main.c"
     C_FLAGS
         -Wall
         -Werror
@@ -63,7 +63,7 @@ DeclareCAmkESComponent(LOG_CLIENT
 # app0x
 DeclareCAmkESComponent(APP0x
     SOURCES
-        "components/app0x/src/main.c"
+        "components/log_clients/app0x/main.c"
     C_FLAGS
         -Wall
         -Werror
@@ -76,7 +76,7 @@ DeclareCAmkESComponent(APP0x
 # app_filesystem
 DeclareCAmkESComponent(APP_FILESYSTEM
     SOURCES
-        "components/app_filesystem/src/main.c"
+        "components/log_clients/app_filesystem/main.c"
     C_FLAGS
         -DSEOS_FS_BUILD_AS_LIB_BASIC_HANDLE
         -DSEOS_PARTITION_MANAGER_BUILD_AS_COMPONENT
@@ -95,7 +95,7 @@ DeclareCAmkESComponent(APP_FILESYSTEM
 # PARTITION_MANAGER
 DeclareCAmkESComponent(PARTITION_MANAGER
     SOURCES
-        "components/partition_manager/src/main.c"
+        "components/test_fixture/partition_manager/src/main.c"
     C_FLAGS
         -Wall
         -Werror
@@ -110,8 +110,8 @@ DeclareCAmkESComponent(PARTITION_MANAGER
 # UartDrv
 DeclareCAmkESComponent(UartDrv
     SOURCES
-        "components/Uart/src/UartDrv.c"
-        "components/Uart/src/qemu_uart.c"
+        "components/test_fixture/Uart/src/UartDrv.c"
+        "components/test_fixture/Uart/src/qemu_uart.c"
     C_FLAGS
         -Wall
         -Werror
@@ -124,7 +124,7 @@ DeclareCAmkESComponent(UartDrv
 # ChanMux
 DeclareCAmkESComponent(ChanMux
     SOURCES
-        "components/ChanMux/src/instance/ChanMux_Instance.c"
+        "components/test_fixture/ChanMux/src/instance/ChanMux_Instance.c"
     C_FLAGS
         -Wall
         -Werror

@@ -1,5 +1,5 @@
-import "../../interfaces/partition_manager.camkes";
-import "../../interfaces/log_server.camkes";
+import "../../../interfaces/partition_manager.camkes";
+import "../../../interfaces/log_server.camkes";
 
 
 component APP_FILESYSTEM {
