@@ -10,5 +10,5 @@ component PARTITION_MANAGER {
     consumes  DataAvailableEvent     ChanMuxSignal_dataAvailable;
 
     dataport  Buf                    pm_dataport_buf_log_server;
-    dataport  Buf                    pm_dataport_buf_app_filesystem;
+    dataport  Buf                    pm_dataport_buf_fileReaderWriter;
 }

@@ -1,7 +1,7 @@
 import "../../../interfaces/log_server.camkes";
 
 
-component LOG_CLIENT {
+component LogsAllLevels {
     control;
 
     //-------------------------------------------------

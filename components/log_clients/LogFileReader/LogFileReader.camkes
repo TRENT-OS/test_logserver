@@ -1,7 +1,7 @@
 import "../../../interfaces/log_server.camkes";
 
 
-component APP0x {
+component LogFileReader {
     control;
 
     //-------------------------------------------------

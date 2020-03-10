@@ -13,11 +13,10 @@ seos_use_libs(
 
 project(demo_logserver C)
 
-# log server
-DeclareCAmkESComponent(LOG_SERVER
+DeclareCAmkESComponent(LogServer
     SOURCES
-        "components/log_server/src/custom_format.c"
-        "components/log_server/src/main.c"
+        "components/LogServer/src/custom_format.c"
+        "components/LogServer/src/LogServer.c"
     C_FLAGS
         -Wall
         -Werror
@@ -47,10 +46,9 @@ DeclareCAmkESComponent(TIME_SERVER
         -Werror
 )
 
-# log_client
-DeclareCAmkESComponent(LOG_CLIENT
+DeclareCAmkESComponent(LogsAllLevels
     SOURCES
-        "components/log_clients/log_client/main.c"
+        "components/log_clients/LogsAllLevels/LogsAllLevels.c"
     C_FLAGS
         -Wall
         -Werror
@@ -60,10 +58,9 @@ DeclareCAmkESComponent(LOG_CLIENT
         seos_libs
 )
 
-# app0x
-DeclareCAmkESComponent(APP0x
+DeclareCAmkESComponent(LogFileReader
     SOURCES
-        "components/log_clients/app0x/main.c"
+        "components/log_clients/LogFileReader/LogFileReader.c"
     C_FLAGS
         -Wall
         -Werror
@@ -73,10 +70,9 @@ DeclareCAmkESComponent(APP0x
         seos_libs
 )
 
-# app_filesystem
-DeclareCAmkESComponent(APP_FILESYSTEM
+DeclareCAmkESComponent(FileReaderWriter
     SOURCES
-        "components/log_clients/app_filesystem/main.c"
+        "components/log_clients/FileReaderWriter/FileReaderWriter.c"
     C_FLAGS
         -DSEOS_FS_BUILD_AS_LIB_BASIC_HANDLE
         -DSEOS_PARTITION_MANAGER_BUILD_AS_COMPONENT

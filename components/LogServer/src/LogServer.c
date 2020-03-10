@@ -37,32 +37,32 @@ typedef struct ClientConfig
 
 static ClientConfig_t clientConfigs[] =
 {
-    { .name = "LOG-SERVER",   .log_level = Debug_LOG_LEVEL_DEBUG,   .log_file = NULL,         .id = LOG_SERVER_ID },
+    { .name = "LOG-SERVER",       .log_level = Debug_LOG_LEVEL_DEBUG,   .log_file = NULL,         .id = LOG_SERVER_ID },
 
-    { .name = "LVL_NONE",     .log_level = Debug_LOG_LEVEL_NONE,    .log_file = NULL,         .id = 10u },
-    { .name = NULL,           .log_level = Debug_LOG_LEVEL_ASSERT,  .log_file = NULL,         .id = 200u },
-    { .name = "LVL_FATAL",    .log_level = Debug_LOG_LEVEL_FATAL,   .log_file = &log_file_01, .id = 3000u },
-    { .name = "LVL_ERROR",    .log_level = Debug_LOG_LEVEL_ERROR,   .log_file = &log_file_02, .id = 40000u },
-    { .name = "LVL_WARNING",  .log_level = Debug_LOG_LEVEL_WARNING, .log_file = NULL,         .id = 500000u },
-    { .name = "LVL_INFO",     .log_level = Debug_LOG_LEVEL_INFO,    .log_file = NULL,         .id = 6000000u },
-    { .name = "LVL_DEBUG",    .log_level = Debug_LOG_LEVEL_DEBUG,   .log_file = NULL,         .id = 0xFFFFu - 1 },
-    { .name = "LVL_TRACE",    .log_level = Debug_LOG_LEVEL_TRACE,   .log_file = NULL,         .id = 0xFFFFu },
-    { .name = "LVL_CUSTOM",   .log_level = Debug_LOG_LEVEL_CUSTOM,  .log_file = NULL,         .id = 0xFFFFFFFu - 1 },
+    { .name = "LVL_NONE",         .log_level = Debug_LOG_LEVEL_NONE,    .log_file = NULL,         .id = 10u },
+    { .name = NULL,               .log_level = Debug_LOG_LEVEL_ASSERT,  .log_file = NULL,         .id = 200u },
+    { .name = "LVL_FATAL",        .log_level = Debug_LOG_LEVEL_FATAL,   .log_file = &log_file_01, .id = 3000u },
+    { .name = "LVL_ERROR",        .log_level = Debug_LOG_LEVEL_ERROR,   .log_file = &log_file_02, .id = 40000u },
+    { .name = "LVL_WARNING",      .log_level = Debug_LOG_LEVEL_WARNING, .log_file = NULL,         .id = 500000u },
+    { .name = "LVL_INFO",         .log_level = Debug_LOG_LEVEL_INFO,    .log_file = NULL,         .id = 6000000u },
+    { .name = "LVL_DEBUG",        .log_level = Debug_LOG_LEVEL_DEBUG,   .log_file = NULL,         .id = 0xFFFFu - 1 },
+    { .name = "LVL_TRACE",        .log_level = Debug_LOG_LEVEL_TRACE,   .log_file = NULL,         .id = 0xFFFFu },
+    { .name = "LVL_CUSTOM",       .log_level = Debug_LOG_LEVEL_CUSTOM,  .log_file = NULL,         .id = 0xFFFFFFFu - 1 },
 
-    { .name = "FILTER_NULL",                                        .log_file = NULL,         .id = NO_FILTER_ID_FIRST },
+    { .name = "FILTER_NULL",                                            .log_file = NULL,         .id = NO_FILTER_ID_FIRST },
 
-    { .name = "CL_FILTER_NONE",                                     .log_file = NULL,         .id = NO_FILTER_ID_FIRST + 1 },
-    { .name = "CL_FILTER_ASSERT",                                   .log_file = NULL,         .id = NO_FILTER_ID_FIRST + 2 },
-    { .name = "CL_FILTER_FATAL",                                    .log_file = NULL,         .id = NO_FILTER_ID_FIRST + 3 },
-    { .name = "CL_FILTER_ERROR",                                    .log_file = NULL,         .id = NO_FILTER_ID_FIRST + 4 },
-    { .name = "CL_FILTER_WARNIN",                                   .log_file = NULL,         .id = NO_FILTER_ID_FIRST + 5 },
-    { .name = "CL_FILTER_INFO",                                     .log_file = NULL,         .id = NO_FILTER_ID_FIRST + 6 },
-    { .name = "CL_FILTER_DEBUG",                                    .log_file = NULL,         .id = NO_FILTER_ID_FIRST + 7 },
-    { .name = "CL_FILTER_TRACE",                                    .log_file = NULL,         .id = NO_FILTER_ID_FIRST + 8 },
-    { .name = "CL_FILTER_CUSTOM",                                   .log_file = NULL,         .id = NO_FILTER_ID_LAST },
+    { .name = "CL_FILTER_NONE",                                         .log_file = NULL,         .id = NO_FILTER_ID_FIRST + 1 },
+    { .name = "CL_FILTER_ASSERT",                                       .log_file = NULL,         .id = NO_FILTER_ID_FIRST + 2 },
+    { .name = "CL_FILTER_FATAL",                                        .log_file = NULL,         .id = NO_FILTER_ID_FIRST + 3 },
+    { .name = "CL_FILTER_ERROR",                                        .log_file = NULL,         .id = NO_FILTER_ID_FIRST + 4 },
+    { .name = "CL_FILTER_WARNIN",                                       .log_file = NULL,         .id = NO_FILTER_ID_FIRST + 5 },
+    { .name = "CL_FILTER_INFO",                                         .log_file = NULL,         .id = NO_FILTER_ID_FIRST + 6 },
+    { .name = "CL_FILTER_DEBUG",                                        .log_file = NULL,         .id = NO_FILTER_ID_FIRST + 7 },
+    { .name = "CL_FILTER_TRACE",                                        .log_file = NULL,         .id = NO_FILTER_ID_FIRST + 8 },
+    { .name = "CL_FILTER_CUSTOM",                                       .log_file = NULL,         .id = NO_FILTER_ID_LAST },
 
-    { .name = "APP0x",        .log_level = Debug_LOG_LEVEL_DEBUG,   .log_file = NULL,         .id = 40001u },
-    { .name = "APP_FS",       .log_level = Debug_LOG_LEVEL_DEBUG,   .log_file = &log_file_02, .id = 40002u }
+    { .name = "LogFileReader",    .log_level = Debug_LOG_LEVEL_DEBUG,   .log_file = NULL,         .id = 40001u },
+    { .name = "FileReaderWriter", .log_level = Debug_LOG_LEVEL_DEBUG,   .log_file = &log_file_02, .id = 40002u }
 };
 
 static const size_t CLIENT_CONFIGS_COUNT = sizeof(clientConfigs)
@@ -227,8 +227,8 @@ void mapClientConfigsDataPorts()
     (clientConfig)++->buffer = dataport_buf_cl_filter_trace;
     (clientConfig)++->buffer = dataport_buf_cl_filter_custom;
 
-    (clientConfig)++->buffer = dataport_buf_app0x;
-    (clientConfig)++->buffer = dataport_buf_app_filesystem;
+    (clientConfig)++->buffer = dataport_buf_logFileReader;
+    (clientConfig)++->buffer = dataport_buf_fileReaderWriter;
 
     // If the manipulated pointer does not point to the end of clientConfigs
     // array, then data ports got misconfigured.

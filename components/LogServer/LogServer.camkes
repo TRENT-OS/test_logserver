@@ -3,7 +3,7 @@ import "../../interfaces/log_server.camkes";
 import "../../interfaces/partition_manager.camkes";
 
 
-component LOG_SERVER {
+component LogServer {
     control;
 
     dataport Buf                     dataport_buf_lvl_none;
@@ -28,8 +28,8 @@ component LOG_SERVER {
     dataport Buf                     dataport_buf_cl_filter_trace;
     dataport Buf                     dataport_buf_cl_filter_custom;
 
-    dataport Buf                     dataport_buf_app0x;
-    dataport Buf                     dataport_buf_app_filesystem;
+    dataport Buf                     dataport_buf_logFileReader;
+    dataport Buf                     dataport_buf_fileReaderWriter;
 
     emits    DataAvailableEvent      logServer_ready;
 
