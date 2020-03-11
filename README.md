@@ -14,6 +14,9 @@ The following components are used in the demo:
   "app_lvl_warning" has a filter on the server side set to the "WARNING" level,
   and the client "app_cl_filter_error" has a filter set to the "ERROR" level on
   the client-side.
+* SendsIllFormattedString - Client that is expected to cause a fault because of
+  logging an entry with format specifiers but no arguments. The failure is
+  expected to occur on the client-side.
 * LogServer - The log server that is in charge of logging functionality.
 
 The following features are presented in the demo:

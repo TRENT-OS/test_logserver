@@ -4,6 +4,7 @@ import <std_connector.camkes>;
 import "components/log_clients/FileReaderWriter/FileReaderWriter.camkes";
 import "components/log_clients/LogFileReader/LogFileReader.camkes";
 import "components/log_clients/LogsAllLevels/LogsAllLevels.camkes";
+import "components/log_clients/SendsIllFormattedString/SendsIllFormattedString.camkes";
 
 // Server
 import "components/LogServer/LogServer.camkes";
@@ -42,6 +43,8 @@ assembly {
         component LogsAllLevels     app_cl_filter_debug;
         component LogsAllLevels     app_cl_filter_trace;
         component LogsAllLevels     app_cl_filter_custom;
+
+        component SendsIllFormattedString sendsIllFormattedString;
 
         // Server
         component LogServer         logServer;
@@ -96,6 +99,8 @@ assembly {
         connection  seL4RPCCall         conn_rpc_logServer2logFileReader(        from logFileReader.log_server_interface,         to logServer.log_server_interface);
         connection  seL4RPCCall         conn_rpc_logServer2fileReaderWriter(     from fileReaderWriter.log_server_interface,      to logServer.log_server_interface);
 
+        connection  seL4RPCCall         conn_rpc_logServer2sendsIllFormattedString(from sendsIllFormattedString.log_server_interface,      to logServer.log_server_interface);
+
         // seL4Notification
         connection  seL4Notification    conn_dataAvailable_logServer2app_lvl_none(   from logServer.logServer_ready, to app_lvl_none.logServer_ready);
         connection  seL4Notification    conn_dataAvailable_logServer2app_lvl_assert( from logServer.logServer_ready, to app_lvl_assert.logServer_ready);
@@ -122,6 +127,8 @@ assembly {
         connection  seL4Notification    conn_dataAvailable_logServer2fileReaderWriter(     from logServer.logServer_ready,  to fileReaderWriter.logServer_ready);
         connection  seL4Notification    conn_dataAvailable_logServer2logFileReader_finish( from logServer.logServer_finish, to logFileReader.logServer_finish);
 
+        connection  seL4Notification    conn_dataAvailable_logServer2sendsIllFormattedString(     from logServer.logServer_ready,  to sendsIllFormattedString.logServer_ready);
+
         // seL4SharedData
         connection  seL4SharedData      conn_dataConnection_app_lvl_none(   from app_lvl_none.logServer_buf,    to logServer.dataport_buf_lvl_none);
         connection  seL4SharedData      conn_dataConnection_app_lvl_assert( from app_lvl_assert.logServer_buf,  to logServer.dataport_buf_lvl_assert);
@@ -147,6 +154,8 @@ assembly {
 
         connection  seL4SharedData      conn_dataConnection_logFileReader(from logFileReader.dataport_buf, to logServer.dataport_buf_logFileReader);
         connection  seL4SharedData      conn_dataConnection_fileReaderWriter(from fileReaderWriter.dataport_buf, to logServer.dataport_buf_fileReaderWriter);
+
+        connection  seL4SharedData      conn_dataConnection_sendsIllFormattedString(from sendsIllFormattedString.logServer_buf, to logServer.dataport_buf_sendsIllFormattedString);
 
         //----------------------------------------------------------------------
         // PARTITION MANAGER connections
@@ -217,8 +226,10 @@ assembly {
         app_cl_filter_trace.log_lvl   = 7;
         app_cl_filter_custom.log_lvl  = 9;
 
-        logFileReader.log_server_interface_attributes = 40001;
-        fileReaderWriter.log_server_interface_attributes = 40002;
+        sendsIllFormattedString.log_server_interface_attributes = 50000;
+
+        logFileReader.log_server_interface_attributes    = 50001;
+        fileReaderWriter.log_server_interface_attributes = 50002;
 
         // timer
         timebase.reg_paddr = 0xF8001000;    // paddr of mmio registers

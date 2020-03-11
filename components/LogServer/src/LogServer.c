@@ -61,8 +61,10 @@ static ClientConfig_t clientConfigs[] =
     { .name = "CL_FILTER_TRACE",                                        .log_file = NULL,         .id = NO_FILTER_ID_FIRST + 8 },
     { .name = "CL_FILTER_CUSTOM",                                       .log_file = NULL,         .id = NO_FILTER_ID_LAST },
 
-    { .name = "LogFileReader",    .log_level = Debug_LOG_LEVEL_DEBUG,   .log_file = NULL,         .id = 40001u },
-    { .name = "FileReaderWriter", .log_level = Debug_LOG_LEVEL_DEBUG,   .log_file = &log_file_02, .id = 40002u }
+    { .name = "ILL_FORMATTED",    .log_level = Debug_LOG_LEVEL_DEBUG,   .log_file = NULL,         .id = 50000u },
+
+    { .name = "LogFileReader",    .log_level = Debug_LOG_LEVEL_DEBUG,   .log_file = NULL,         .id = 50001u },
+    { .name = "FileReaderWriter", .log_level = Debug_LOG_LEVEL_DEBUG,   .log_file = &log_file_02, .id = 50002u }
 };
 
 static const size_t CLIENT_CONFIGS_COUNT = sizeof(clientConfigs)
@@ -226,6 +228,8 @@ void mapClientConfigsDataPorts()
     (clientConfig)++->buffer = dataport_buf_cl_filter_debug;
     (clientConfig)++->buffer = dataport_buf_cl_filter_trace;
     (clientConfig)++->buffer = dataport_buf_cl_filter_custom;
+
+    (clientConfig)++->buffer = dataport_buf_sendsIllFormattedString;
 
     (clientConfig)++->buffer = dataport_buf_logFileReader;
     (clientConfig)++->buffer = dataport_buf_fileReaderWriter;

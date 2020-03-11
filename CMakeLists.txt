@@ -58,6 +58,18 @@ DeclareCAmkESComponent(LogsAllLevels
         seos_libs
 )
 
+DeclareCAmkESComponent(SendsIllFormattedString
+    SOURCES
+        "components/log_clients/SendsIllFormattedString/SendsIllFormattedString.c"
+    C_FLAGS
+        -Wall
+        -Werror
+    LIBS
+        seos_core_api
+        seos_logger
+        seos_libs
+)
+
 DeclareCAmkESComponent(LogFileReader
     SOURCES
         "components/log_clients/LogFileReader/LogFileReader.c"

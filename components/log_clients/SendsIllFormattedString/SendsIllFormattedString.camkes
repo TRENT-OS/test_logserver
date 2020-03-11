@@ -1,0 +1,15 @@
+import "../../../interfaces/log_server.camkes";
+
+
+component SendsIllFormattedString {
+    control;
+
+    //-------------------------------------------------
+    // interface to log server
+    dataport Buf                logServer_buf;
+    consumes DataAvailableEvent logServer_ready;
+
+    uses     LogSrvInf          log_server_interface;
+
+    attribute int log_lvl;
+}

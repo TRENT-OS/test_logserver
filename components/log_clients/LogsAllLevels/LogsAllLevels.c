@@ -17,6 +17,9 @@ static void tearDownLogging();
 // == 4096 - (2 + 2)
 const char maxPossibleLogEntry[3963];
 
+const char format_string[] =
+                    "%d %u %o %x %X %f %F %e %E %g %G %a %A %c %s %p %n %%";
+
 #define NO_FILTER -1
 
 int run()
@@ -49,6 +52,7 @@ void testLogging()
 
     Debug_LOG_ASSERT("");
     Debug_LOG_ASSERT("%s", maxPossibleLogEntry);
+    Debug_LOG_ASSERT("%s", format_string);
 
     Debug_LOG_ASSERT ("Debug_LOG_ASSERT");
     Debug_LOG_FATAL  ("Debug_LOG_FATAL");
