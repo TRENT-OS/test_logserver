@@ -15,7 +15,7 @@ static void tearDownLogging();
 // Max possible entry is:
 // (DATABUFFER_SIZE - (LOG_LEVEL_SERVER_LENGTH + LOG_LEVEL_CLIENT_LENGTH))
 // == 4096 - (2 + 2)
-const char maxPossibleLogEntry[3963];
+const char maxPossibleLogEntry[];
 
 const char format_string[] =
                     "%d %u %o %x %X %f %F %e %E %g %G %a %A %c %s %p %n %%";
@@ -72,7 +72,7 @@ void tearDownLogging()
     Log_filter_dtor(&filter);
 }
 
-const char maxPossibleLogEntry[3963] =
+const char maxPossibleLogEntry[] =
     "Lorem ipsum dolor sit amet consectetur adipiscing elit nulla imperdiet "
     "tempus, class litora sagittis per vitae varius risus potenti platea, "
     "magnis pellentesque tristique nec volutpat lacinia ultrices conubia "
@@ -86,34 +86,6 @@ const char maxPossibleLogEntry[3963] =
     "potenti nisl augue semper lacus lobortis. Nisl iaculis magna lectus odio "
     "facilisis est nullam, feugiat varius nunc nibh mi primis scelerisque "
     "conubia, cras nam malesuada tellus gravida diam. Ut habitasse quis "
-    "hendrerit placerat laoreet donec tortor fringilla, ac cum lobortis "
-    "malesuada suspendisse sem felis lectus vestibulum, duis dapibus magna "
-    "velit augue scelerisque aenean. Aptent ridiculus dictum malesuada pretium "
-    "commodo vel risus orci tellus feugiat, elementum ullamcorper venenatis "
-    "donec felis mattis class nulla parturient. Fermentum hac a tortor taciti "
-    "litora curae quis facilisi himenaeos, consequat leo lacinia per "
-    "condimentum diam eu morbi phasellus nulla, turpis sociis maecenas class "
-    "massa senectus nullam eros. Consequat eleifend vel congue dictum purus "
-    "curabitur ultricies ornare ullamcorper, venenatis est velit posuere non "
-    "justo proin fames ad bibendum, lectus primis faucibus nisi a habitasse "
-    "imperdiet enim. Sapien aptent vehicula torquent sociosqu faucibus "
-    "dictumst vestibulum curabitur fermentum massa, nostra erat tortor taciti "
-    "volutpat sollicitudin quisque nec duis, ac habitant sem congue pulvinar "
-    "nibh lacus tristique id. Cum eu pharetra ullamcorper fringilla vulputate "
-    "in blandit condimentum, laoreet dapibus nullam turpis congue suspendisse "
-    "accumsan egestas, id et odio lobortis auctor ultrices imperdiet. Lacinia "
-    "nam diam curabitur non sollicitudin quam, conubia dignissim pharetra nec "
-    "fermentum, mus eleifend in duis pulvinar. Rutrum ornare sed lacinia "
-    "dictum vivamus erat pharetra iaculis massa hendrerit facilisi dis diam "
-    "bibendum, odio class himenaeos varius mauris quisque potenti "
-    "conubia aenean posuere felis dui lobortis fames. Facilisis urna fusce "
-    "ultrices venenatis ac morbi dictum per habitant turpis placerat, tempor "
-    "habitasse nullam sem pellentesque malesuada condimentum interdum nostra "
-    "lectus tincidunt posuere, dui himenaeos natoque neque volutpat vulputate "
-    "aptent cras gravida dapibus. Neque ornare auctor quam nulla vestibulum "
-    "mauris proin parturient, accumsan himenaeos ante tempor lectus curabitur "
-    "blandit, ullamcorper aliquet fusce lobortis mollis pharetra dis. Interdum "
-    "velit euismod placerat est platea praesent feugiat nisl rhoncus duis, "
     "rutrum venenatis sagittis dignissim orci blandit pretium ad magna, "
     "eleifend malesuada purus condimentum posuere sollicitudin eget "
     "ullamcorper tempor. Nam nostra nulla suscipit pharetra purus sociis "
