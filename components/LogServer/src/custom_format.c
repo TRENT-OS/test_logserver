@@ -33,8 +33,8 @@ _Log_format_convert(Format_t *self, Log_info_t *log_info)
 
     sprintf(
         (((Log_format_t *)self))->buffer,
-        "%*s CUSTOM_FORMAT %-*s\n",
-            FORMAT_ID_LENGTH, log_info->log_id_name,
+        "%-*s       CUSTOM_FORMAT      %.*s\n",
+            LOG_ID_AND_NAME_LENGTH, log_info->log_id_and_name,
             (int)msg_len, log_info->log_databuffer.log_message);
 
     return true;

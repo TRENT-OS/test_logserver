@@ -48,7 +48,7 @@ void setUpLogging()
 
 void testLogging()
 {
-    Debug_LOG(Debug_LOG_LEVEL_NONE, "NONE", "Debug_LOG_NONE");
+    Debug_LOG(Debug_LOG_LEVEL_NONE, "   NONE", "Debug_LOG_NONE");
 
     Debug_LOG_ASSERT("");
     Debug_LOG_ASSERT("%s", maxPossibleLogEntry);
@@ -62,7 +62,7 @@ void testLogging()
     Debug_LOG_DEBUG  ("Debug_LOG_DEBUG");
     Debug_LOG_TRACE  ("Debug_LOG_TRACE");
 
-    Debug_LOG(Debug_LOG_LEVEL_CUSTOM, "CUSTOM", "Debug_LOG_CUSTOM");
+    Debug_LOG(Debug_LOG_LEVEL_CUSTOM, " CUSTOM", "Debug_LOG_CUSTOM");
 }
 
 void tearDownLogging()
