@@ -1,10 +1,24 @@
+/* Copyright (C) 2020, HENSOLDT Cyber GmbH */
+
+/**
+ * @file
+ * @brief    Client that logs its activity on the all possible levels.
+ *
+ * This client does the following:
+ *  1. Initializes logging.
+ *  2. Logs empty, large, and format string entries.
+ *  3. Logs on every possible level including `custom` level.
+ *  4. Deinitializes logging.
+ */
+
+/** @cond SKIP_IMPORTS */
 import "../../../interfaces/log_server.camkes";
+/** @endcond */
 
-
+/** @hideinitializer */
 component LogsAllLevels {
     control;
 
-    //-------------------------------------------------
     // interface to log server
     dataport Buf                logServer_buf;
     consumes DataAvailableEvent logServer_ready;

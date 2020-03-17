@@ -1,8 +1,29 @@
+/* Copyright (C) 2020, HENSOLDT Cyber GmbH */
+
+/**
+ * @file
+ * @brief    The log server under test.
+ *
+ * All client are connected to this server and are sending different log
+ * entries.
+ *
+ * At somepoint the log server will finish its operation and will emit `finish`
+ * event.
+ *
+ * @note    Please note that the name of the client corresponds to its
+ *          configuration e.g. client "LVL_WARNING" has a filter on the
+ *          server side set to the "WARNING" level, and the client
+ *          "CL_FILTER_ERROR" has a filter set to the "ERROR" level on the
+ *          client-side.
+ */
+
+/** @cond SKIP_IMPORTS */
 import "../../interfaces/time_server.camkes";
 import "../../interfaces/log_server.camkes";
 import "../../interfaces/partition_manager.camkes";
+/** @endcond */
 
-
+/** @hideinitializer */
 component LogServer {
     control;
 

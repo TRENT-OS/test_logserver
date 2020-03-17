@@ -1,23 +1,15 @@
 # SEOS logserver - demo application
 
-The purposes of this demo application is to present all common features
-offered by the log server, and help the user to configure it in the desired way.
+The purpose of this demo application is to present all common features offered
+by the log server, and help the user to configure it in the desired way.
 
 The following components are used in the demo:
 
-* FileReaderWriter - Client that reads and writes a file to prove that there are
-  no conflicts with log entries written to the log file.
-* LogFileReader - Log file reader used at the end of the demo to dump logs from
-  the files to the console.
-* LogsAllLevels - Several clients that are logging their activity. Please note
-  that the name of the client corresponds to its configuration e.g. client
-  "app_lvl_warning" has a filter on the server side set to the "WARNING" level,
-  and the client "app_cl_filter_error" has a filter set to the "ERROR" level on
-  the client-side.
-* SendsIllFormattedString - Client that is expected to cause a fault because of
-  logging an entry with format specifiers but no arguments. The failure is
-  expected to occur on the client-side.
-* LogServer - The log server that is in charge of logging functionality.
+* FileReaderWriter
+* LogFileReader
+* LogsAllLevels
+* SendsIllFormattedString
+* LogServer
 
 The following features are presented in the demo:
 

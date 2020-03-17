@@ -1,18 +1,26 @@
+/* Copyright (C) 2020, HENSOLDT Cyber GmbH */
+
+/**
+ * @file
+ * @brief   Client that reads and writes a file to prove that there are
+ *          no conflicts with log entries written to the log file.
+ */
+
+/** @cond SKIP_IMPORTS */
 import "../../../interfaces/partition_manager.camkes";
 import "../../../interfaces/log_server.camkes";
+/** @endcond */
 
-
+/** @hideinitializer */
 component FileReaderWriter {
     control;
 
-    //-------------------------------------------------
     // interface to log server
     dataport Buf                     dataport_buf;
-
     consumes DataAvailableEvent      logServer_ready;
-
     uses     LogSrvInf               log_server_interface;
 
+    // interface to partition manager
     dataport Buf                     pm_dataport_buf;
     uses partition_manager_interface api_pm_component;
 }

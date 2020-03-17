@@ -1,11 +1,20 @@
+/* Copyright (C) 2020, HENSOLDT Cyber GmbH */
+
+/**
+ * @file
+ * @brief   Log file reader used at the end of the demo to dump logs from the
+ *          files to the console.
+ */
+
+/** @cond SKIP_IMPORTS */
 import "../../../interfaces/log_server.camkes";
+/** @endcond */
 
-
+/** @hideinitializer */
 component LogFileReader {
     control;
 
-    //-------------------------------------------------
-    // interface to log server
+    // interface to the log server
     dataport Buf                dataport_buf;
 
     consumes DataAvailableEvent logServer_finish;
