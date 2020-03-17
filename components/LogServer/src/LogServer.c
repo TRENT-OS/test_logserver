@@ -55,7 +55,7 @@ static ClientConfig_t clientConfigs[] =
     { .name = "CL_FILTER_ASSERT",                                       .log_file = NULL,         .id = NO_FILTER_ID_FIRST + 2 },
     { .name = "CL_FILTER_FATAL",                                        .log_file = NULL,         .id = NO_FILTER_ID_FIRST + 3 },
     { .name = "CL_FILTER_ERROR",                                        .log_file = NULL,         .id = NO_FILTER_ID_FIRST + 4 },
-    { .name = "CL_FILTER_WARNIN",                                       .log_file = NULL,         .id = NO_FILTER_ID_FIRST + 5 },
+    { .name = "CL_FILTER_WARNING",                                      .log_file = NULL,         .id = NO_FILTER_ID_FIRST + 5 },
     { .name = "CL_FILTER_INFO",                                         .log_file = NULL,         .id = NO_FILTER_ID_FIRST + 6 },
     { .name = "CL_FILTER_DEBUG",                                        .log_file = NULL,         .id = NO_FILTER_ID_FIRST + 7 },
     { .name = "CL_FILTER_TRACE",                                        .log_file = NULL,         .id = NO_FILTER_ID_FIRST + 8 },
