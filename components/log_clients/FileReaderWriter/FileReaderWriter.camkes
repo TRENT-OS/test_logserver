@@ -7,7 +7,7 @@
  */
 
 /** @cond SKIP_IMPORTS */
-import "../../../interfaces/partition_manager.camkes";
+import <seos_if_partitionManager.camkes>;
 import "../../../interfaces/log_server.camkes";
 /** @endcond */
 
