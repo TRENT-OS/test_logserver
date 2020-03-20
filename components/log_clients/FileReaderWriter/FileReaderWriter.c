@@ -40,19 +40,19 @@ filesystem_init(void)
     pm_disk_data_t pm_disk_data;
     pm_partition_data_t pm_partition_data;
 
-    if(partition_manager_get_info_disk(&pm_disk_data) != SEOS_PM_SUCCESS)
+    if(partition_manager_get_info_disk(&pm_disk_data) != SEOS_SUCCESS)
     {
         printf("Fail to get disk info!\n");
         return false;
     }
 
-    if(partition_manager_get_info_partition(PARTITION_ID, &pm_partition_data) != SEOS_PM_SUCCESS)
+    if(partition_manager_get_info_partition(PARTITION_ID, &pm_partition_data) != SEOS_SUCCESS)
     {
         printf("Fail to get partition info: %d!\n", pm_partition_data.partition_id);
         return false;
     }
 
-    if(partition_init(pm_partition_data.partition_id, 0) != SEOS_FS_SUCCESS)
+    if(partition_init(pm_partition_data.partition_id, 0) != SEOS_SUCCESS)
     {
         printf("Fail to init partition: %d!\n", pm_partition_data.partition_id);
         return false;
@@ -74,13 +74,13 @@ filesystem_init(void)
                 0,  // default value: count file/dir entries: FAT12/FAT16 = 16; FAT32 = 0
                 0,  // default value: count header sectors: 512
                 FS_PARTITION_OVERWRITE_CREATE)
-        != SEOS_FS_SUCCESS)
+        != SEOS_SUCCESS)
     {
         printf("Fail to create filesystem on partition: %d!\n", pm_partition_data.partition_id);
         return false;
     }
 
-    if(partition_close(phandle) != SEOS_FS_SUCCESS)
+    if(partition_close(phandle) != SEOS_SUCCESS)
     {
         printf("Fail to close partition: %d!\n", pm_partition_data.partition_id);
         return false;
@@ -92,7 +92,7 @@ filesystem_init(void)
 
 
 int run(void) {
-    seos_fs_result_t partition_stat;
+    seos_err_t err;
     uint8_t file_stat;
     hPartition_t phandle;
     int64_t length;
@@ -175,17 +175,17 @@ int run(void) {
     /**********************/
     /* Unmount partitions */
     /**********************/
-    partition_stat = partition_fs_unmount(phandle);
-    Debug_LOG_DEBUG("partition_unmount 1: %d", (uint8_t)partition_stat);
-    if(partition_stat > 0)
+    err = partition_fs_unmount(phandle);
+    Debug_LOG_DEBUG("partition_unmount 1: %d", err);
+    if(err > 0)
         return EOF;
 
     /********************/
     /* Close partitions */
     /********************/
-    partition_stat = partition_close(phandle);
-    Debug_LOG_DEBUG("partition_close 1: %d", (uint8_t)partition_stat);
-    if(partition_stat > 0)
+    err = partition_close(phandle);
+    Debug_LOG_DEBUG("partition_close 1: %d", err);
+    if(err > 0)
         return EOF;
 
     // destruction
@@ -202,7 +202,7 @@ int run(void) {
 
 bool _create_file(hPartition_t phandle, const char *name, int length, const char c){
     hFile_t fhandle;
-    seos_fs_result_t file_stat = SEOS_FS_SUCCESS;
+    seos_err_t err = SEOS_SUCCESS;
     char buf_write_file[length];
 
     if(length > DATABUFFER_SIZE){
@@ -220,15 +220,15 @@ bool _create_file(hPartition_t phandle, const char *name, int length, const char
     memset(buf_write_file, c, length);
 
     // Call filesystem api function to write into a file
-    file_stat = file_write(fhandle, 0, length, buf_write_file);
-    Debug_LOG_DEBUG("file_write:        %d", (uint8_t)file_stat);
-    if(file_stat > 0)
+    err = file_write(fhandle, 0, length, buf_write_file);
+    Debug_LOG_DEBUG("file_write:        %d", err);
+    if(err > 0)
         return false;
 
     // Close this file
-    file_stat = file_close(fhandle);
-    Debug_LOG_DEBUG("file_close:        %d", (uint8_t)file_stat);
-    if(file_stat > 0)
+    err = file_close(fhandle);
+    Debug_LOG_DEBUG("file_close:        %d", err);
+    if(err > 0)
         return false;
 
     return true;
@@ -238,7 +238,7 @@ bool _create_file(hPartition_t phandle, const char *name, int length, const char
 
 bool _read_from_file(hPartition_t phandle, const char *name, int length, const char c){
     hFile_t fhandle;
-    seos_fs_result_t file_stat = SEOS_FS_SUCCESS;
+    seos_err_t err = SEOS_SUCCESS;
     char buf_read_file[length];
     char buf_write_file[length];
     int8_t read_err = EOF;
@@ -261,9 +261,9 @@ bool _read_from_file(hPartition_t phandle, const char *name, int length, const c
     memset(buf_read_file, 0, length);
 
     // Call filesystem api function to read from a file
-    file_stat = file_read(fhandle, 0, length, buf_read_file);
-    Debug_LOG_DEBUG("file_read:         %d", (uint8_t)file_stat);
-    if(file_stat > 0)
+    err = file_read(fhandle, 0, length, buf_read_file);
+    Debug_LOG_DEBUG("file_read:         %d", err);
+    if(err > 0)
         return false;
 
     for(int i = 0; i < length; i++){
@@ -277,10 +277,10 @@ bool _read_from_file(hPartition_t phandle, const char *name, int length, const c
         return false;
 
     // Close file
-    file_stat = file_close(fhandle);
-    Debug_LOG_DEBUG("file_close:        %d", (uint8_t)file_stat);
-    if(file_stat > 0)
-        return false;
+    err = file_close(fhandle);
+    Debug_LOG_DEBUG("file_close:        %d", err);
+    if(read_err > 0)
+         return false;
 
     return true;
 }

@@ -32,7 +32,7 @@ static char proxy_NVM_message[PAGE_SIZE] = {0};
 
 
 void api_pm_component__init(void){
-    seos_pm_result_t pm_stat;
+    seos_err_t err;
 
     if (!ChanMuxClient_ctor(
             &chanmux,
@@ -49,7 +49,7 @@ void api_pm_component__init(void){
         return;
     }
 
-    pm_stat = api_pm_partition_manager_init(&proxy_NVM);
-    if(pm_stat != SEOS_PM_SUCCESS)
+    err = api_pm_partition_manager_init(&proxy_NVM);
+    if(err != SEOS_SUCCESS)
         Debug_LOG_DEBUG("Fail to init partition manager.");
 }
