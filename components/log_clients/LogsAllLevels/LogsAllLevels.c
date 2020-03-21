@@ -49,6 +49,7 @@ void setUpLogging()
 void testLogging()
 {
     Debug_LOG(Debug_LOG_LEVEL_NONE, "   NONE", "Debug_LOG_NONE");
+    Debug_LOG(Debug_LOG_LEVEL_MAX,  "    MAX", "Debug_LOG_MAX");
 
     Debug_LOG_ASSERT("");
     Debug_LOG_ASSERT("%s", maxPossibleLogEntry);

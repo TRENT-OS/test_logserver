@@ -99,3 +99,4 @@ static const Partition_cat_t partition_conf = {
 #define API_LOG_SERVER_READ_LOG_FILE            log_server_interface_read_log_file
 
 #define Debug_LOG_LEVEL_CUSTOM                  9
+#define Debug_LOG_LEVEL_MAX                     0xFE

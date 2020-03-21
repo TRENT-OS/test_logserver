@@ -31,6 +31,7 @@ assembly {
         component LogsAllLevels     app_lvl_debug;
         component LogsAllLevels     app_lvl_trace;
         component LogsAllLevels     app_lvl_custom;
+        component LogsAllLevels     app_lvl_max;
 
         component LogsAllLevels     app_no_filters;
 
@@ -83,6 +84,7 @@ assembly {
         connection  seL4RPCCall         conn_rpc_logServer2app_lvl_debug(  from app_lvl_debug.log_server_interface,   to logServer.log_server_interface);
         connection  seL4RPCCall         conn_rpc_logServer2app_lvl_trace(  from app_lvl_trace.log_server_interface,   to logServer.log_server_interface);
         connection  seL4RPCCall         conn_rpc_logServer2app_lvl_custom( from app_lvl_custom.log_server_interface,  to logServer.log_server_interface);
+        connection  seL4RPCCall         conn_rpc_logServer2app_lvl_max(    from app_lvl_max.log_server_interface,     to logServer.log_server_interface);
 
         connection  seL4RPCCall         conn_rpc_logServer2app_no_filters( from app_no_filters.log_server_interface,  to logServer.log_server_interface);
 
@@ -111,6 +113,7 @@ assembly {
         connection  seL4Notification    conn_dataAvailable_logServer2app_lvl_debug(  from logServer.logServer_ready, to app_lvl_debug.logServer_ready);
         connection  seL4Notification    conn_dataAvailable_logServer2app_lvl_trace(  from logServer.logServer_ready, to app_lvl_trace.logServer_ready);
         connection  seL4Notification    conn_dataAvailable_logServer2app_lvl_custom( from logServer.logServer_ready, to app_lvl_custom.logServer_ready);
+        connection  seL4Notification    conn_dataAvailable_logServer2app_lvl_max(    from logServer.logServer_ready, to app_lvl_max.logServer_ready);
 
         connection  seL4Notification    conn_dataAvailable_logServer2app_no_filters( from logServer.logServer_ready, to app_no_filters.logServer_ready);
 
@@ -139,6 +142,7 @@ assembly {
         connection  seL4SharedData      conn_dataConnection_app_lvl_debug(  from app_lvl_debug.logServer_buf,   to logServer.dataport_buf_lvl_debug);
         connection  seL4SharedData      conn_dataConnection_app_lvl_trace(  from app_lvl_trace.logServer_buf,   to logServer.dataport_buf_lvl_trace);
         connection  seL4SharedData      conn_dataConnection_app_lvl_custom( from app_lvl_custom.logServer_buf,  to logServer.dataport_buf_lvl_custom);
+        connection  seL4SharedData      conn_dataConnection_app_lvl_max(    from app_lvl_max.logServer_buf,     to logServer.dataport_buf_lvl_max);
 
         connection  seL4SharedData      conn_dataConnection_app_no_filters( from app_no_filters.logServer_buf,  to logServer.dataport_buf_no_filters);
 
@@ -191,6 +195,7 @@ assembly {
         app_lvl_debug.log_server_interface_attributes         = 0xFFFF - 1;
         app_lvl_trace.log_server_interface_attributes         = 0xFFFF;
         app_lvl_custom.log_server_interface_attributes        = 0xFFFFFFF - 1;
+        app_lvl_max.log_server_interface_attributes           = 0xAAAA;
 
         app_no_filters.log_server_interface_attributes        = 0xCAFE;
 
@@ -213,6 +218,7 @@ assembly {
         app_lvl_debug.log_lvl   = -1;
         app_lvl_trace.log_lvl   = -1;
         app_lvl_custom.log_lvl  = -1;
+        app_lvl_max.log_lvl     = -1;
 
         app_no_filters.log_lvl  = -1;
 

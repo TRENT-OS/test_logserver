@@ -28,6 +28,7 @@ component LogServer {
     control;
 
     dataport Buf                     dataport_buf_lvl_none;
+    dataport Buf                     dataport_buf_lvl_max;
     dataport Buf                     dataport_buf_lvl_assert;
     dataport Buf                     dataport_buf_lvl_fatal;
     dataport Buf                     dataport_buf_lvl_error;

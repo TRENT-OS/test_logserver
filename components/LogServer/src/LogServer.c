@@ -48,6 +48,7 @@ static ClientConfig_t clientConfigs[] =
     { .name = "LVL_DEBUG",        .log_level = Debug_LOG_LEVEL_DEBUG,   .log_file = NULL,         .id = 0xFFFFu - 1 },
     { .name = "LVL_TRACE",        .log_level = Debug_LOG_LEVEL_TRACE,   .log_file = NULL,         .id = 0xFFFFu },
     { .name = "LVL_CUSTOM",       .log_level = Debug_LOG_LEVEL_CUSTOM,  .log_file = NULL,         .id = 0xFFFFFFFu - 1 },
+    { .name = "LVL_MAX",          .log_level = Debug_LOG_LEVEL_MAX,     .log_file = NULL,         .id = 0xAAAAu },
 
     { .name = "FILTER_NULL",                                            .log_file = NULL,         .id = NO_FILTER_ID_FIRST },
 
@@ -233,6 +234,7 @@ void mapClientConfigsDataPorts()
     (clientConfig)++->buffer = dataport_buf_lvl_debug;
     (clientConfig)++->buffer = dataport_buf_lvl_trace;
     (clientConfig)++->buffer = dataport_buf_lvl_custom;
+    (clientConfig)++->buffer = dataport_buf_lvl_max;
 
     (clientConfig)++->buffer = dataport_buf_no_filters;
 
