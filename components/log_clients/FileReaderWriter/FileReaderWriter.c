@@ -21,50 +21,76 @@
 
 #define DATA_LENGTH                 1000
 
-
-
 static Log_filter_t filter;
 static Log_emitter_callback_t reg;
 
+static
+seos_err_t
+_create_file(
+    hPartition_t phandle,
+    const char *name,
+    int length,
+    const char c);
 
+static
+seos_err_t
+_read_from_file(
+    hPartition_t phandle,
+    const char *name,
+    int length,
+    const char c);
 
-bool _create_file(hPartition_t phandle, const char *name, int length, const char c);
-bool _read_from_file(hPartition_t phandle, const char *name, int length, const char c);
-
-
-
-static bool
+static seos_err_t
 filesystem_init(void)
 {
     hPartition_t phandle;
     pm_disk_data_t pm_disk_data;
     pm_partition_data_t pm_partition_data;
 
-    if(partition_manager_get_info_disk(&pm_disk_data) != SEOS_SUCCESS)
+    seos_err_t ret = partition_manager_get_info_disk(&pm_disk_data);
+    if(SEOS_SUCCESS != ret)
     {
-        printf("Fail to get disk info!\n");
-        return false;
+        Debug_LOG_ERROR("Fail to get disk info! Error code: %d", ret);
+        return ret;
     }
 
-    if(partition_manager_get_info_partition(PARTITION_ID, &pm_partition_data) != SEOS_SUCCESS)
+    ret = partition_manager_get_info_partition(
+            PARTITION_ID,
+            &pm_partition_data);
+
+    if(SEOS_SUCCESS != ret)
     {
-        printf("Fail to get partition info: %d!\n", pm_partition_data.partition_id);
-        return false;
+        Debug_LOG_ERROR(
+            "Fail to get partition info: %d! Error code: %d",
+            pm_partition_data.partition_id,
+            ret);
+
+        return ret;
     }
 
-    if(partition_init(pm_partition_data.partition_id, 0) != SEOS_SUCCESS)
+    ret = partition_init(pm_partition_data.partition_id, 0);
+    if(SEOS_SUCCESS != ret)
     {
-        printf("Fail to init partition: %d!\n", pm_partition_data.partition_id);
-        return false;
+        Debug_LOG_ERROR("Fail to init partition: %d! Error code: %d",
+        pm_partition_data.partition_id,
+        ret);
+
+        return ret;
     }
 
-    if( (phandle = partition_open(pm_partition_data.partition_id)) < 0)
+    phandle = partition_open(pm_partition_data.partition_id);
+    if(!is_valid_partition_handle(phandle))
     {
-        printf("Fail to open partition: %d!\n", pm_partition_data.partition_id);
-        return false;
+        ret = SEOS_ERROR_INVALID_HANDLE;
+        Debug_LOG_ERROR(
+            "Fail to open partition: %d! Error code: %d",
+            pm_partition_data.partition_id,
+            ret);
+
+        return ret;
     }
 
-    if(partition_fs_create(
+    ret = partition_fs_create(
                 phandle,
                 FS_TYPE_FAT32,
                 pm_partition_data.partition_size,
@@ -73,30 +99,37 @@ filesystem_init(void)
                 0,  // default value: reserved sectors count: FAT12/FAT16 = 1; FAT32 = 3
                 0,  // default value: count file/dir entries: FAT12/FAT16 = 16; FAT32 = 0
                 0,  // default value: count header sectors: 512
-                FS_PARTITION_OVERWRITE_CREATE)
-        != SEOS_SUCCESS)
+                FS_PARTITION_OVERWRITE_CREATE);
+
+    if(SEOS_SUCCESS != ret)
     {
-        printf("Fail to create filesystem on partition: %d!\n", pm_partition_data.partition_id);
-        return false;
+        Debug_LOG_ERROR(
+            "Fail to create filesystem on partition: %d! Error code: %d",
+            pm_partition_data.partition_id,
+            ret);
+
+        return ret;
     }
 
-    if(partition_close(phandle) != SEOS_SUCCESS)
+    ret = partition_close(phandle);
+    if(SEOS_SUCCESS != ret)
     {
-        printf("Fail to close partition: %d!\n", pm_partition_data.partition_id);
-        return false;
+        Debug_LOG_ERROR(
+            "Fail to close partition: %d!",
+            pm_partition_data.partition_id);
+
+        return ret;
     }
 
-    return true;
+    return ret;
 }
 
 
 
-int run(void) {
-    seos_err_t err;
-    uint8_t file_stat;
+int run(void)
+{
     hPartition_t phandle;
     int64_t length;
-    int8_t ret;
 
     /**********/
     /* Logger */
@@ -112,18 +145,30 @@ int run(void) {
     /*******************/
     /* Filesystem init */
     /*******************/
-    ret = filesystem_init();
-    if(ret < 0){
-        Debug_LOG_ERROR("Fail to init demo!");
-        return EOF;
+    seos_err_t ret = filesystem_init();
+    if(SEOS_SUCCESS != ret)
+    {
+        Debug_LOG_ERROR(
+            "Fail to init demo! Error code: %d",
+            ret);
+
+        return ret;
     }
 
     /*******************/
     /* Open partitions */
     /*******************/
     phandle = partition_open(PARTITION_ID);
-    if(phandle < 0)
-        return EOF;
+    if(!is_valid_partition_handle(phandle))
+    {
+        ret = SEOS_ERROR_INVALID_HANDLE;
+        Debug_LOG_ERROR(
+            "Fail to open partition: %d! Error code: %d",
+            PARTITION_ID,
+            ret);
+
+        return ret;
+    }
 
     /*******************/
     /* Partition mount */
@@ -133,16 +178,18 @@ int run(void) {
     /****************/
     /* Create files */
     /****************/
-    file_stat = _create_file(phandle, FILE_NAME_P1_F1, DATA_LENGTH, 'a');
-    if(file_stat == false){
-        Debug_LOG_ERROR("_create_file error %d", file_stat);
-        return EOF;
+    ret = _create_file(phandle, FILE_NAME_P1_F1, DATA_LENGTH, 'a');
+    if(SEOS_SUCCESS != ret)
+    {
+        Debug_LOG_ERROR("_create_file error %d", ret);
+        return ret;
     }
 
-    file_stat = _create_file(phandle, FILE_NAME_P1_F2, DATA_LENGTH * 2, 'b');
-    if(file_stat == false){
-        Debug_LOG_ERROR("_create_file error %d", file_stat);
-        return EOF;
+    ret = _create_file(phandle, FILE_NAME_P1_F2, DATA_LENGTH * 2, 'b');
+    if(SEOS_SUCCESS != ret)
+    {
+        Debug_LOG_ERROR("_create_file error %d", ret);
+        return ret;
     }
 
     /*****************/
@@ -154,98 +201,127 @@ int run(void) {
     Debug_LOG_DEBUG("file_getSize:      %lld", length);
     if(length < 0){
         Debug_LOG_ERROR("file_getSize error from file: %s", FILE_NAME_P1_F2);
-        return EOF;
+        return SEOS_ERROR_GENERIC;
     }
 
     /**************/
     /* Read files */
     /**************/
-    file_stat = _read_from_file(phandle, FILE_NAME_P1_F1, DATA_LENGTH, 'a');
-    if(file_stat == false){
-        Debug_LOG_ERROR("_read_from_file error %d", file_stat);
-        return EOF;
+    ret = _read_from_file(phandle, FILE_NAME_P1_F1, DATA_LENGTH, 'a');
+    if(SEOS_SUCCESS != ret)
+    {
+        Debug_LOG_ERROR("Read from file %s failed. Error code: %d",
+        FILE_NAME_P1_F1,
+        ret);
+
+        return ret;
     }
 
-    file_stat = _read_from_file(phandle, FILE_NAME_P1_F2, DATA_LENGTH * 2, 'b');
-    if(file_stat == false){
-        Debug_LOG_ERROR("_read_from_file error %d", file_stat);
-        return EOF;
+    ret = _read_from_file(phandle, FILE_NAME_P1_F2, DATA_LENGTH * 2, 'b');
+    if(SEOS_SUCCESS != ret)
+    {
+        Debug_LOG_ERROR("Read from file %s failed. Error code: %d",
+        FILE_NAME_P1_F2,
+        ret);
+
+        return ret;
     }
 
     /**********************/
     /* Unmount partitions */
     /**********************/
-    err = partition_fs_unmount(phandle);
-    Debug_LOG_DEBUG("partition_unmount 1: %d", err);
-    if(err > 0)
-        return EOF;
+    ret = partition_fs_unmount(phandle);
+    Debug_LOG_DEBUG("partition_unmount 1: %d", ret);
+
+    if(SEOS_SUCCESS != ret)
+    {
+        return ret;
+    }
 
     /********************/
     /* Close partitions */
     /********************/
-    err = partition_close(phandle);
-    Debug_LOG_DEBUG("partition_close 1: %d", err);
-    if(err > 0)
-        return EOF;
+    ret = partition_close(phandle);
+    Debug_LOG_DEBUG("partition_close 1: %d", ret);
+
+    if(SEOS_SUCCESS != ret)
+    {
+        return ret;
+    }
 
     // destruction
     Log_emitter_dtor();
-
     Log_emitter_callback_dtor(&reg);
-
     Log_filter_dtor(&filter);
 
-    return 0;
+    return SEOS_SUCCESS;
 }
 
-
-
-bool _create_file(hPartition_t phandle, const char *name, int length, const char c){
+//static
+seos_err_t
+_create_file(
+    hPartition_t phandle,
+    const char *name,
+    int length,
+    const char c)
+{
     hFile_t fhandle;
-    seos_err_t err = SEOS_SUCCESS;
     char buf_write_file[length];
 
     if(length > DATABUFFER_SIZE){
         Debug_LOG_ERROR("Length for data buffer to big!");
-        return false;
+
+        return SEOS_ERROR_INVALID_PARAMETER;
     }
 
     Debug_LOG_DEBUG("### Create file %s ###", name);
     // Open file
     fhandle = file_open(phandle, name, FA_CREATE_ALWAYS | FA_WRITE);
-    if(fhandle < 0)
-        return EOF;
+    if(!is_valid_file_handle(fhandle))
+    {
+        Debug_LOG_ERROR(
+            "Failed to open the file: %s",
+            name);
+
+        return SEOS_ERROR_INVALID_HANDLE;
+    }
 
     // fill buffer with test data
     memset(buf_write_file, c, length);
 
     // Call filesystem api function to write into a file
-    err = file_write(fhandle, 0, length, buf_write_file);
+    seos_err_t err = file_write(fhandle, 0, length, buf_write_file);
     Debug_LOG_DEBUG("file_write:        %d", err);
-    if(err > 0)
-        return false;
+
+    if(SEOS_SUCCESS != err)
+    {
+        return err;
+    }
 
     // Close this file
     err = file_close(fhandle);
     Debug_LOG_DEBUG("file_close:        %d", err);
-    if(err > 0)
-        return false;
 
-    return true;
+    return err;
 }
 
-
-
-bool _read_from_file(hPartition_t phandle, const char *name, int length, const char c){
+//static
+seos_err_t
+_read_from_file(
+    hPartition_t phandle,
+    const char *name,
+    int length,
+    const char c)
+{
     hFile_t fhandle;
-    seos_err_t err = SEOS_SUCCESS;
     char buf_read_file[length];
     char buf_write_file[length];
     int8_t read_err = EOF;
 
     if(length > DATABUFFER_SIZE){
         Debug_LOG_ERROR("Length for data buffer to big!");
-        return false;
+
+        return SEOS_ERROR_INVALID_PARAMETER;
     }
 
     // fill buffer with test data
@@ -254,33 +330,48 @@ bool _read_from_file(hPartition_t phandle, const char *name, int length, const c
     Debug_LOG_DEBUG("### Read from file %s ###", name);
     // Open file
     fhandle = file_open(phandle, name, FA_READ);
-    if(fhandle < 0)
-        return EOF;
+    if(!is_valid_file_handle(fhandle))
+    {
+        Debug_LOG_ERROR(
+            "Failed to open the file: %s",
+            name);
+
+        return SEOS_ERROR_INVALID_HANDLE;
+    }
 
     // clear the receive buffer
     memset(buf_read_file, 0, length);
 
     // Call filesystem api function to read from a file
-    err = file_read(fhandle, 0, length, buf_read_file);
+    seos_err_t err = file_read(fhandle, 0, length, buf_read_file);
     Debug_LOG_DEBUG("file_read:         %d", err);
-    if(err > 0)
-        return false;
+    if(SEOS_SUCCESS != err)
+    {
+        return err;
+    }
 
-    for(int i = 0; i < length; i++){
-        if(buf_read_file[i] != buf_write_file[i]){
-            Debug_LOG_ERROR("Read values corrupted!");
-            read_err = 1;
+    for(int i = 0; i < length; i++)
+    {
+        if(buf_read_file[i] != buf_write_file[i])
+        {
+            Debug_LOG_ERROR(
+                "Read values corrupted at index %d! " \
+                "buf_read_file[i] = %d, buf_write_file[i] = %d",
+                i,
+                buf_read_file[i],
+                buf_write_file[i]);
+            ++read_err;
         }
     }
 
     if(read_err > 0)
-        return false;
+    {
+        return SEOS_ERROR_GENERIC;
+    }
 
     // Close file
     err = file_close(fhandle);
     Debug_LOG_DEBUG("file_close:        %d", err);
-    if(read_err > 0)
-         return false;
 
-    return true;
+    return err;
 }

@@ -141,24 +141,34 @@ filesystem_init(void)
     pm_disk_data_t pm_disk_data;
     pm_partition_data_t pm_partition_data;
 
-    if(partition_manager_get_info_disk(&pm_disk_data) != SEOS_SUCCESS)
+    seos_err_t ret =  partition_manager_get_info_disk(&pm_disk_data);
+
+    if(SEOS_SUCCESS != ret)
     {
-        printf("Fail to get disk info!\n");
+        printf("Fail to get disk info! Error code: %d\n", ret);
+
         return false;
     }
 
-    if(partition_manager_get_info_partition(PARTITION_ID, &pm_partition_data)
-        != SEOS_SUCCESS)
+    ret = partition_manager_get_info_partition(PARTITION_ID, &pm_partition_data);
+    if(SEOS_SUCCESS != ret)
     {
         printf(
-            "Fail to get partition info: %d!\n",
-            pm_partition_data.partition_id);
+            "Fail to get partition info: %d! Error code: %d\n",
+            pm_partition_data.partition_id,
+            ret);
+
         return false;
     }
 
-    if(partition_init(pm_partition_data.partition_id, 0) != SEOS_SUCCESS)
+    ret = partition_init(pm_partition_data.partition_id, 0);
+    if(SEOS_SUCCESS != ret)
     {
-        printf("Fail to init partition: %d!\n", pm_partition_data.partition_id);
+        printf(
+            "Fail to init partition: %d! Error code: %d\n",
+            pm_partition_data.partition_id,
+            ret);
+
         return false;
     }
 
@@ -169,7 +179,7 @@ filesystem_init(void)
         return false;
     }
 
-    if(partition_fs_create(
+    ret = partition_fs_create(
             phandle,
             FS_TYPE_FAT16,
             pm_partition_data.partition_size,
@@ -178,19 +188,26 @@ filesystem_init(void)
             0,  // default value: reserved sectors count: FAT12/FAT16 = 1; FAT32 = 3
             0,  // default value: count file/dir entries: FAT12/FAT16 = 16; FAT32 = 0
             0,  // default value: count header sectors: 512
-            FS_PARTITION_OVERWRITE_CREATE)
-        != SEOS_SUCCESS)
+            FS_PARTITION_OVERWRITE_CREATE);
+
+    if(SEOS_SUCCESS != ret)
     {
         printf(
-            "Fail to create filesystem on partition: %d!\n",
-            pm_partition_data.partition_id);
+            "Fail to create filesystem on partition: %d! Error code: %d\n",
+            pm_partition_data.partition_id,
+            ret);
+
         return false;
     }
 
-    if(partition_close(phandle) != SEOS_SUCCESS)
+    ret = partition_close(phandle);
+    if(SEOS_SUCCESS != ret)
     {
-        printf("Fail to close partition: %d!\n",
-        pm_partition_data.partition_id);
+        printf(
+            "Fail to close partition: %d! Error code: %d\n",
+            pm_partition_data.partition_id,
+            ret);
+
         return false;
     }
 

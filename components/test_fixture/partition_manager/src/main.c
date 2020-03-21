@@ -31,9 +31,8 @@ static char proxy_NVM_message[PAGE_SIZE] = {0};
 
 
 
-void api_pm_component__init(void){
-    seos_err_t err;
-
+void api_pm_component__init(void)
+{
     if (!ChanMuxClient_ctor(
             &chanmux,
             GET_PROPERTY_CHANMUX_CHANNEL,
@@ -49,7 +48,10 @@ void api_pm_component__init(void){
         return;
     }
 
-    err = api_pm_partition_manager_init(&proxy_NVM);
-    if(err != SEOS_SUCCESS)
-        Debug_LOG_DEBUG("Fail to init partition manager.");
+    seos_err_t err = api_pm_partition_manager_init(&proxy_NVM);
+
+    if(SEOS_SUCCESS != err)
+    {
+        Debug_LOG_ERROR("Fail to init partition manager. Error code: %d", err);
+    }
 }
