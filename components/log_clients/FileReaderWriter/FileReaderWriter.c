@@ -316,7 +316,6 @@ _read_from_file(
     hFile_t fhandle;
     char buf_read_file[length];
     char buf_write_file[length];
-    int8_t read_err = EOF;
 
     if(length > DATABUFFER_SIZE){
         Debug_LOG_ERROR("Length for data buffer to big!");
@@ -350,6 +349,7 @@ _read_from_file(
         return err;
     }
 
+    int readErr = 0;
     for(int i = 0; i < length; i++)
     {
         if(buf_read_file[i] != buf_write_file[i])
@@ -360,11 +360,12 @@ _read_from_file(
                 i,
                 buf_read_file[i],
                 buf_write_file[i]);
-            ++read_err;
+
+            ++readErr;
         }
     }
 
-    if(read_err > 0)
+    if(readErr > 0)
     {
         return SEOS_ERROR_GENERIC;
     }
