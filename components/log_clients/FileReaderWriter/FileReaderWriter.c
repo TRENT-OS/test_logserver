@@ -2,7 +2,7 @@
 
 #include "seos_fs.h"
 #include "seos_pm.h"
-#include "seos_logger.h"
+#include "OS_Logger.h"
 
 #include <camkes.h>
 
@@ -21,8 +21,8 @@
 
 #define DATA_LENGTH                 1000
 
-static Log_filter_t filter;
-static Log_emitter_callback_t reg;
+static OS_LoggerFilter_Handle_t filter;
+static OS_LoggerEmitterCallback_Handle_t reg;
 
 static
 seos_err_t
@@ -135,12 +135,12 @@ int run(void)
     /* Logger */
     /**********/
     // set up registered functions layer
-    Log_emitter_callback_ctor(&reg, logServer_ready_wait, API_LOG_SERVER_EMIT);
+    OS_LoggerEmitterCallback_ctor(&reg, logServer_ready_wait, API_LOG_SERVER_EMIT);
 
     // set up log filter layer
-    Log_filter_ctor(&filter, Debug_LOG_LEVEL_DEBUG);
+    OS_LoggerFilter_ctor(&filter, Debug_LOG_LEVEL_DEBUG);
 
-    get_instance_Log_emitter(DATABUFFER_CLIENT, &filter, &reg);
+    OS_LoggerEmitter_getInstance(DATABUFFER_CLIENT, &filter, &reg);
 
     /*******************/
     /* Filesystem init */
@@ -250,9 +250,9 @@ int run(void)
     }
 
     // destruction
-    Log_emitter_dtor();
-    Log_emitter_callback_dtor(&reg);
-    Log_filter_dtor(&filter);
+    OS_LoggerEmitter_dtor();
+    OS_LoggerEmitterCallback_dtor(&reg);
+    OS_LoggerFilter_dtor(&filter);
 
     return SEOS_SUCCESS;
 }

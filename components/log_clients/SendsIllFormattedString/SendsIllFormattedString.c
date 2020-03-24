@@ -1,9 +1,9 @@
 #include "LibDebug/Debug.h"
-#include "seos_logger.h"
+#include "OS_Logger.h"
 #include <camkes.h>
 
-static Log_filter_t filter;
-static Log_emitter_callback_t reg;
+static OS_LoggerFilter_Handle_t filter;
+static OS_LoggerEmitterCallback_Handle_t reg;
 
 static void setUpLogging();
 static void testLogging();
@@ -20,8 +20,8 @@ int run()
 
 void setUpLogging()
 {
-    Log_emitter_callback_ctor(&reg, logServer_ready_wait, API_LOG_SERVER_EMIT);
-    get_instance_Log_emitter(logServer_buf, NULL, &reg);
+    OS_LoggerEmitterCallback_ctor(&reg, logServer_ready_wait, API_LOG_SERVER_EMIT);
+    OS_LoggerEmitter_getInstance(logServer_buf, NULL, &reg);
 }
 
 void testLogging()
@@ -32,7 +32,7 @@ void testLogging()
 
 void tearDownLogging()
 {
-    Log_emitter_dtor();
-    Log_emitter_callback_dtor(&reg);
-    Log_filter_dtor(&filter);
+    OS_LoggerEmitter_dtor();
+    OS_LoggerEmitterCallback_dtor(&reg);
+    OS_LoggerFilter_dtor(&filter);
 }

@@ -1,9 +1,9 @@
 #include "LibDebug/Debug.h"
-#include "seos_logger.h"
+#include "OS_Logger.h"
 #include <camkes.h>
 
-static Log_filter_t filter;
-static Log_emitter_callback_t reg;
+static OS_LoggerFilter_Handle_t filter;
+static OS_LoggerEmitterCallback_Handle_t reg;
 
 static void setUpLogging();
 static void testLogging();
@@ -13,7 +13,7 @@ static void tearDownLogging();
 //  however nothing gets displayed when used.
 //
 // Max possible entry is:
-// (DATABUFFER_SIZE - (LOG_LEVEL_SERVER_LENGTH + LOG_LEVEL_CLIENT_LENGTH))
+// (DATABUFFER_SIZE - (OS_Logger_LOG_LEVEL_LENGTH + OS_Logger_LOG_LEVEL_LENGTH))
 // == 4096 - (2 + 2)
 const char maxPossibleLogEntry[];
 
@@ -33,16 +33,16 @@ int run()
 
 void setUpLogging()
 {
-    Log_emitter_callback_ctor(&reg, logServer_ready_wait, API_LOG_SERVER_EMIT);
+    OS_LoggerEmitterCallback_ctor(&reg, logServer_ready_wait, API_LOG_SERVER_EMIT);
 
     if(NO_FILTER == log_lvl)
     {
-        get_instance_Log_emitter(logServer_buf, NULL, &reg);
+        OS_LoggerEmitter_getInstance(logServer_buf, NULL, &reg);
     }
     else
     {
-        Log_filter_ctor(&filter, log_lvl);
-        get_instance_Log_emitter(logServer_buf, &filter, &reg);
+        OS_LoggerFilter_ctor(&filter, log_lvl);
+        OS_LoggerEmitter_getInstance(logServer_buf, &filter, &reg);
     }
 }
 
@@ -68,9 +68,9 @@ void testLogging()
 
 void tearDownLogging()
 {
-    Log_emitter_dtor();
-    Log_emitter_callback_dtor(&reg);
-    Log_filter_dtor(&filter);
+    OS_LoggerEmitter_dtor();
+    OS_LoggerEmitterCallback_dtor(&reg);
+    OS_LoggerFilter_dtor(&filter);
 }
 
 const char maxPossibleLogEntry[] =
@@ -103,3 +103,4 @@ const char maxPossibleLogEntry[] =
     "litora magna commodo ornare. Euismod in metus sociis pellentesque aenean "
     "blandit, cubilia nibh eu pharetra hendrerit parturient purus, nisl "
     "viverra pra.";
+

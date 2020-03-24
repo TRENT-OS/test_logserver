@@ -1,6 +1,6 @@
 #include "LibDebug/Debug.h"
 
-#include "seos_logger.h"
+#include "OS_Logger.h"
 
 #include <camkes.h>
 
@@ -17,8 +17,8 @@
 
 
 
-static Log_file_client_callback_t log_file_client_callback;
-static Log_file_client_t log_file_client;
+static OS_LoggerFileClientCallback_Handle_t log_file_client_callback;
+static OS_LoggerFileClient_Handle_t log_file_client;
 
 
 
@@ -31,13 +31,13 @@ int run()
     bool retval;
 
     // set up log file client callback
-    Log_file_client_callback_ctor(&log_file_client_callback, API_LOG_SERVER_READ_LOG_FILE);
+    OS_LoggerFileClientCallback_ctor(&log_file_client_callback, API_LOG_SERVER_READ_LOG_FILE);
 
     // set up log file client
-    Log_file_client_ctor(&log_file_client, DATABUFFER_CLIENT, buf, &log_file_client_callback);
+    OS_LoggerFileClient_ctor(&log_file_client, DATABUFFER_CLIENT, buf, &log_file_client_callback);
 
     // read log file 01
-    retval = Log_file_client_read_log_file(&log_file_client, LOG_FILENAME_01, 0, DATABUFFER_SIZE);
+    retval = OS_LoggerFileClient_read(&log_file_client, LOG_FILENAME_01, 0, DATABUFFER_SIZE);
     if(retval == false){
         Debug_LOG_ERROR("Fail to read log file!");
         return 0;
@@ -46,7 +46,7 @@ int run()
     printf("log file 01 content:\n%s", buf);
 
     // read log file 02
-    retval = Log_file_client_read_log_file(&log_file_client, LOG_FILENAME_02, 0, DATABUFFER_SIZE);
+    retval = OS_LoggerFileClient_read(&log_file_client, LOG_FILENAME_02, 0, DATABUFFER_SIZE);
     if(retval == false){
         Debug_LOG_ERROR("Fail to read log file!");
         return 0;
@@ -58,9 +58,9 @@ int run()
                 buf);
 
     // destruction
-    Log_file_client_callback_dtor(&log_file_client_callback);
+    OS_LoggerFileClientCallback_dtor(&log_file_client_callback);
 
-    Log_file_client_dtor(&log_file_client);
+    OS_LoggerFileClient_dtor(&log_file_client);
 
     return 0;
 }

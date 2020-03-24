@@ -1,6 +1,6 @@
 #include "LibDebug/Debug.h"
 
-#include "seos_log_server_backend_filesystem.h"
+#include "OS_LoggerServerBackendFilesystem.h"
 #include "custom_format.h"
 
 #include "seos_fs.h"
@@ -20,19 +20,19 @@ static const uint8_t  PARTITION_ID  = 1u;
 #define LOG_FILENAME_01 "log_01.txt"
 #define LOG_FILENAME_02 "log_02.txt"
 
-static Log_file_t log_file_01, log_file_02;
+static OS_LoggerFile_Handle_t log_file_01, log_file_02;
 
 static char buf_log_server[DATABUFFER_SIZE];
 
 typedef struct ClientConfig
 {
-    Log_consumer_t consumer;
-    void*          buffer;
-    Log_filter_t   log_filter;
-    uint8_t        log_level;
-    Log_file_t*    log_file;
-    uint32_t       id;
-    const char*    name;
+    OS_LoggerConsumer_Handle_t consumer;
+    void*                      buffer;
+    OS_LoggerFilter_Handle_t   log_filter;
+    uint8_t                    log_level;
+    OS_LoggerFile_Handle_t*    log_file;
+    uint32_t                   id;
+    const char*                name;
 } ClientConfig_t;
 
 static ClientConfig_t clientConfigs[] =
@@ -73,15 +73,15 @@ static const size_t CLIENT_CONFIGS_COUNT = sizeof(clientConfigs)
 
 uint32_t API_LOG_SERVER_GET_SENDER_ID(void);
 
-static Log_consumer_callback_t  log_consumer_callback;
-static Log_format_t             format;
-static Log_subject_t            subject;
-static Log_output_t             filesystem, console;
-static Log_emitter_callback_t   emitter_callback;
+static OS_LoggerConsumerCallback_t       log_consumer_callback;
+static OS_LoggerFormat_Handle_t          format;
+static OS_LoggerSubject_Handle_t         subject;
+static OS_LoggerOutput_Handle_t          filesystem, console;
+static OS_LoggerEmitterCallback_Handle_t emitter_callback;
 
 // Emitter configuration
-static Log_subject_t  subject_log_server;
-static Log_output_t   console_log_server;
+static OS_LoggerSubject_Handle_t  subject_log_server;
+static OS_LoggerOutput_Handle_t   console_log_server;
 
 static void mapClientConfigsDataPorts();
 static void initLogFiles();
@@ -94,7 +94,7 @@ static bool filesystem_init(void);
 void log_server_interface__init()
 {
     // set up consumer chain
-    get_instance_Consumer_chain();
+    OS_LoggerConsumerChain_getInstance();
 
     initLogTargetsAndSubjects();
     initClients();
@@ -109,7 +109,7 @@ void log_server_interface__init()
     initLogFiles();
 
     // start polling
-    Consumer_chain_poll();
+    OS_LoggerConsumerChain_poll();
 
     LOG_SUCCESS();
 }
@@ -260,45 +260,51 @@ void mapClientConfigsDataPorts()
 
 void initLogFiles()
 {
-    Log_file_ctor(&log_file_01, PARTITION_ID, LOG_FILENAME_01);
-    Log_file_ctor(&log_file_02, PARTITION_ID, LOG_FILENAME_02);
-    Log_file_create_log_file(&log_file_01);
-    Log_file_create_log_file(&log_file_02);
+    OS_LoggerFile_ctor(&log_file_01, PARTITION_ID, LOG_FILENAME_01);
+    OS_LoggerFile_ctor(&log_file_02, PARTITION_ID, LOG_FILENAME_02);
+    OS_LoggerFile_create(&log_file_01);
+    OS_LoggerFile_create(&log_file_02);
 }
 
 void initLogTargetsAndSubjects()
 {
-    Log_format_ctor(&format);
+    OS_LoggerFormat_ctor(&format);
 
     // register objects to observe
-    Log_subject_ctor(&subject);
+    OS_LoggerSubject_ctor(&subject);
 
     // Emitter configuration
-    Log_subject_ctor(&subject_log_server);
+    OS_LoggerSubject_ctor(&subject_log_server);
 
     // set up backend
-    Log_output_filesystem_ctor(&filesystem, &format);
-    Log_output_console_ctor(&console, &format);
+    OS_LoggerOutputFileSystem_ctor(&filesystem, &format);
+    OS_LoggerOutputConsole_ctor(&console, &format);
 
     // Emitter configuration
-    Log_output_console_ctor(&console_log_server, &custom_format);
+    OS_LoggerOutputConsole_ctor(&console_log_server, &custom_format);
 
     // attach observed object to subject
-    Log_subject_attach((Subject_t *)&subject, (Observer_t *)&filesystem);
-    Log_subject_attach((Subject_t *)&subject, (Observer_t *)&console);
+    OS_LoggerSubject_attach(
+        (OS_LoggerAbstractSubject_Handle_t *)&subject,
+        (OS_LoggerAbstractObserver_Handle_t *)&filesystem);
+
+    OS_LoggerSubject_attach(
+        (OS_LoggerAbstractSubject_Handle_t *)&subject,
+        (OS_LoggerAbstractObserver_Handle_t *)&console);
+
     // Emitter configuration
-    Log_subject_attach(
-        (Subject_t *)&subject_log_server,
-        (Observer_t *)&console_log_server);
+    OS_LoggerSubject_attach(
+        (OS_LoggerAbstractSubject_Handle_t *)&subject_log_server,
+        (OS_LoggerAbstractObserver_Handle_t *)&console_log_server);
 
     // Emitter configuration: set up registered functions layer
-    Log_emitter_callback_ctor(&emitter_callback, NULL, API_LOG_SERVER_EMIT);
+    OS_LoggerEmitterCallback_ctor(&emitter_callback, NULL, API_LOG_SERVER_EMIT);
 }
 
 void initClients()
 {
     // set up registered functions layer
-    Log_consumer_callback_ctor(
+    OS_LoggerConsumerCallback_ctor(
         &log_consumer_callback,
         logServer_ready_emit,
         API_LOG_SERVER_GET_SENDER_ID,
@@ -307,27 +313,27 @@ void initClients()
     mapClientConfigsDataPorts();
 
     // Emitter configuration: set up log emitter layer
-    get_instance_Log_emitter(
+    OS_LoggerEmitter_getInstance(
         clientConfigs[LOG_SERVER_ID].buffer,
         &clientConfigs[LOG_SERVER_ID].log_filter,
         &emitter_callback);
 
     for(size_t i = 0; i < CLIENT_CONFIGS_COUNT; ++i)
     {
-        Log_filter_ctor(
+        OS_LoggerFilter_ctor(
             &clientConfigs[i].log_filter,
              clientConfigs[i].log_level);
 
         bool isFilterNull = (NO_FILTER_ID_FIRST <= clientConfigs[i].id)
                          && (NO_FILTER_ID_LAST  >= clientConfigs[i].id);
 
-        Log_filter_t* const pFilter = isFilterNull ?
+        OS_LoggerFilter_Handle_t* const pFilter = isFilterNull ?
                                         NULL : &clientConfigs[i].log_filter;
 
         const bool isLogServer  = (LOG_SERVER_ID == clientConfigs[i].id);
-        Log_subject_t* pSubject = isLogServer ? &subject_log_server : &subject;
+        OS_LoggerSubject_Handle_t* pSubject = isLogServer ? &subject_log_server : &subject;
 
-        Log_consumer_ctor(
+        OS_LoggerConsumer_ctor(
             &clientConfigs[i].consumer,
             clientConfigs[i].buffer,
             pFilter,
@@ -338,6 +344,6 @@ void initClients()
             clientConfigs[i].name
         );
 
-        Consumer_chain_append(&clientConfigs[i].consumer);
+        OS_LoggerConsumerChain_append(&clientConfigs[i].consumer);
     }
 }

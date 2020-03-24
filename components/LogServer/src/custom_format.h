@@ -1,8 +1,9 @@
 #pragma once
 
-#include "log_format.h"
+#include "OS_LoggerFormat.h"
 
 /**
  * @brief Custom format that will display name of the client and message.
  */
-extern Log_format_t custom_format;
+extern OS_LoggerFormat_Handle_t custom_format;
+
