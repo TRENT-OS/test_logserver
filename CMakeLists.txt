@@ -4,6 +4,7 @@ seos_set_config_file(config/config.h)
 
 seos_use_libs(
     SEOS_LIBS
+    SEOS_CHANMUX
     SEOS_PARTITION_MANAGER
     SEOS_FILESYSTEM_CORE
     SEOS_FILESYSTEM_FAT
@@ -112,6 +113,8 @@ DeclareCAmkESComponent(PARTITION_MANAGER
         seos_core_api
         seos_logger
         seos_libs
+        chanmux_client
+        proxy_nvm
         seos_partition_manager
 )
 
@@ -140,6 +143,7 @@ DeclareCAmkESComponent(ChanMux
         seos_core_api
         seos_logger
         seos_libs
+        chanmux_server
 )
 
 DeclareCAmkESRootserver(demo_logserver.camkes)
