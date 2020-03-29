@@ -7,7 +7,7 @@
  */
 
 /** @cond SKIP_IMPORTS */
-import "../../../interfaces/log_server.camkes";
+import <if_OS_Logger.camkes>;
 /** @endcond */
 
 /** @hideinitializer */
@@ -19,5 +19,5 @@ component LogFileReader {
 
     consumes DataAvailableEvent logServer_finish;
 
-    uses     LogSrvInf          log_server_interface;
+    uses     if_OS_Logger       log_server_interface;
 }
