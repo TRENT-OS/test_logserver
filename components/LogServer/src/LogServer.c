@@ -4,7 +4,7 @@
 #include "custom_format.h"
 
 #include "seos_fs.h"
-#include "seos_pm.h"
+#include "seos_pm_api.h"
 
 #include <stdio.h>
 #include <camkes.h>
