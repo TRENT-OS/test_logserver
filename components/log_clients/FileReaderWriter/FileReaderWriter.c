@@ -1,6 +1,6 @@
 #include "LibDebug/Debug.h"
 
-#include "seos_fs_api.h"
+#include "OS_FilesystemApi.h"
 #include "seos_pm_api.h"
 #include "OS_Logger.h"
 
@@ -68,7 +68,7 @@ filesystem_init(void)
         return ret;
     }
 
-    ret = partition_init(pm_partition_data.partition_id, 0);
+    ret = OS_FilesystemApi_init(pm_partition_data.partition_id, 0);
     if(SEOS_SUCCESS != ret)
     {
         Debug_LOG_ERROR("Fail to init partition: %d! Error code: %d",
@@ -78,8 +78,8 @@ filesystem_init(void)
         return ret;
     }
 
-    phandle = partition_open(pm_partition_data.partition_id);
-    if(!is_valid_partition_handle(phandle))
+    phandle = OS_FilesystemApi_open(pm_partition_data.partition_id);
+    if(!OS_FilesystemApi_validatePartitionHandle(phandle))
     {
         ret = SEOS_ERROR_INVALID_HANDLE;
         Debug_LOG_ERROR(
@@ -90,7 +90,7 @@ filesystem_init(void)
         return ret;
     }
 
-    ret = partition_fs_create(
+    ret = OS_FilesystemApi_create(
                 phandle,
                 FS_TYPE_FAT32,
                 pm_partition_data.partition_size,
@@ -111,7 +111,7 @@ filesystem_init(void)
         return ret;
     }
 
-    ret = partition_close(phandle);
+    ret = OS_FilesystemApi_close(phandle);
     if(SEOS_SUCCESS != ret)
     {
         Debug_LOG_ERROR(
@@ -158,8 +158,8 @@ int run(void)
     /*******************/
     /* Open partitions */
     /*******************/
-    phandle = partition_open(PARTITION_ID);
-    if(!is_valid_partition_handle(phandle))
+    phandle = OS_FilesystemApi_open(PARTITION_ID);
+    if(!OS_FilesystemApi_validatePartitionHandle(phandle))
     {
         ret = SEOS_ERROR_INVALID_HANDLE;
         Debug_LOG_ERROR(
@@ -173,7 +173,7 @@ int run(void)
     /*******************/
     /* Partition mount */
     /***************** */
-    partition_fs_mount(phandle);
+    OS_FilesystemApi_mount(phandle);
 
     /****************/
     /* Create files */
@@ -197,7 +197,7 @@ int run(void)
     /*****************/
     Debug_LOG_DEBUG("### Get file size from file %s ###", FILE_NAME_P1_F2);
 
-    length = file_getSize(phandle, FILE_NAME_P1_F2);
+    length = OS_FilesystemApi_getSizeOfFile(phandle, FILE_NAME_P1_F2);
     Debug_LOG_DEBUG("file_getSize:      %lld", length);
     if(length < 0){
         Debug_LOG_ERROR("file_getSize error from file: %s", FILE_NAME_P1_F2);
@@ -230,7 +230,7 @@ int run(void)
     /**********************/
     /* Unmount partitions */
     /**********************/
-    ret = partition_fs_unmount(phandle);
+    ret = OS_FilesystemApi_unmount(phandle);
     Debug_LOG_DEBUG("partition_unmount 1: %d", ret);
 
     if(SEOS_SUCCESS != ret)
@@ -241,7 +241,7 @@ int run(void)
     /********************/
     /* Close partitions */
     /********************/
-    ret = partition_close(phandle);
+    ret = OS_FilesystemApi_close(phandle);
     Debug_LOG_DEBUG("partition_close 1: %d", ret);
 
     if(SEOS_SUCCESS != ret)
@@ -276,8 +276,8 @@ _create_file(
 
     Debug_LOG_DEBUG("### Create file %s ###", name);
     // Open file
-    fhandle = file_open(phandle, name, FA_CREATE_ALWAYS | FA_WRITE);
-    if(!is_valid_file_handle(fhandle))
+    fhandle = OS_FilesystemApi_openFile(phandle, name, FA_CREATE_ALWAYS | FA_WRITE);
+    if(!OS_FilesystemApi_validateFileHandle(fhandle))
     {
         Debug_LOG_ERROR(
             "Failed to open the file: %s",
@@ -290,7 +290,7 @@ _create_file(
     memset(buf_write_file, c, length);
 
     // Call filesystem api function to write into a file
-    seos_err_t err = file_write(fhandle, 0, length, buf_write_file);
+    seos_err_t err = OS_FilesystemApi_writeFile(fhandle, 0, length, buf_write_file);
     Debug_LOG_DEBUG("file_write:        %d", err);
 
     if(SEOS_SUCCESS != err)
@@ -299,7 +299,7 @@ _create_file(
     }
 
     // Close this file
-    err = file_close(fhandle);
+    err = OS_FilesystemApi_closeFile(fhandle);
     Debug_LOG_DEBUG("file_close:        %d", err);
 
     return err;
@@ -328,8 +328,8 @@ _read_from_file(
 
     Debug_LOG_DEBUG("### Read from file %s ###", name);
     // Open file
-    fhandle = file_open(phandle, name, FA_READ);
-    if(!is_valid_file_handle(fhandle))
+    fhandle = OS_FilesystemApi_openFile(phandle, name, FA_READ);
+    if(!OS_FilesystemApi_validateFileHandle(fhandle))
     {
         Debug_LOG_ERROR(
             "Failed to open the file: %s",
@@ -342,7 +342,7 @@ _read_from_file(
     memset(buf_read_file, 0, length);
 
     // Call filesystem api function to read from a file
-    seos_err_t err = file_read(fhandle, 0, length, buf_read_file);
+    seos_err_t err = OS_FilesystemApi_readFile(fhandle, 0, length, buf_read_file);
     Debug_LOG_DEBUG("file_read:         %d", err);
     if(SEOS_SUCCESS != err)
     {
@@ -371,7 +371,7 @@ _read_from_file(
     }
 
     // Close file
-    err = file_close(fhandle);
+    err = OS_FilesystemApi_closeFile(fhandle);
     Debug_LOG_DEBUG("file_close:        %d", err);
 
     return err;
