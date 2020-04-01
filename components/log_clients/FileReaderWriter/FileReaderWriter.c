@@ -1,6 +1,6 @@
 #include "LibDebug/Debug.h"
 
-#include "seos_fs.h"
+#include "seos_fs_api.h"
 #include "seos_pm_api.h"
 #include "OS_Logger.h"
 

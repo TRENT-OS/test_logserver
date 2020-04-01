@@ -3,7 +3,7 @@
 #include "OS_LoggerServerBackendFilesystem.h"
 #include "custom_format.h"
 
-#include "seos_fs.h"
+#include "seos_fs_api.h"
 #include "seos_pm_api.h"
 
 #include <stdio.h>
