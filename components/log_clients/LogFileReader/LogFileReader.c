@@ -1,7 +1,5 @@
 #include "LibDebug/Debug.h"
-
-#include "OS_Logger.h"
-
+#include "Logger/Client/OS_LoggerFileClient.h"
 #include <camkes.h>
 
 

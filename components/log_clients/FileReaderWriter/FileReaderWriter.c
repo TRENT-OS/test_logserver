@@ -2,8 +2,6 @@
 
 #include "OS_FilesystemApi.h"
 #include "seos_pm_api.h"
-#include "OS_Logger.h"
-
 #include <camkes.h>
 
 

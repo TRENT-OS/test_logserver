@@ -1,5 +1,4 @@
 #include "LibDebug/Debug.h"
-#include "OS_Logger.h"
 #include <camkes.h>
 
 static OS_LoggerFilter_Handle_t filter;
