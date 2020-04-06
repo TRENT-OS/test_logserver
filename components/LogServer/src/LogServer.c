@@ -10,7 +10,7 @@
 
 #include "custom_format.h"
 
-#include "OS_FilesystemApi.h"
+#include "OS_Filesystem.h"
 #include "seos_pm_api.h"
 
 #include <stdio.h>
@@ -169,7 +169,7 @@ filesystem_init(void)
         return false;
     }
 
-    ret = OS_FilesystemApi_init(pm_partition_data.partition_id, 0);
+    ret = OS_Filesystem_init(pm_partition_data.partition_id, 0);
     if(SEOS_SUCCESS != ret)
     {
         printf(
@@ -180,14 +180,14 @@ filesystem_init(void)
         return false;
     }
 
-    phandle = OS_FilesystemApi_open(pm_partition_data.partition_id);
-    if(!OS_FilesystemApi_validatePartitionHandle(phandle))
+    phandle = OS_Filesystem_open(pm_partition_data.partition_id);
+    if(!OS_Filesystem_validatePartitionHandle(phandle))
     {
         printf("Fail to open partition: %d!\n", pm_partition_data.partition_id);
         return false;
     }
 
-    ret = OS_FilesystemApi_create(
+    ret = OS_Filesystem_create(
             phandle,
             FS_TYPE_FAT16,
             pm_partition_data.partition_size,
@@ -208,7 +208,7 @@ filesystem_init(void)
         return false;
     }
 
-    ret = OS_FilesystemApi_close(phandle);
+    ret = OS_Filesystem_close(phandle);
     if(SEOS_SUCCESS != ret)
     {
         printf(
