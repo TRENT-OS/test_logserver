@@ -118,7 +118,6 @@ ChanMux_getInstance(void)
     if ((NULL == self) && ChanMux_ctor(&theOne,
                                        channels,
                                        ChanMux_config_getConfig(),
-                                       NULL,
                                        ChanMux_dataAvailable_emit,
                                        Output_write))
     {
