@@ -70,6 +70,8 @@ void tearDownLogging()
     OS_LoggerEmitter_dtor();
     OS_LoggerEmitterCallback_dtor(&reg);
     OS_LoggerFilter_dtor(&filter);
+
+    done_emit();
 }
 
 const char maxPossibleLogEntry[] =

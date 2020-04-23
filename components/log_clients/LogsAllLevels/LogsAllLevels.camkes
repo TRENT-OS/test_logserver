@@ -19,6 +19,8 @@ import <if_OS_Logger.camkes>;
 component LogsAllLevels {
     control;
 
+    emits Trigger done;
+
     // interface to log server
     dataport Buf                logServer_buf;
     consumes DataAvailableEvent logServer_ready;

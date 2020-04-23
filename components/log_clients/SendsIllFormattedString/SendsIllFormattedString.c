@@ -11,6 +11,13 @@ static void tearDownLogging();
 int run()
 {
     setUpLogging();
+
+    // Delaying till other components are done with their logging.
+    //
+    // This componente throws an exception, so we want it to be the last one to
+    // log anything.
+    ready_wait();
+
     testLogging();
     tearDownLogging();
 

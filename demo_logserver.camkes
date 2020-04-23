@@ -130,7 +130,8 @@ assembly {
         connection  seL4Notification    conn_dataAvailable_logServer2fileReaderWriter(     from logServer.logServer_ready,  to fileReaderWriter.logServer_ready);
         connection  seL4Notification    conn_dataAvailable_logServer2logFileReader_finish( from logServer.logServer_finish, to logFileReader.logServer_finish);
 
-        connection  seL4Notification    conn_dataAvailable_logServer2sendsIllFormattedString(     from logServer.logServer_ready,  to sendsIllFormattedString.logServer_ready);
+        connection  seL4Notification    conn_dataAvailable_logServer2sendsIllFormattedString(from logServer.logServer_ready, to sendsIllFormattedString.logServer_ready);
+        connection  seL4Notification    conn_finished_app_lvl_max2sendsIllFormattedString(from app_lvl_max.done, to sendsIllFormattedString.ready);
 
         // seL4SharedData
         connection  seL4SharedData      conn_dataConnection_app_lvl_none(   from app_lvl_none.logServer_buf,    to logServer.dataport_buf_lvl_none);
