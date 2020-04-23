@@ -25,6 +25,9 @@ void setUpLogging()
 
 void testLogging()
 {
+    Debug_LOG_INFO("!!! Exception will be thrown below due to the ill formatted"
+                      " string!!!");
+
     // Notice missing arguments for the format specifiers!
     Debug_LOG_INFO("%d %u %o %x %X %f %F %e %E %g %G %a %A %c %s %p %n %%");
 }
