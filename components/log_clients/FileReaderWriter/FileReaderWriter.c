@@ -20,7 +20,6 @@
 #define DATA_LENGTH                 1000
 
 static OS_LoggerFilter_Handle_t filter;
-static OS_LoggerEmitterCallback_Handle_t reg;
 
 static
 seos_err_t
@@ -132,13 +131,10 @@ int run(void)
     /**********/
     /* Logger */
     /**********/
-    // set up registered functions layer
-    OS_LoggerEmitterCallback_ctor(&reg, logServer_ready_wait, API_LOG_SERVER_EMIT);
-
     // set up log filter layer
     OS_LoggerFilter_ctor(&filter, Debug_LOG_LEVEL_DEBUG);
 
-    OS_LoggerEmitter_getInstance(DATABUFFER_CLIENT, &filter, &reg);
+    OS_LoggerEmitter_getInstance(DATABUFFER_CLIENT, &filter, API_LOG_SERVER_EMIT);
 
     /*******************/
     /* Filesystem init */
@@ -249,7 +245,6 @@ int run(void)
 
     // destruction
     OS_LoggerEmitter_dtor();
-    OS_LoggerEmitterCallback_dtor(&reg);
     OS_LoggerFilter_dtor(&filter);
 
     return SEOS_SUCCESS;

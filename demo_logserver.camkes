@@ -104,33 +104,7 @@ assembly {
         connection  seL4RPCCall         conn_rpc_logServer2sendsIllFormattedString(from sendsIllFormattedString.log_server_interface,      to logServer.log_server_interface);
 
         // seL4Notification
-        connection  seL4Notification    conn_dataAvailable_logServer2app_lvl_none(   from logServer.logServer_ready, to app_lvl_none.logServer_ready);
-        connection  seL4Notification    conn_dataAvailable_logServer2app_lvl_assert( from logServer.logServer_ready, to app_lvl_assert.logServer_ready);
-        connection  seL4Notification    conn_dataAvailable_logServer2app_lvl_fatal(  from logServer.logServer_ready, to app_lvl_fatal.logServer_ready);
-        connection  seL4Notification    conn_dataAvailable_logServer2app_lvl_error(  from logServer.logServer_ready, to app_lvl_error.logServer_ready);
-        connection  seL4Notification    conn_dataAvailable_logServer2app_lvl_warning(from logServer.logServer_ready, to app_lvl_warning.logServer_ready);
-        connection  seL4Notification    conn_dataAvailable_logServer2app_lvl_info(   from logServer.logServer_ready, to app_lvl_info.logServer_ready);
-        connection  seL4Notification    conn_dataAvailable_logServer2app_lvl_debug(  from logServer.logServer_ready, to app_lvl_debug.logServer_ready);
-        connection  seL4Notification    conn_dataAvailable_logServer2app_lvl_trace(  from logServer.logServer_ready, to app_lvl_trace.logServer_ready);
-        connection  seL4Notification    conn_dataAvailable_logServer2app_lvl_custom( from logServer.logServer_ready, to app_lvl_custom.logServer_ready);
-        connection  seL4Notification    conn_dataAvailable_logServer2app_lvl_max(    from logServer.logServer_ready, to app_lvl_max.logServer_ready);
-
-        connection  seL4Notification    conn_dataAvailable_logServer2app_no_filters( from logServer.logServer_ready, to app_no_filters.logServer_ready);
-
-        connection  seL4Notification    conn_dataAvailable_logServer2app_cl_filter_none(   from logServer.logServer_ready, to app_cl_filter_none.logServer_ready);
-        connection  seL4Notification    conn_dataAvailable_logServer2app_cl_filter_assert( from logServer.logServer_ready, to app_cl_filter_assert.logServer_ready);
-        connection  seL4Notification    conn_dataAvailable_logServer2app_cl_filter_fatal(  from logServer.logServer_ready, to app_cl_filter_fatal.logServer_ready);
-        connection  seL4Notification    conn_dataAvailable_logServer2app_cl_filter_error(  from logServer.logServer_ready, to app_cl_filter_error.logServer_ready);
-        connection  seL4Notification    conn_dataAvailable_logServer2app_cl_filter_warning(from logServer.logServer_ready, to app_cl_filter_warning.logServer_ready);
-        connection  seL4Notification    conn_dataAvailable_logServer2app_cl_filter_info(   from logServer.logServer_ready, to app_cl_filter_info.logServer_ready);
-        connection  seL4Notification    conn_dataAvailable_logServer2app_cl_filter_debug(  from logServer.logServer_ready, to app_cl_filter_debug.logServer_ready);
-        connection  seL4Notification    conn_dataAvailable_logServer2app_cl_filter_trace(  from logServer.logServer_ready, to app_cl_filter_trace.logServer_ready);
-        connection  seL4Notification    conn_dataAvailable_logServer2app_cl_filter_custom( from logServer.logServer_ready, to app_cl_filter_custom.logServer_ready);
-
-        connection  seL4Notification    conn_dataAvailable_logServer2fileReaderWriter(     from logServer.logServer_ready,  to fileReaderWriter.logServer_ready);
         connection  seL4Notification    conn_dataAvailable_logServer2logFileReader_finish( from logServer.logServer_finish, to logFileReader.logServer_finish);
-
-        connection  seL4Notification    conn_dataAvailable_logServer2sendsIllFormattedString(from logServer.logServer_ready, to sendsIllFormattedString.logServer_ready);
         connection  seL4Notification    conn_finished_app_lvl_max2sendsIllFormattedString(from app_lvl_max.done, to sendsIllFormattedString.ready);
 
         // seL4SharedData

@@ -84,7 +84,6 @@ static OS_LoggerConsumerCallback_t       log_consumer_callback;
 static OS_LoggerFormat_Handle_t          format;
 static OS_LoggerSubject_Handle_t         subject;
 static OS_LoggerOutput_Handle_t          filesystem, console;
-static OS_LoggerEmitterCallback_Handle_t emitter_callback;
 
 // Emitter configuration
 static OS_LoggerSubject_Handle_t  subject_log_server;
@@ -98,7 +97,7 @@ static bool filesystem_init(void);
 
 #define LOG_SUCCESS() Debug_LOG_DEBUG("%s => SUCCESS!", __func__)
 
-void log_server_interface__init()
+void pre_init()
 {
     // set up consumer chain
     OS_LoggerConsumerChain_getInstance();
@@ -303,9 +302,6 @@ void initLogTargetsAndSubjects()
     OS_LoggerSubject_attach(
         (OS_LoggerAbstractSubject_Handle_t *)&subject_log_server,
         (OS_LoggerAbstractObserver_Handle_t *)&console_log_server);
-
-    // Emitter configuration: set up registered functions layer
-    OS_LoggerEmitterCallback_ctor(&emitter_callback, NULL, API_LOG_SERVER_EMIT);
 }
 
 void initClients()
@@ -323,7 +319,7 @@ void initClients()
     OS_LoggerEmitter_getInstance(
         clientConfigs[LOG_SERVER_ID].buffer,
         &clientConfigs[LOG_SERVER_ID].log_filter,
-        &emitter_callback);
+        API_LOG_SERVER_EMIT);
 
     for(size_t i = 0; i < CLIENT_CONFIGS_COUNT; ++i)
     {

@@ -2,15 +2,14 @@
 #include <camkes.h>
 
 static OS_LoggerFilter_Handle_t filter;
-static OS_LoggerEmitterCallback_Handle_t reg;
 
-static void setUpLogging();
 static void testLogging();
 static void tearDownLogging();
 
 int run()
 {
-    setUpLogging();
+    OS_LoggerEmitter_getInstance(logServer_buf, NULL, API_LOG_SERVER_EMIT);
+
 
     // Delaying till other components are done with their logging.
     //
@@ -22,12 +21,6 @@ int run()
     tearDownLogging();
 
     return 0;
-}
-
-void setUpLogging()
-{
-    OS_LoggerEmitterCallback_ctor(&reg, logServer_ready_wait, API_LOG_SERVER_EMIT);
-    OS_LoggerEmitter_getInstance(logServer_buf, NULL, &reg);
 }
 
 void testLogging()
@@ -42,6 +35,5 @@ void testLogging()
 void tearDownLogging()
 {
     OS_LoggerEmitter_dtor();
-    OS_LoggerEmitterCallback_dtor(&reg);
     OS_LoggerFilter_dtor(&filter);
 }

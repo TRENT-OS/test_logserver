@@ -17,7 +17,6 @@ component FileReaderWriter {
 
     // interface to log server
     dataport Buf                     dataport_buf;
-    consumes DataAvailableEvent      logServer_ready;
     uses     if_OS_Logger            log_server_interface;
 
     // interface to partition manager
