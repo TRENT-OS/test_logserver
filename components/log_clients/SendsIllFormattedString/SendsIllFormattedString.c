@@ -6,11 +6,13 @@ static OS_LoggerFilter_Handle_t filter;
 static void testLogging();
 static void tearDownLogging();
 
-int run()
+void post_init()
 {
     OS_LoggerEmitter_getInstance(logServer_buf, NULL, API_LOG_SERVER_EMIT);
+}
 
-
+int run()
+{
     // Delaying till other components are done with their logging.
     //
     // This componente throws an exception, so we want it to be the last one to

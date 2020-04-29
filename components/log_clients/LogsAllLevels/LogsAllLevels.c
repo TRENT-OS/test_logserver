@@ -3,7 +3,6 @@
 
 static OS_LoggerFilter_Handle_t filter;
 
-static void setUpLogging();
 static void testLogging();
 static void tearDownLogging();
 
@@ -20,16 +19,7 @@ const char format_string[] =
 
 #define NO_FILTER -1
 
-int run()
-{
-    setUpLogging();
-    testLogging();
-    tearDownLogging();
-
-    return 0;
-}
-
-void setUpLogging()
+void post_init()
 {
     if(NO_FILTER == log_lvl)
     {
@@ -40,6 +30,14 @@ void setUpLogging()
         OS_LoggerFilter_ctor(&filter, log_lvl);
         OS_LoggerEmitter_getInstance(logServer_buf, &filter, API_LOG_SERVER_EMIT);
     }
+}
+
+int run()
+{
+    testLogging();
+    tearDownLogging();
+
+    return 0;
 }
 
 void testLogging()

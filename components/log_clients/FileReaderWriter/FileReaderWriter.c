@@ -121,20 +121,20 @@ filesystem_init(void)
     return ret;
 }
 
+void post_init()
+{
+    OS_LoggerFilter_ctor(&filter, Debug_LOG_LEVEL_DEBUG);
 
+    OS_LoggerEmitter_getInstance(
+        DATABUFFER_CLIENT,
+        &filter,
+        API_LOG_SERVER_EMIT);
+}
 
 int run(void)
 {
     hPartition_t phandle;
     int64_t length;
-
-    /**********/
-    /* Logger */
-    /**********/
-    // set up log filter layer
-    OS_LoggerFilter_ctor(&filter, Debug_LOG_LEVEL_DEBUG);
-
-    OS_LoggerEmitter_getInstance(DATABUFFER_CLIENT, &filter, API_LOG_SERVER_EMIT);
 
     /*******************/
     /* Filesystem init */
