@@ -114,9 +114,6 @@ void pre_init()
 
     initLogFiles();
 
-    // start polling
-    OS_LoggerConsumerChain_poll();
-
     LOG_SUCCESS();
 }
 
@@ -309,7 +306,6 @@ void initClients()
     // set up registered functions layer
     OS_LoggerConsumerCallback_ctor(
         &log_consumer_callback,
-        logServer_ready_emit,
         API_LOG_SERVER_GET_SENDER_ID,
         api_time_server_get_timestamp);
 
