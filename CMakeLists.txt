@@ -40,7 +40,7 @@ DeclareCAmkESComponent(LogServer
 )
 
 # time server
-DeclareCAmkESComponent(TIME_SERVER
+DeclareCAmkESComponent(TimeServer
     INCLUDES
         components/test_fixture/time_server/include
         components/test_fixture/time_server/timestamp
@@ -108,7 +108,7 @@ DeclareCAmkESComponent(FileReaderWriter
 )
 
 # PARTITION_MANAGER
-DeclareCAmkESComponent(PARTITION_MANAGER
+DeclareCAmkESComponent(PartitionManager
     SOURCES
         "components/test_fixture/partition_manager/src/main.c"
     C_FLAGS

@@ -10,8 +10,8 @@ import "components/log_clients/SendsIllFormattedString/SendsIllFormattedString.c
 import "components/LogServer/LogServer.camkes";
 
 // Test Fixture
-import "components/test_fixture/time_server/TIME_SERVER.camkes";
-import "components/test_fixture/partition_manager/PARTITION_MANAGER.camkes";
+import "components/test_fixture/time_server/time_server.camkes";
+import "components/test_fixture/partition_manager/partition_manager.camkes";
 import "components/test_fixture/ChanMux/ChanMux.camkes";
 import "components/test_fixture/Uart/Uart.camkes";
 
@@ -51,27 +51,27 @@ assembly {
         component LogServer         logServer;
 
         // Test Fixture
-        component TIMEBASE          timebase;
-        component TIME_SERVER       time_server;
-        component PARTITION_MANAGER partition_manager;
+        component TimerDev          timerDev;
+        component TimeServer        time_server;
+        component PartitionManager  partition_manager;
         component ChanMux	        chanMux;
         component UartDev	        uartDev;
         component UartDrv	        uartDrv;
 
         //----------------------------------------------------------------------
-        // TIME SERVER configuration
+        // TimeServer configuration
         //----------------------------------------------------------------------
-        connection seL4HardwareMMIO      time_server_mem(from time_server.reg, to timebase.reg);
-        connection seL4HardwareInterrupt time_server_irq_ticks(from timebase.irq_ticks, to time_server.irq_ticks);
-        connection seL4HardwareInterrupt time_server_irq_sleep(from timebase.irq_sleep, to time_server.irq_sleep);
+        connection seL4HardwareMMIO      time_server_mem(from time_server.reg, to timerDev.reg);
+        connection seL4HardwareInterrupt time_server_irq_ticks(from timerDev.irq_ticks, to time_server.irq_ticks);
+        connection seL4HardwareInterrupt time_server_irq_sleep(from timerDev.irq_sleep, to time_server.irq_sleep);
 
         //----------------------------------------------------------------------
-        // TIME CLIENT configuration
+        // TimeServer connections
         //----------------------------------------------------------------------
         connection seL4RPCCall  logServer_2_time_server(from logServer.api_time_server, to time_server.api_time_server);
 
         //----------------------------------------------------------------------
-        // LOG SERVER connections
+        // LogServer connections
         //----------------------------------------------------------------------
 
         // seL4RPCCall
@@ -137,7 +137,7 @@ assembly {
         connection  seL4SharedData      conn_dataConnection_sendsIllFormattedString(from sendsIllFormattedString.logServer_buf, to logServer.dataport_buf_sendsIllFormattedString);
 
         //----------------------------------------------------------------------
-        // PARTITION MANAGER connections
+        // PartitionManager connections
         //----------------------------------------------------------------------
         connection  seL4RPCCall     interface_partition_manager2logServer(from logServer.api_pm_component, to partition_manager.api_pm_component);
         connection  seL4SharedData  dataport_interface_partition_manager2logServer(from logServer.pm_dataport_buf, to partition_manager.pm_dataport_buf_log_server);
@@ -213,10 +213,10 @@ assembly {
         fileReaderWriter.log_server_interface_attributes = 50002;
 
         // timer
-        timebase.reg_paddr = 0xF8001000;    // paddr of mmio registers
-        timebase.reg_size = 0x1000;         // size of mmio registers
-        timebase.irq_ticks_irq_number = 42; // time_server irq number
-        timebase.irq_sleep_irq_number = 43; // time_server irq number
+        timerDev.reg_paddr = 0xF8001000;    // paddr of mmio registers
+        timerDev.reg_size = 0x1000;         // size of mmio registers
+        timerDev.irq_ticks_irq_number = 42; // time_server irq number
+        timerDev.irq_sleep_irq_number = 43; // time_server irq number
         // assign an initial value to semaphore
         time_server.sem_ticks_value = 0;
         time_server.sem_sleep_value = 0;

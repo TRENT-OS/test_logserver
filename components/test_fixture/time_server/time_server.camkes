@@ -1,7 +1,7 @@
 import "../../../interfaces/time_server.camkes";
 
 
-component TIMEBASE{
+component TimerDev {
     hardware;
 
     dataport Buf           reg;
@@ -10,7 +10,7 @@ component TIMEBASE{
 }
 
 
-component TIME_SERVER {
+component TimeServer {
     control;
 
     dataport Buf             reg;

@@ -2,7 +2,7 @@ import "../../../interfaces/ChanMuxInf.camkes";
 import <seos_if_partitionManager.camkes>;
 
 
-component PARTITION_MANAGER {
+component PartitionManager {
     provides  partition_manager_interface api_pm_component;
 
     dataport  Buf                    chanMuxDataPort;
