@@ -110,7 +110,7 @@ DeclareCAmkESComponent(FileReaderWriter
 # PARTITION_MANAGER
 DeclareCAmkESComponent(PartitionManager
     SOURCES
-        "components/test_fixture/partition_manager/src/main.c"
+        "components/test_fixture/partition_manager/partition_manager.c"
     C_FLAGS
         -Wall
         -Werror
@@ -138,20 +138,11 @@ DeclareCAmkESComponent(UartDrv
 )
 
 # ChanMux
-DeclareCAmkESComponent(ChanMux
-    SOURCES
-        "components/test_fixture/ChanMux/src/instance/ChanMux_Instance.c"
-    C_FLAGS
-        -Wall
-        -Werror
-    LIBS
-        system_config
-        seos_core_api
-        seos_logger
-        seos_libs
-        chanmux_server
+DeclareCAmkESComponent_ChanMux(
+    ChanMux
+    components/test_fixture/ChanMux/ChanMux_config.c
+    system_config
 )
 
-DeclareCAmkESRootserver(test_logserver.camkes)
-GenerateCAmkESRootServer()
+DeclareAndCreateCamkESSystem(test_logserver.camkes)
 GenerateSimulateScript()

@@ -1,14 +1,19 @@
-import "../../../interfaces/ChanMuxInf.camkes";
+import <seos_if_chanMux.camkes>;
 import <seos_if_partitionManager.camkes>;
 
 
 component PartitionManager {
-    provides  partition_manager_interface api_pm_component;
 
-    dataport  Buf                    chanMuxDataPort;
-    uses      ChanMuxInInf           ChanMuxRpc;
-    consumes  DataAvailableEvent     ChanMuxSignal_dataAvailable;
+    //-------------------------------------------------
+    // upper interface
+    provides  partition_manager_interface  api_pm_component;
+    dataport  Buf                          logServer_port;
+    dataport  Buf                          fileReaderWriter_port;
 
-    dataport  Buf                    pm_dataport_buf_log_server;
-    dataport  Buf                    pm_dataport_buf_fileReaderWriter;
+    //-------------------------------------------------
+    // lower interface to ChanMux
+    uses      ChanMuxDriverInf             chanMux_rpc;
+    consumes  DataAvailableEvent           chanMux_event_hasData;
+    dataport  Buf                          chanMux_port;
+
 }

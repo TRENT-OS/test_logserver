@@ -34,17 +34,14 @@
 // ChanMUX
 //-----------------------------------------------------------------------------
 
-enum {
-    CHANNEL_LAN_DATA,       // 0
-    CHANNEL_WAN_DATA,       // 1
-    CHANNEL_LAN_CTRL,       // 2
-    CHANNEL_WAN_CTRL,       // 3
-    CHANNEL_NW_STACK_CTRL,  // 4
-    CHANNEL_NW_STACK_DATA,  // 5
-    CHANNEL_CLIENT_DATA,    // 6
+#define CHANMUX_CHANNEL_NVM     6
 
-    CHANMUX_NUM_CHANNELS    // 7
-};
+
+//-----------------------------------------------------------------------------
+// ChanMUX clients
+//-----------------------------------------------------------------------------
+
+#define CHANMUX_ID_PM           101
 
 
 //-----------------------------------------------------------------------------
@@ -73,6 +70,9 @@ enum {
 //-----------------------------------------------------------------------------
 // PARTITION MANAGER
 //-----------------------------------------------------------------------------
+
+#if !defined(CAMKES_TOOL_PROCESSING)
+
 typedef struct
 {
     const char *partition_name;
@@ -93,6 +93,8 @@ static const Partition_cat_t partition_conf = {
     .partition[1].partition_size = 0x200800,     // FAT16
     .partition[1].block_size = 512
 };
+
+#endif // !defined(CAMKES_TOOL_PROCESSING)
 
 // internal defines
 #define PM_CONF_ARRAY_SIZE(x)                   (sizeof(x)/sizeof(x[0]))
@@ -116,9 +118,13 @@ static const Partition_cat_t partition_conf = {
 // LOGGER
 //-----------------------------------------------------------------------------
 
+#if !defined(CAMKES_TOOL_PROCESSING)
+
 // If the belows header is included in the config file and Logger library is
 // linked, the LibDebug will forward entries to the LogServer.
 #include "Logger/Client/OS_Logger.h"
+
+#endif //!defined(CAMKES_TOOL_PROCESSING)
 
 // api interface name
 #define API_LOG_SERVER_EMIT                     log_server_interface_emit

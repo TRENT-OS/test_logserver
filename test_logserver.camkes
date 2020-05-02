@@ -12,8 +12,14 @@ import "components/LogServer/LogServer.camkes";
 // Test Fixture
 import "components/test_fixture/time_server/time_server.camkes";
 import "components/test_fixture/partition_manager/partition_manager.camkes";
-import "components/test_fixture/ChanMux/ChanMux.camkes";
 import "components/test_fixture/Uart/Uart.camkes";
+
+#include "system_config.h"
+
+#define CHANMUX_COMPONENT_NAME  ChanMux
+#define CHANMUX_UPPER_INTERFACES "components/test_fixture/ChanMux/ChanMux_upper_interface.camkes"
+#include "ChanMux/ChanMux.camkes"
+
 
 assembly {
     composition {
@@ -41,11 +47,10 @@ assembly {
         //----------------------------------------------------------------------
         // ChanMux connections
         //----------------------------------------------------------------------
-        component   ChanMux                chanMux;
-
-        connection  seL4RPCCall            chanmux_uart(from chanMux.Output, to uartDrv.UartDrv);
-        connection  seL4RPCCall            uart_chanmux(from uartDrv.Output, to chanMux.ChanMuxOut);
-        connection  seL4SharedData         uart_dataConnection(from chanMux.outputDataPort, to uartDrv.inputDataPort);
+        DECLARE_AND_CONNECT_INSTANCE_CHANMUX(
+            ChanMux, chanMux,
+            uartDrv.UartDrv, uartDrv.inputDataPort,
+            uartDrv.Output)
 
 
         //----------------------------------------------------------------------
@@ -53,9 +58,9 @@ assembly {
         //----------------------------------------------------------------------
         component   PartitionManager       partition_manager;
 
-        connection  seL4RPCCall            partition_manager_chanmux(from partition_manager.ChanMuxRpc, to chanMux.ChanMuxIn);
-        connection  seL4SharedData         dataConnection(from partition_manager.chanMuxDataPort, to chanMux.client_dataport_buf);
-        connection  seL4Notification       dataAvailableLan(from chanMux.dataAvailable_client, to partition_manager.ChanMuxSignal_dataAvailable);
+        connection  seL4RPCCall            partition_manager_chanmux(from partition_manager.chanMux_rpc, to chanMux.chanMux_rpc);
+        connection  seL4SharedData         dataConnection(from partition_manager.chanMux_port, to chanMux.pm_port);
+        connection  seL4Notification       dataAvailableLan(from chanMux.pm_event_hasData, to partition_manager.chanMux_event_hasData);
 
 
         //----------------------------------------------------------------------
@@ -66,7 +71,7 @@ assembly {
         connection  seL4RPCCall            logServer_2_time_server(from logServer.api_time_server, to time_server.api_time_server);
 
         connection  seL4RPCCall            interface_partition_manager2logServer(from logServer.api_pm_component, to partition_manager.api_pm_component);
-        connection  seL4SharedData         dataport_interface_partition_manager2logServer(from logServer.pm_dataport_buf, to partition_manager.pm_dataport_buf_log_server);
+        connection  seL4SharedData         dataport_interface_partition_manager2logServer(from logServer.pm_dataport_buf, to partition_manager.logServer_port);
 
 
         //----------------------------------------------------------------------
@@ -75,7 +80,7 @@ assembly {
         component   FileReaderWriter       fileReaderWriter;
 
         connection  seL4RPCCall            interface_partition_manager2fileReaderWriter(from fileReaderWriter.api_pm_component, to partition_manager.api_pm_component);
-        connection  seL4SharedData         dataport_interface_partition_manager2fileReaderWriter(from fileReaderWriter.pm_dataport_buf, to partition_manager.pm_dataport_buf_fileReaderWriter);
+        connection  seL4SharedData         dataport_interface_partition_manager2fileReaderWriter(from fileReaderWriter.pm_dataport_buf, to partition_manager.fileReaderWriter_port);
 
         connection  seL4RPCCall            conn_rpc_logServer2fileReaderWriter(     from fileReaderWriter.log_server_interface,      to logServer.log_server_interface);
 
@@ -239,6 +244,10 @@ assembly {
         // assign an initial value to semaphore
         time_server.sem_ticks_value = 0;
         time_server.sem_sleep_value = 0;
+
+        // assign endpoint badges for n:1 RPC interface of ChanMUX. The generic
+        // naming scheme is <component>.<interface>_attributes = <badge ID>
+        partition_manager.chanMux_rpc_attributes = CHANMUX_ID_PM;
 
         // UART
         uartDev.uartRegBase_paddr  = 0xE0000000;

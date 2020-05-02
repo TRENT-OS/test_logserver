@@ -1,0 +1,15 @@
+/*
+ *  ChanMUX upper interfaces
+ *
+ *  Copyright (C) 2020, Hensoldt Cyber GmbH
+ *
+ *
+ *  The file components/ChanMux/ChanMux.camkes from the generic ChanMux CAmkES
+ *  component will include this
+ *
+ */
+
+//-------------------------------------------------
+// upper interface to partition manager
+dataport  Buf                 pm_port;
+emits     DataAvailableEvent  pm_event_hasData;
