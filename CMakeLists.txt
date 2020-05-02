@@ -152,6 +152,6 @@ DeclareCAmkESComponent(ChanMux
         chanmux_server
 )
 
-DeclareCAmkESRootserver(demo_logserver.camkes)
+DeclareCAmkESRootserver(test_logserver.camkes)
 GenerateCAmkESRootServer()
 GenerateSimulateScript()
