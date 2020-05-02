@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.7.2)
 
-seos_set_config_file(config/config.h)
+seos_set_config_file(system_config.h)
 
 seos_use_libs(
     SEOS_LIBS
@@ -11,6 +11,12 @@ seos_use_libs(
     SEOS_FILESYSTEM_SPIFFS
     SEOS_LOGGER
 )
+
+
+project(system_config C)
+add_library(${PROJECT_NAME} INTERFACE)
+target_include_directories(${PROJECT_NAME} INTERFACE ${CMAKE_CURRENT_LIST_DIR})
+
 
 project(demo_logserver C)
 
@@ -140,6 +146,7 @@ DeclareCAmkESComponent(ChanMux
         -Wall
         -Werror
     LIBS
+        system_config
         seos_core_api
         seos_logger
         seos_libs
