@@ -18,9 +18,82 @@ import "components/test_fixture/Uart/Uart.camkes";
 assembly {
     composition {
 
-        // Clients
-        component FileReaderWriter  fileReaderWriter;
-        component LogFileReader     logFileReader;
+        //----------------------------------------------------------------------
+        // TimeServer
+        //----------------------------------------------------------------------
+        component   TimerDev               timerDev;
+        component   TimeServer             time_server;
+
+        connection  seL4HardwareMMIO       time_server_mem(from time_server.reg, to timerDev.reg);
+        connection  seL4HardwareInterrupt  time_server_irq_ticks(from timerDev.irq_ticks, to time_server.irq_ticks);
+        connection  seL4HardwareInterrupt  time_server_irq_sleep(from timerDev.irq_sleep, to time_server.irq_sleep);
+
+
+        //----------------------------------------------------------------------
+        // UART connections
+        //----------------------------------------------------------------------
+        component   UartDev                uartDev;
+        component   UartDrv                uartDrv;
+
+        connection  seL4HardwareMMIO       uart_memio(from uartDrv.uartRegBase, to uartDev.uartRegBase);
+
+
+        //----------------------------------------------------------------------
+        // ChanMux connections
+        //----------------------------------------------------------------------
+        component   ChanMux                chanMux;
+
+        connection  seL4RPCCall            chanmux_uart(from chanMux.Output, to uartDrv.UartDrv);
+        connection  seL4RPCCall            uart_chanmux(from uartDrv.Output, to chanMux.ChanMuxOut);
+        connection  seL4SharedData         uart_dataConnection(from chanMux.outputDataPort, to uartDrv.inputDataPort);
+
+
+        //----------------------------------------------------------------------
+        // PartitionManager connections
+        //----------------------------------------------------------------------
+        component   PartitionManager       partition_manager;
+
+        connection  seL4RPCCall            partition_manager_chanmux(from partition_manager.ChanMuxRpc, to chanMux.ChanMuxIn);
+        connection  seL4SharedData         dataConnection(from partition_manager.chanMuxDataPort, to chanMux.client_dataport_buf);
+        connection  seL4Notification       dataAvailableLan(from chanMux.dataAvailable_client, to partition_manager.ChanMuxSignal_dataAvailable);
+
+
+        //----------------------------------------------------------------------
+        // LogServer
+        //----------------------------------------------------------------------
+        component   LogServer              logServer;
+
+        connection  seL4RPCCall            logServer_2_time_server(from logServer.api_time_server, to time_server.api_time_server);
+
+        connection  seL4RPCCall            interface_partition_manager2logServer(from logServer.api_pm_component, to partition_manager.api_pm_component);
+        connection  seL4SharedData         dataport_interface_partition_manager2logServer(from logServer.pm_dataport_buf, to partition_manager.pm_dataport_buf_log_server);
+
+
+        //----------------------------------------------------------------------
+        // FileReaderWriter Client
+        //----------------------------------------------------------------------
+        component   FileReaderWriter       fileReaderWriter;
+
+        connection  seL4RPCCall            interface_partition_manager2fileReaderWriter(from fileReaderWriter.api_pm_component, to partition_manager.api_pm_component);
+        connection  seL4SharedData         dataport_interface_partition_manager2fileReaderWriter(from fileReaderWriter.pm_dataport_buf, to partition_manager.pm_dataport_buf_fileReaderWriter);
+
+        connection  seL4RPCCall            conn_rpc_logServer2fileReaderWriter(     from fileReaderWriter.log_server_interface,      to logServer.log_server_interface);
+
+
+        //----------------------------------------------------------------------
+        // LogFileReader Client
+        //----------------------------------------------------------------------
+        component   LogFileReader          logFileReader;
+
+        connection  seL4RPCCall            conn_rpc_logServer2logFileReader(        from logFileReader.log_server_interface,         to logServer.log_server_interface);
+
+
+        //----------------------------------------------------------------------
+        // Test Apps
+        //----------------------------------------------------------------------
+
+        component SendsIllFormattedString sendsIllFormattedString;
+        connection  seL4RPCCall         conn_rpc_logServer2sendsIllFormattedString(from sendsIllFormattedString.log_server_interface,      to logServer.log_server_interface);
 
         component LogsAllLevels     app_lvl_none;
         component LogsAllLevels     app_lvl_assert;
@@ -45,34 +118,6 @@ assembly {
         component LogsAllLevels     app_cl_filter_trace;
         component LogsAllLevels     app_cl_filter_custom;
 
-        component SendsIllFormattedString sendsIllFormattedString;
-
-        // Server
-        component LogServer         logServer;
-
-        // Test Fixture
-        component TimerDev          timerDev;
-        component TimeServer        time_server;
-        component PartitionManager  partition_manager;
-        component ChanMux	        chanMux;
-        component UartDev	        uartDev;
-        component UartDrv	        uartDrv;
-
-        //----------------------------------------------------------------------
-        // TimeServer configuration
-        //----------------------------------------------------------------------
-        connection seL4HardwareMMIO      time_server_mem(from time_server.reg, to timerDev.reg);
-        connection seL4HardwareInterrupt time_server_irq_ticks(from timerDev.irq_ticks, to time_server.irq_ticks);
-        connection seL4HardwareInterrupt time_server_irq_sleep(from timerDev.irq_sleep, to time_server.irq_sleep);
-
-        //----------------------------------------------------------------------
-        // TimeServer connections
-        //----------------------------------------------------------------------
-        connection seL4RPCCall  logServer_2_time_server(from logServer.api_time_server, to time_server.api_time_server);
-
-        //----------------------------------------------------------------------
-        // LogServer connections
-        //----------------------------------------------------------------------
 
         // seL4RPCCall
         connection  seL4RPCCall         conn_rpc_logServer2app_lvl_none(   from app_lvl_none.log_server_interface,    to logServer.log_server_interface);
@@ -98,10 +143,6 @@ assembly {
         connection  seL4RPCCall         conn_rpc_logServer2app_cl_filter_trace(  from app_cl_filter_trace.log_server_interface,   to logServer.log_server_interface);
         connection  seL4RPCCall         conn_rpc_logServer2app_cl_filter_custom( from app_cl_filter_custom.log_server_interface,  to logServer.log_server_interface);
 
-        connection  seL4RPCCall         conn_rpc_logServer2logFileReader(        from logFileReader.log_server_interface,         to logServer.log_server_interface);
-        connection  seL4RPCCall         conn_rpc_logServer2fileReaderWriter(     from fileReaderWriter.log_server_interface,      to logServer.log_server_interface);
-
-        connection  seL4RPCCall         conn_rpc_logServer2sendsIllFormattedString(from sendsIllFormattedString.log_server_interface,      to logServer.log_server_interface);
 
         // seL4Notification
         connection  seL4Notification    conn_dataAvailable_logServer2logFileReader_finish( from logServer.logServer_finish, to logFileReader.logServer_finish);
@@ -136,28 +177,6 @@ assembly {
 
         connection  seL4SharedData      conn_dataConnection_sendsIllFormattedString(from sendsIllFormattedString.logServer_buf, to logServer.dataport_buf_sendsIllFormattedString);
 
-        //----------------------------------------------------------------------
-        // PartitionManager connections
-        //----------------------------------------------------------------------
-        connection  seL4RPCCall     interface_partition_manager2logServer(from logServer.api_pm_component, to partition_manager.api_pm_component);
-        connection  seL4SharedData  dataport_interface_partition_manager2logServer(from logServer.pm_dataport_buf, to partition_manager.pm_dataport_buf_log_server);
-
-        connection  seL4RPCCall     interface_partition_manager2fileReaderWriter(from fileReaderWriter.api_pm_component, to partition_manager.api_pm_component);
-        connection  seL4SharedData  dataport_interface_partition_manager2fileReaderWriter(from fileReaderWriter.pm_dataport_buf, to partition_manager.pm_dataport_buf_fileReaderWriter);
-
-        //----------------------------------------------------------------------
-        // ChanMux, UART connections
-        //----------------------------------------------------------------------
-        connection  seL4RPCCall     partition_manager_chanmux(from partition_manager.ChanMuxRpc, to chanMux.ChanMuxIn);
-        connection  seL4RPCCall     chanmux_uart(from chanMux.Output, to uartDrv.UartDrv);
-        connection  seL4RPCCall     uart_chanmux(from uartDrv.Output, to chanMux.ChanMuxOut);
-
-        connection  seL4SharedData  uart_dataConnection(from chanMux.outputDataPort, to uartDrv.inputDataPort);
-        connection  seL4SharedData  dataConnection(from partition_manager.chanMuxDataPort, to chanMux.client_dataport_buf);
-
-        connection  seL4Notification dataAvailableLan(from chanMux.dataAvailable_client, to partition_manager.ChanMuxSignal_dataAvailable);
-
-        connection  seL4HardwareMMIO uart_memio(from uartDrv.uartRegBase, to uartDev.uartRegBase);
     }
     configuration {
 
