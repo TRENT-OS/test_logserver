@@ -1,7 +1,7 @@
 #include "custom_format.h"
 #include <stdio.h>
 
-static bool _Log_format_convert(
+static seos_err_t _Log_format_convert(
     OS_LoggerAbstractFormat_Handle_t *self,
     OS_LoggerDataBuffer_info *log_info);
 
@@ -17,7 +17,7 @@ OS_LoggerFormat_Handle_t custom_format =
 };
 
 static
-bool
+seos_err_t
 _Log_format_convert(
     OS_LoggerAbstractFormat_Handle_t *self,
     OS_LoggerDataBuffer_info *log_info)
@@ -26,7 +26,7 @@ _Log_format_convert(
 
     if(NULL == log_info)
     {
-        return false;
+        return SEOS_ERROR_INVALID_PARAMETER;
     }
 
     size_t msg_len = strlen(log_info->log_databuffer.log_message);
@@ -42,5 +42,5 @@ _Log_format_convert(
             OS_Logger_ID_AND_NAME_LENGTH, log_info->log_id_and_name,
             (int)msg_len, log_info->log_databuffer.log_message);
 
-    return true;
+    return SEOS_SUCCESS;
 }
