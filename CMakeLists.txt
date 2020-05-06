@@ -124,17 +124,8 @@ DeclareCAmkESComponent(PartitionManager
 )
 
 # UartDrv
-DeclareCAmkESComponent(UartDrv
-    SOURCES
-        "components/test_fixture/Uart/src/UartDrv.c"
-        "components/test_fixture/Uart/src/qemu_uart.c"
-    C_FLAGS
-        -Wall
-        -Werror
-    LIBS
-        seos_core_api
-        seos_logger
-        seos_libs
+DeclareCAmkESComponent_UART(
+    UART
 )
 
 # ChanMux

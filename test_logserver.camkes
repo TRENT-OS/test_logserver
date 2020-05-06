@@ -12,9 +12,11 @@ import "components/LogServer/LogServer.camkes";
 // Test Fixture
 import "components/test_fixture/time_server/time_server.camkes";
 import "components/test_fixture/partition_manager/partition_manager.camkes";
-import "components/test_fixture/Uart/Uart.camkes";
 
 #include "system_config.h"
+
+#include "UART/uart.camkes"
+DECLARE_COMPONENT_UART(UART)
 
 #define CHANMUX_COMPONENT_NAME  ChanMux
 #define CHANMUX_UPPER_INTERFACES "components/test_fixture/ChanMux/ChanMux_upper_interface.camkes"
@@ -38,10 +40,8 @@ assembly {
         //----------------------------------------------------------------------
         // UART connections
         //----------------------------------------------------------------------
-        component   UartDev                uartDev;
-        component   UartDrv                uartDrv;
-
-        connection  seL4HardwareMMIO       uart_memio(from uartDrv.uartRegBase, to uartDev.uartRegBase);
+        DECLARE_AND_CONNECT_INSTANCE_UART(
+            UART, uartDrv)
 
 
         //----------------------------------------------------------------------
@@ -250,8 +250,6 @@ assembly {
         partition_manager.chanMux_rpc_attributes = CHANMUX_ID_PM;
 
         // UART
-        uartDev.uartRegBase_paddr  = 0xE0000000;
-        uartDev.uartRegBase_size   = 0x1000;
-        uartDrv.inputDataPort       = "R";
+        CONFIGURE_INSTANCE_UART(uartDrv, 0xE0000000, 59)
     }
 }
