@@ -145,7 +145,7 @@ filesystem_init(void)
     pm_disk_data_t pm_disk_data;
     pm_partition_data_t pm_partition_data;
 
-    seos_err_t ret =  partition_manager_get_info_disk(&pm_disk_data);
+    OS_Error_t ret =  partition_manager_get_info_disk(&pm_disk_data);
 
     if(SEOS_SUCCESS != ret)
     {

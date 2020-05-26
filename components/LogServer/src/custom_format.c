@@ -1,7 +1,7 @@
 #include "custom_format.h"
 #include <stdio.h>
 
-static seos_err_t _Log_format_convert(
+static OS_Error_t _Log_format_convert(
     OS_LoggerAbstractFormat_Handle_t *self,
     OS_LoggerDataBuffer_info *log_info);
 
@@ -17,7 +17,7 @@ OS_LoggerFormat_Handle_t custom_format =
 };
 
 static
-seos_err_t
+OS_Error_t
 _Log_format_convert(
     OS_LoggerAbstractFormat_Handle_t *self,
     OS_LoggerDataBuffer_info *log_info)

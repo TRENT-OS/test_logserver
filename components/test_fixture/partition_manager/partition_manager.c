@@ -32,7 +32,7 @@ void api_pm_component__init(void)
         return;
     }
 
-    seos_err_t ret = api_pm_partition_manager_init(
+    OS_Error_t ret = api_pm_partition_manager_init(
                             ChanMuxNvmDriver_get_nvm(&chanMuxNvmDriver));
     if(ret != SEOS_SUCCESS)
     {

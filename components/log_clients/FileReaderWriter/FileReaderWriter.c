@@ -22,7 +22,7 @@
 static OS_LoggerFilter_Handle_t filter;
 
 static
-seos_err_t
+OS_Error_t
 _create_file(
     hPartition_t phandle,
     const char *name,
@@ -30,21 +30,21 @@ _create_file(
     const char c);
 
 static
-seos_err_t
+OS_Error_t
 _read_from_file(
     hPartition_t phandle,
     const char *name,
     int length,
     const char c);
 
-static seos_err_t
+static OS_Error_t
 filesystem_init(void)
 {
     hPartition_t phandle;
     pm_disk_data_t pm_disk_data;
     pm_partition_data_t pm_partition_data;
 
-    seos_err_t ret = partition_manager_get_info_disk(&pm_disk_data);
+    OS_Error_t ret = partition_manager_get_info_disk(&pm_disk_data);
     if(SEOS_SUCCESS != ret)
     {
         Debug_LOG_ERROR("Fail to get disk info! Error code: %d", ret);
@@ -139,7 +139,7 @@ int run(void)
     /*******************/
     /* Filesystem init */
     /*******************/
-    seos_err_t ret = filesystem_init();
+    OS_Error_t ret = filesystem_init();
     if(SEOS_SUCCESS != ret)
     {
         Debug_LOG_ERROR(
@@ -251,7 +251,7 @@ int run(void)
 }
 
 //static
-seos_err_t
+OS_Error_t
 _create_file(
     hPartition_t phandle,
     const char *name,
@@ -283,7 +283,7 @@ _create_file(
     memset(buf_write_file, c, length);
 
     // Call filesystem api function to write into a file
-    seos_err_t err = OS_Filesystem_writeFile(fhandle, 0, length, buf_write_file);
+    OS_Error_t err = OS_Filesystem_writeFile(fhandle, 0, length, buf_write_file);
     Debug_LOG_DEBUG("file_write:        %d", err);
 
     if(SEOS_SUCCESS != err)
@@ -299,7 +299,7 @@ _create_file(
 }
 
 //static
-seos_err_t
+OS_Error_t
 _read_from_file(
     hPartition_t phandle,
     const char *name,
@@ -335,7 +335,7 @@ _read_from_file(
     memset(buf_read_file, 0, length);
 
     // Call filesystem api function to read from a file
-    seos_err_t err = OS_Filesystem_readFile(fhandle, 0, length, buf_read_file);
+    OS_Error_t err = OS_Filesystem_readFile(fhandle, 0, length, buf_read_file);
     Debug_LOG_DEBUG("file_read:         %d", err);
     if(SEOS_SUCCESS != err)
     {
