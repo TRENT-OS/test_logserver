@@ -3,10 +3,9 @@
 
 static OS_Error_t _Log_format_convert(
     OS_LoggerAbstractFormat_Handle_t *self,
-    OS_LoggerDataBuffer_info *log_info);
+    OS_LoggerEntry_t const * const entry);
 
 static const OS_LoggerAbstractFormat_vtable_t _custom_format_vtable = {
-    .dtor    = OS_LoggerFormat_dtor,
     .convert = _Log_format_convert,
     .print   = OS_LoggerFormat_print
 };
@@ -20,27 +19,33 @@ static
 OS_Error_t
 _Log_format_convert(
     OS_LoggerAbstractFormat_Handle_t *self,
-    OS_LoggerDataBuffer_info *log_info)
+    OS_LoggerEntry_t const * const entry)
 {
     OS_Logger_CHECK_SELF(self);
 
-    if(NULL == log_info)
+    if(NULL == entry)
     {
         return OS_ERROR_INVALID_PARAMETER;
     }
 
-    size_t msg_len = strlen(log_info->log_databuffer.log_message);
+    size_t msg_len = strlen(entry->msg);
 
     if(msg_len > OS_Logger_MESSAGE_LENGTH)
     {
         msg_len = OS_Logger_MESSAGE_LENGTH;
     }
 
+    OS_LoggerFormat_Handle_t * const log_format =
+                                        (OS_LoggerFormat_Handle_t*)self;
+
     sprintf(
-        (((OS_LoggerFormat_Handle_t *)self))->buffer,
-        "%-*s       CUSTOM_FORMAT         %.*s\n",
-            OS_Logger_ID_AND_NAME_LENGTH, log_info->log_id_and_name,
-            (int)msg_len, log_info->log_databuffer.log_message);
+        log_format->buffer,
+        "%.*u %-*s       CUSTOM_FORMAT         %.*s\n",
+
+            OS_Logger_ID_LENGTH, entry->consumerMetadata.id,
+            OS_Logger_NAME_LENGTH, entry->consumerMetadata.name,
+
+            (int)msg_len, entry->msg);
 
     return OS_SUCCESS;
 }
