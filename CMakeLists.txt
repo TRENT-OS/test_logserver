@@ -3,13 +3,13 @@ cmake_minimum_required(VERSION 3.7.2)
 seos_set_config_file(system_config.h)
 
 seos_use_libs(
-    SEOS_LIBS
-    SEOS_CHANMUX
-    SEOS_PARTITION_MANAGER
-    SEOS_FILESYSTEM_CORE
-    SEOS_FILESYSTEM_FAT
-    SEOS_FILESYSTEM_SPIFFS
-    SEOS_LOGGER
+    OS_LIBS
+    OS_CHANMUX
+    OS_PARTITION_MANAGER
+    OS_FILESYSTEM_CORE
+    OS_FILESYSTEM_FAT
+    OS_FILESYSTEM_SPIFFS
+    OS_LOGGER
 )
 
 
@@ -27,8 +27,8 @@ DeclareCAmkESComponent(LogServer
     C_FLAGS
         -Wall
         -Werror
-        -DSEOS_FS_BUILD_AS_LIB_BASIC_HANDLE
-        -DSEOS_PARTITION_MANAGER_BUILD_AS_COMPONENT
+        -DOS_FS_BUILD_AS_LIB_BASIC_HANDLE
+        -DOS_PARTITION_MANAGER_BUILD_AS_COMPONENT
     LIBS
         seos_core_api
         seos_log_server_backend_filesystem
@@ -93,8 +93,8 @@ DeclareCAmkESComponent(FileReaderWriter
     SOURCES
         "components/log_clients/FileReaderWriter/FileReaderWriter.c"
     C_FLAGS
-        -DSEOS_FS_BUILD_AS_LIB_BASIC_HANDLE
-        -DSEOS_PARTITION_MANAGER_BUILD_AS_COMPONENT
+        -DOS_FS_BUILD_AS_LIB_BASIC_HANDLE
+        -DOS_PARTITION_MANAGER_BUILD_AS_COMPONENT
         -Wall
         -Werror
     LIBS
@@ -114,7 +114,7 @@ DeclareCAmkESComponent(PartitionManager
     C_FLAGS
         -Wall
         -Werror
-        -DSEOS_PARTITION_MANAGER_BUILD_AS_COMPONENT
+        -DOS_PARTITION_MANAGER_BUILD_AS_COMPONENT
     LIBS
         seos_core_api
         seos_logger

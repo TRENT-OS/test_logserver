@@ -1,4 +1,4 @@
-# SEOS logserver - demo application
+# OS logserver - demo application
 
 The purpose of this demo application is to present all common features offered
 by the log server, and help the user to configure it in the desired way.
