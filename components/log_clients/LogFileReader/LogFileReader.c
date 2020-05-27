@@ -36,7 +36,7 @@ int run()
 
     // read log file 01
     retval = OS_LoggerFileClient_read(&log_file_client, LOG_FILENAME_01, 0, DATABUFFER_SIZE);
-    if(retval != SEOS_SUCCESS){
+    if(retval != OS_SUCCESS){
         Debug_LOG_ERROR("Fail to read log file! Error code: %d", retval);
         return 0;
     }
@@ -45,7 +45,7 @@ int run()
 
     // read log file 02
     retval = OS_LoggerFileClient_read(&log_file_client, LOG_FILENAME_02, 0, DATABUFFER_SIZE);
-    if(retval != SEOS_SUCCESS){
+    if(retval != OS_SUCCESS){
         Debug_LOG_ERROR("Fail to read log file! Error code: %d", retval);
         return 0;
     }

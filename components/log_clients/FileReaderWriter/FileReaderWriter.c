@@ -45,7 +45,7 @@ filesystem_init(void)
     pm_partition_data_t pm_partition_data;
 
     OS_Error_t ret = partition_manager_get_info_disk(&pm_disk_data);
-    if(SEOS_SUCCESS != ret)
+    if(OS_SUCCESS != ret)
     {
         Debug_LOG_ERROR("Fail to get disk info! Error code: %d", ret);
         return ret;
@@ -55,7 +55,7 @@ filesystem_init(void)
             PARTITION_ID,
             &pm_partition_data);
 
-    if(SEOS_SUCCESS != ret)
+    if(OS_SUCCESS != ret)
     {
         Debug_LOG_ERROR(
             "Fail to get partition info: %d! Error code: %d",
@@ -66,7 +66,7 @@ filesystem_init(void)
     }
 
     ret = OS_Filesystem_init(pm_partition_data.partition_id, 0);
-    if(SEOS_SUCCESS != ret)
+    if(OS_SUCCESS != ret)
     {
         Debug_LOG_ERROR("Fail to init partition: %d! Error code: %d",
         pm_partition_data.partition_id,
@@ -78,7 +78,7 @@ filesystem_init(void)
     phandle = OS_Filesystem_open(pm_partition_data.partition_id);
     if(!OS_Filesystem_validatePartitionHandle(phandle))
     {
-        ret = SEOS_ERROR_INVALID_HANDLE;
+        ret = OS_ERROR_INVALID_HANDLE;
         Debug_LOG_ERROR(
             "Fail to open partition: %d! Error code: %d",
             pm_partition_data.partition_id,
@@ -98,7 +98,7 @@ filesystem_init(void)
                 0,  // default value: count header sectors: 512
                 FS_PARTITION_OVERWRITE_CREATE);
 
-    if(SEOS_SUCCESS != ret)
+    if(OS_SUCCESS != ret)
     {
         Debug_LOG_ERROR(
             "Fail to create filesystem on partition: %d! Error code: %d",
@@ -109,7 +109,7 @@ filesystem_init(void)
     }
 
     ret = OS_Filesystem_close(phandle);
-    if(SEOS_SUCCESS != ret)
+    if(OS_SUCCESS != ret)
     {
         Debug_LOG_ERROR(
             "Fail to close partition: %d!",
@@ -140,7 +140,7 @@ int run(void)
     /* Filesystem init */
     /*******************/
     OS_Error_t ret = filesystem_init();
-    if(SEOS_SUCCESS != ret)
+    if(OS_SUCCESS != ret)
     {
         Debug_LOG_ERROR(
             "Fail to init demo! Error code: %d",
@@ -155,7 +155,7 @@ int run(void)
     phandle = OS_Filesystem_open(PARTITION_ID);
     if(!OS_Filesystem_validatePartitionHandle(phandle))
     {
-        ret = SEOS_ERROR_INVALID_HANDLE;
+        ret = OS_ERROR_INVALID_HANDLE;
         Debug_LOG_ERROR(
             "Fail to open partition: %d! Error code: %d",
             PARTITION_ID,
@@ -173,14 +173,14 @@ int run(void)
     /* Create files */
     /****************/
     ret = _create_file(phandle, FILE_NAME_P1_F1, DATA_LENGTH, 'a');
-    if(SEOS_SUCCESS != ret)
+    if(OS_SUCCESS != ret)
     {
         Debug_LOG_ERROR("_create_file error %d", ret);
         return ret;
     }
 
     ret = _create_file(phandle, FILE_NAME_P1_F2, DATA_LENGTH * 2, 'b');
-    if(SEOS_SUCCESS != ret)
+    if(OS_SUCCESS != ret)
     {
         Debug_LOG_ERROR("_create_file error %d", ret);
         return ret;
@@ -195,14 +195,14 @@ int run(void)
     Debug_LOG_DEBUG("file_getSize:      %lld", length);
     if(length < 0){
         Debug_LOG_ERROR("file_getSize error from file: %s", FILE_NAME_P1_F2);
-        return SEOS_ERROR_GENERIC;
+        return OS_ERROR_GENERIC;
     }
 
     /**************/
     /* Read files */
     /**************/
     ret = _read_from_file(phandle, FILE_NAME_P1_F1, DATA_LENGTH, 'a');
-    if(SEOS_SUCCESS != ret)
+    if(OS_SUCCESS != ret)
     {
         Debug_LOG_ERROR("Read from file %s failed. Error code: %d",
         FILE_NAME_P1_F1,
@@ -212,7 +212,7 @@ int run(void)
     }
 
     ret = _read_from_file(phandle, FILE_NAME_P1_F2, DATA_LENGTH * 2, 'b');
-    if(SEOS_SUCCESS != ret)
+    if(OS_SUCCESS != ret)
     {
         Debug_LOG_ERROR("Read from file %s failed. Error code: %d",
         FILE_NAME_P1_F2,
@@ -227,7 +227,7 @@ int run(void)
     ret = OS_Filesystem_unmount(phandle);
     Debug_LOG_DEBUG("partition_unmount 1: %d", ret);
 
-    if(SEOS_SUCCESS != ret)
+    if(OS_SUCCESS != ret)
     {
         return ret;
     }
@@ -238,7 +238,7 @@ int run(void)
     ret = OS_Filesystem_close(phandle);
     Debug_LOG_DEBUG("partition_close 1: %d", ret);
 
-    if(SEOS_SUCCESS != ret)
+    if(OS_SUCCESS != ret)
     {
         return ret;
     }
@@ -247,7 +247,7 @@ int run(void)
     OS_LoggerEmitter_dtor();
     OS_LoggerFilter_dtor(&filter);
 
-    return SEOS_SUCCESS;
+    return OS_SUCCESS;
 }
 
 //static
@@ -264,7 +264,7 @@ _create_file(
     if(length > DATABUFFER_SIZE){
         Debug_LOG_ERROR("Length for data buffer to big!");
 
-        return SEOS_ERROR_INVALID_PARAMETER;
+        return OS_ERROR_INVALID_PARAMETER;
     }
 
     Debug_LOG_DEBUG("### Create file %s ###", name);
@@ -276,7 +276,7 @@ _create_file(
             "Failed to open the file: %s",
             name);
 
-        return SEOS_ERROR_INVALID_HANDLE;
+        return OS_ERROR_INVALID_HANDLE;
     }
 
     // fill buffer with test data
@@ -286,7 +286,7 @@ _create_file(
     OS_Error_t err = OS_Filesystem_writeFile(fhandle, 0, length, buf_write_file);
     Debug_LOG_DEBUG("file_write:        %d", err);
 
-    if(SEOS_SUCCESS != err)
+    if(OS_SUCCESS != err)
     {
         return err;
     }
@@ -313,7 +313,7 @@ _read_from_file(
     if(length > DATABUFFER_SIZE){
         Debug_LOG_ERROR("Length for data buffer to big!");
 
-        return SEOS_ERROR_INVALID_PARAMETER;
+        return OS_ERROR_INVALID_PARAMETER;
     }
 
     // fill buffer with test data
@@ -328,7 +328,7 @@ _read_from_file(
             "Failed to open the file: %s",
             name);
 
-        return SEOS_ERROR_INVALID_HANDLE;
+        return OS_ERROR_INVALID_HANDLE;
     }
 
     // clear the receive buffer
@@ -337,7 +337,7 @@ _read_from_file(
     // Call filesystem api function to read from a file
     OS_Error_t err = OS_Filesystem_readFile(fhandle, 0, length, buf_read_file);
     Debug_LOG_DEBUG("file_read:         %d", err);
-    if(SEOS_SUCCESS != err)
+    if(OS_SUCCESS != err)
     {
         return err;
     }
@@ -360,7 +360,7 @@ _read_from_file(
 
     if(readErr > 0)
     {
-        return SEOS_ERROR_GENERIC;
+        return OS_ERROR_GENERIC;
     }
 
     // Close file

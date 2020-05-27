@@ -147,7 +147,7 @@ filesystem_init(void)
 
     OS_Error_t ret =  partition_manager_get_info_disk(&pm_disk_data);
 
-    if(SEOS_SUCCESS != ret)
+    if(OS_SUCCESS != ret)
     {
         printf("Fail to get disk info! Error code: %d\n", ret);
 
@@ -155,7 +155,7 @@ filesystem_init(void)
     }
 
     ret = partition_manager_get_info_partition(PARTITION_ID, &pm_partition_data);
-    if(SEOS_SUCCESS != ret)
+    if(OS_SUCCESS != ret)
     {
         printf(
             "Fail to get partition info: %d! Error code: %d\n",
@@ -166,7 +166,7 @@ filesystem_init(void)
     }
 
     ret = OS_Filesystem_init(pm_partition_data.partition_id, 0);
-    if(SEOS_SUCCESS != ret)
+    if(OS_SUCCESS != ret)
     {
         printf(
             "Fail to init partition: %d! Error code: %d\n",
@@ -194,7 +194,7 @@ filesystem_init(void)
             0,  // default value: count header sectors: 512
             FS_PARTITION_OVERWRITE_CREATE);
 
-    if(SEOS_SUCCESS != ret)
+    if(OS_SUCCESS != ret)
     {
         printf(
             "Fail to create filesystem on partition: %d! Error code: %d\n",
@@ -205,7 +205,7 @@ filesystem_init(void)
     }
 
     ret = OS_Filesystem_close(phandle);
-    if(SEOS_SUCCESS != ret)
+    if(OS_SUCCESS != ret)
     {
         printf(
             "Fail to close partition: %d! Error code: %d\n",

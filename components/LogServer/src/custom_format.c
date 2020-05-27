@@ -26,7 +26,7 @@ _Log_format_convert(
 
     if(NULL == log_info)
     {
-        return SEOS_ERROR_INVALID_PARAMETER;
+        return OS_ERROR_INVALID_PARAMETER;
     }
 
     size_t msg_len = strlen(log_info->log_databuffer.log_message);
@@ -42,5 +42,5 @@ _Log_format_convert(
             OS_Logger_ID_AND_NAME_LENGTH, log_info->log_id_and_name,
             (int)msg_len, log_info->log_databuffer.log_message);
 
-    return SEOS_SUCCESS;
+    return OS_SUCCESS;
 }
