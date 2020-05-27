@@ -6,19 +6,11 @@ static void testLogging();
 void post_init()
 {
     OS_LoggerEmitter_getInstance(logServer_buf, NULL, API_LOG_SERVER_EMIT);
-}
 
-int run()
-{
-    // Delaying till other components are done with their logging.
-    //
-    // This componente throws an exception, so we want it to be the last one to
-    // log anything.
-    ready_wait();
-
-    testLogging();
-
-    return 0;
+    if(0 != ready_reg_callback(&testLogging, NULL))
+    {
+        Debug_LOG_INFO("Failed to register a callback for the 'ready' event.");
+    }
 }
 
 void testLogging()

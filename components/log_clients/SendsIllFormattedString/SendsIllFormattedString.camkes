@@ -16,7 +16,6 @@ import <if_OS_Logger.camkes>;
 
 /** @hideinitializer */
 component SendsIllFormattedString {
-    control;
 
     consumes Trigger ready;
 
