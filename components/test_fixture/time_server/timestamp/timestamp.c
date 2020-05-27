@@ -84,17 +84,6 @@ get_instance_Timestamp(void)
     return this;
 }
 
-
-
-void
-Timestamp_dtor(void)
-{
-    memset(this, 0, sizeof (Timestamp_t));
-    this = NULL;
-}
-
-
-
 bool
 Timestamp_get_time(Timestamp_t *t_stamp, uint8_t hours, Time_t *tm)
 {

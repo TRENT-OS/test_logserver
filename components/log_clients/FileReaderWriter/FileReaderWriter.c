@@ -243,10 +243,6 @@ int run(void)
         return ret;
     }
 
-    // destruction
-    OS_LoggerEmitter_dtor();
-    OS_LoggerFilter_dtor(&filter);
-
     return OS_SUCCESS;
 }
 

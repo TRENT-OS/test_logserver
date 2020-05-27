@@ -55,10 +55,5 @@ int run()
            "demo finished successfully\n",
                 buf);
 
-    // destruction
-    OS_LoggerFileClientCallback_dtor(&log_file_client_callback);
-
-    OS_LoggerFileClient_dtor(&log_file_client);
-
     return 0;
 }

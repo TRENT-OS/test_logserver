@@ -47,11 +47,6 @@ struct Timestamp_t{
 Timestamp_t *
 get_instance_Timestamp(void);
 
-
-void
-Timestamp_dtor(void);
-
-
 bool
 Timestamp_create_timestamp(const char *date, const char *time);
 

@@ -62,9 +62,6 @@ void testLogging()
 
 void tearDownLogging()
 {
-    OS_LoggerEmitter_dtor();
-    OS_LoggerFilter_dtor(&filter);
-
     done_emit();
 }
 

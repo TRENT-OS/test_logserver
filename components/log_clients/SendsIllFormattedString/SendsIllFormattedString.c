@@ -1,10 +1,7 @@
 #include "LibDebug/Debug.h"
 #include <camkes.h>
 
-static OS_LoggerFilter_Handle_t filter;
-
 static void testLogging();
-static void tearDownLogging();
 
 void post_init()
 {
@@ -20,7 +17,6 @@ int run()
     ready_wait();
 
     testLogging();
-    tearDownLogging();
 
     return 0;
 }
@@ -32,10 +28,4 @@ void testLogging()
 
     // Notice missing arguments for the format specifiers!
     Debug_LOG_INFO("%d %u %o %x %X %f %F %e %E %g %G %a %A %c %s %p %n %%");
-}
-
-void tearDownLogging()
-{
-    OS_LoggerEmitter_dtor();
-    OS_LoggerFilter_dtor(&filter);
 }
