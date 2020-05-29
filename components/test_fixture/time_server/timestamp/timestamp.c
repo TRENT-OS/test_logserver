@@ -160,7 +160,6 @@ Timestamp_get_timestamp(Time_t *tm, Timestamp_t *t_stamp)
 {
     if(NULL == this)
     {
-        // Debug_printf
         return false;
     }
 
@@ -188,7 +187,6 @@ Timestamp_create_timestamp(const char *date, const char *time)
 {
     if(NULL == this)
     {
-        // Debug_printf
         return false;
     }
 
