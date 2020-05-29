@@ -1,7 +1,7 @@
 #include "LibDebug/Debug.h"
 
 #include "OS_Filesystem.h"
-#include "seos_pm_api.h"
+#include "OS_PartitionManager.h"
 #include <camkes.h>
 
 
@@ -41,17 +41,17 @@ static OS_Error_t
 filesystem_init(void)
 {
     hPartition_t phandle;
-    pm_disk_data_t pm_disk_data;
-    pm_partition_data_t pm_partition_data;
+    OS_PartitionManagerDataTypes_DiskData_t pm_disk_data;
+    OS_PartitionManagerDataTypes_PartitionData_t pm_partition_data;
 
-    OS_Error_t ret = partition_manager_get_info_disk(&pm_disk_data);
+    OS_Error_t ret = OS_PartitionManager_getInfoDisk(&pm_disk_data);
     if(OS_SUCCESS != ret)
     {
         Debug_LOG_ERROR("Fail to get disk info! Error code: %d", ret);
         return ret;
     }
 
-    ret = partition_manager_get_info_partition(
+    ret = OS_PartitionManager_getInfoPartition(
             PARTITION_ID,
             &pm_partition_data);
 

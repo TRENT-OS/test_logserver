@@ -11,7 +11,7 @@
 #include "custom_format.h"
 
 #include "OS_Filesystem.h"
-#include "seos_pm_api.h"
+#include "OS_PartitionManager.h"
 
 #include <stdio.h>
 #include <camkes.h>
@@ -142,10 +142,10 @@ static bool
 filesystem_init(void)
 {
     hPartition_t phandle;
-    pm_disk_data_t pm_disk_data;
-    pm_partition_data_t pm_partition_data;
+    OS_PartitionManagerDataTypes_DiskData_t pm_disk_data;
+    OS_PartitionManagerDataTypes_PartitionData_t pm_partition_data;
 
-    OS_Error_t ret =  partition_manager_get_info_disk(&pm_disk_data);
+    OS_Error_t ret =  OS_PartitionManager_getInfoDisk(&pm_disk_data);
 
     if(OS_SUCCESS != ret)
     {
@@ -154,7 +154,7 @@ filesystem_init(void)
         return false;
     }
 
-    ret = partition_manager_get_info_partition(PARTITION_ID, &pm_partition_data);
+    ret = OS_PartitionManager_getInfoPartition(PARTITION_ID, &pm_partition_data);
     if(OS_SUCCESS != ret)
     {
         printf(

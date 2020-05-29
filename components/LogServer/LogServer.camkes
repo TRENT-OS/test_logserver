@@ -18,7 +18,7 @@
  */
 
 /** @cond SKIP_IMPORTS */
-import <seos_if_partitionManager.camkes>;
+import <if_OS_PartitionManager.camkes>;
 import "../../interfaces/time_server.camkes";
 import <if_OS_Logger.camkes>;
 /** @endcond */
