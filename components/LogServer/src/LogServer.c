@@ -289,16 +289,16 @@ void initLogTargetsAndSubjects()
     // attach observed object to subject
     OS_LoggerSubject_attach(
         (OS_LoggerAbstractSubject_Handle_t *)&subject,
-        (OS_LoggerAbstractObserver_Handle_t *)&filesystem);
+        &filesystem);
 
     OS_LoggerSubject_attach(
         (OS_LoggerAbstractSubject_Handle_t *)&subject,
-        (OS_LoggerAbstractObserver_Handle_t *)&console);
+        &console);
 
     // Emitter configuration
     OS_LoggerSubject_attach(
         (OS_LoggerAbstractSubject_Handle_t *)&subject_log_server,
-        (OS_LoggerAbstractObserver_Handle_t *)&console_log_server);
+        &console_log_server);
 }
 
 void initClients()
