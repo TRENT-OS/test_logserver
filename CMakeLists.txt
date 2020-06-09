@@ -30,13 +30,13 @@ DeclareCAmkESComponent(LogServer
         -DOS_FS_BUILD_AS_LIB_BASIC_HANDLE
         -DOS_PARTITION_MANAGER_BUILD_AS_COMPONENT
     LIBS
-        seos_core_api
-        seos_log_server_backend_filesystem
-        seos_libs
-        seos_partition_manager_api
-        seos_filesystem_core
-        seos_filesystem_fat
-        seos_filesystem_spiffs
+        os_core_api
+        os_log_server_backend_filesystem
+        os_libs
+        os_partition_manager_api
+        os_filesystem_core
+        os_filesystem_fat
+        os_filesystem_spiffs
 )
 
 # time server
@@ -60,9 +60,9 @@ DeclareCAmkESComponent(LogsAllLevels
         -Wall
         -Werror
     LIBS
-        seos_core_api
-        seos_logger
-        seos_libs
+        os_core_api
+        os_logger
+        os_libs
 )
 
 DeclareCAmkESComponent(SendsIllFormattedString
@@ -72,9 +72,9 @@ DeclareCAmkESComponent(SendsIllFormattedString
         -Wall
         -Werror
     LIBS
-        seos_core_api
-        seos_logger
-        seos_libs
+        os_core_api
+        os_logger
+        os_libs
 )
 
 DeclareCAmkESComponent(LogFileReader
@@ -84,9 +84,9 @@ DeclareCAmkESComponent(LogFileReader
         -Wall
         -Werror
     LIBS
-        seos_core_api
-        seos_logger
-        seos_libs
+        os_core_api
+        os_logger
+        os_libs
 )
 
 DeclareCAmkESComponent(FileReaderWriter
@@ -98,13 +98,13 @@ DeclareCAmkESComponent(FileReaderWriter
         -Wall
         -Werror
     LIBS
-        seos_core_api
-        seos_logger
-        seos_libs
-        seos_partition_manager_api
-        seos_filesystem_core
-        seos_filesystem_fat
-        seos_filesystem_spiffs
+        os_core_api
+        os_logger
+        os_libs
+        os_partition_manager_api
+        os_filesystem_core
+        os_filesystem_fat
+        os_filesystem_spiffs
 )
 
 # PARTITION_MANAGER
@@ -116,11 +116,11 @@ DeclareCAmkESComponent(PartitionManager
         -Werror
         -DOS_PARTITION_MANAGER_BUILD_AS_COMPONENT
     LIBS
-        seos_core_api
-        seos_logger
-        seos_libs
+        os_core_api
+        os_logger
+        os_libs
         proxy_nvm
-        seos_partition_manager
+        os_partition_manager
 )
 
 # UartDrv
