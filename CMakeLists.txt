@@ -19,14 +19,17 @@ os_use_libs(
 )
 
 
+#-------------------------------------------------------------------------------
 project(system_config C)
 add_library(${PROJECT_NAME} INTERFACE)
 target_include_directories(${PROJECT_NAME} INTERFACE ${CMAKE_CURRENT_LIST_DIR})
 
 
+#-------------------------------------------------------------------------------
 project(demo_logserver C)
 
-DeclareCAmkESComponent(LogServer
+DeclareCAmkESComponent(
+    LogServer
     SOURCES
         "components/LogServer/src/custom_format.c"
         "components/LogServer/src/LogServer.c"
@@ -45,8 +48,8 @@ DeclareCAmkESComponent(LogServer
         os_filesystem_spiffs
 )
 
-# time server
-DeclareCAmkESComponent(TimeServer
+DeclareCAmkESComponent(
+    TimeServer
     INCLUDES
         components/test_fixture/time_server/include
         components/test_fixture/time_server/timestamp
@@ -59,7 +62,8 @@ DeclareCAmkESComponent(TimeServer
         -Werror
 )
 
-DeclareCAmkESComponent(LogsAllLevels
+DeclareCAmkESComponent(
+    LogsAllLevels
     SOURCES
         "components/log_clients/LogsAllLevels/LogsAllLevels.c"
     C_FLAGS
@@ -71,7 +75,8 @@ DeclareCAmkESComponent(LogsAllLevels
         os_libs
 )
 
-DeclareCAmkESComponent(SendsIllFormattedString
+DeclareCAmkESComponent(
+    SendsIllFormattedString
     SOURCES
         "components/log_clients/SendsIllFormattedString/SendsIllFormattedString.c"
     C_FLAGS
@@ -83,7 +88,8 @@ DeclareCAmkESComponent(SendsIllFormattedString
         os_libs
 )
 
-DeclareCAmkESComponent(LogFileReader
+DeclareCAmkESComponent(
+    LogFileReader
     SOURCES
         "components/log_clients/LogFileReader/LogFileReader.c"
     C_FLAGS
@@ -95,7 +101,8 @@ DeclareCAmkESComponent(LogFileReader
         os_libs
 )
 
-DeclareCAmkESComponent(FileReaderWriter
+DeclareCAmkESComponent(
+    FileReaderWriter
     SOURCES
         "components/log_clients/FileReaderWriter/FileReaderWriter.c"
     C_FLAGS
@@ -113,8 +120,8 @@ DeclareCAmkESComponent(FileReaderWriter
         os_filesystem_spiffs
 )
 
-# PARTITION_MANAGER
-DeclareCAmkESComponent(PartitionManager
+DeclareCAmkESComponent(
+    PartitionManager
     SOURCES
         "components/test_fixture/partition_manager/partition_manager.c"
     C_FLAGS
@@ -129,17 +136,16 @@ DeclareCAmkESComponent(PartitionManager
         os_partition_manager
 )
 
-# UartDrv
 DeclareCAmkESComponent_UART(
     UART
 )
 
-# ChanMux
 DeclareCAmkESComponent_ChanMux(
     ChanMux
     components/test_fixture/ChanMux/ChanMux_config.c
     system_config
 )
+
 
 DeclareAndCreateCamkESSystem(test_logserver.camkes)
 GenerateSimulateScript()
