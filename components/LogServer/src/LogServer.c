@@ -8,6 +8,8 @@
 #include "Logger/Server/OS_LoggerOutputConsole.h"
 #include "Logger/Server/OS_LoggerOutputFileSystem.h"
 
+#include "Logger/Client/OS_LoggerEmitter.h"
+
 #include "custom_format.h"
 
 #include "OS_Filesystem.h"
