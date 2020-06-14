@@ -42,6 +42,7 @@ DeclareCAmkESComponent(
         os_core_api
         os_log_server_backend_filesystem
         os_libs
+        os_logger
         os_partition_manager_api
         os_filesystem_core
         os_filesystem_fat
