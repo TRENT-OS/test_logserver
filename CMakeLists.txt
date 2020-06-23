@@ -131,10 +131,20 @@ DeclareCAmkESComponent_UART(
     UART
 )
 
-DeclareCAmkESComponent_ChanMux(
+DeclareCAmkESComponent(
     ChanMux
-    components/test_fixture/ChanMux/ChanMux_config.c
-    system_config
+    SOURCES
+        ${COMPONENT_CHANMUX_DIR}/ChanMux.c
+        components/test_fixture/ChanMux/ChanMux_config.c
+    C_FLAGS
+        -Wall
+        -Werror
+    LIBS
+        system_config
+        os_core_api
+        os_logger
+        os_libs
+        chanmux_server
 )
 
 

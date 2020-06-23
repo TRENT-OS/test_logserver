@@ -148,6 +148,8 @@ assembly {
         connection  seL4RPCCall         conn_rpc_logServer2app_cl_filter_trace(  from app_cl_filter_trace.log_server_interface,   to logServer.log_server_interface);
         connection  seL4RPCCall         conn_rpc_logServer2app_cl_filter_custom( from app_cl_filter_custom.log_server_interface,  to logServer.log_server_interface);
 
+        connection  seL4RPCCall         conn_rpc_logServer2chanmux(              from chanMux.log_server_interface,               to logServer.log_server_interface);
+
 
         // seL4Notification
         connection  seL4Notification    conn_dataAvailable_logServer2logFileReader_finish( from logServer.logServer_finish, to logFileReader.logServer_finish);
@@ -182,6 +184,7 @@ assembly {
 
         connection  seL4SharedData      conn_dataConnection_sendsIllFormattedString(from sendsIllFormattedString.logServer_buf, to logServer.dataport_buf_sendsIllFormattedString);
 
+        connection  seL4SharedData      conn_dataConnection_chanMux(from chanMux.logServer_buf, to logServer.dataport_buf_chanMux);
     }
     configuration {
 
@@ -208,6 +211,8 @@ assembly {
         app_cl_filter_trace.log_server_interface_attributes   = 0xCAFE + 8;
         app_cl_filter_custom.log_server_interface_attributes  = 0xCAFE + 9;
 
+        chanMux.log_server_interface_attributes               = 3001;
+
         app_lvl_none.log_lvl    = -1;
         app_lvl_assert.log_lvl  = -1;
         app_lvl_fatal.log_lvl   = -1;
@@ -230,6 +235,8 @@ assembly {
         app_cl_filter_debug.log_lvl   = 6;
         app_cl_filter_trace.log_lvl   = 7;
         app_cl_filter_custom.log_lvl  = 9;
+
+        chanMux.log_lvl = 1;
 
         sendsIllFormattedString.log_server_interface_attributes = 50000;
 

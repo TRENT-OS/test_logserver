@@ -55,6 +55,8 @@ component LogServer {
     dataport Buf                     dataport_buf_logFileReader;
     dataport Buf                     dataport_buf_fileReaderWriter;
 
+    dataport Buf                     dataport_buf_chanMux;
+
     emits    DataAvailableEvent      logServer_finish;
 
     provides if_OS_Logger            log_server_interface;

@@ -13,3 +13,8 @@
 // upper interface to partition manager
 dataport  Buf                 pm_port;
 emits     DataAvailableEvent  pm_event_hasData;
+
+// interface to log server
+dataport  Buf           logServer_buf;
+uses      if_OS_Logger  log_server_interface;
+attribute int           log_lvl;

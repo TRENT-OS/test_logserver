@@ -74,7 +74,9 @@ static ClientConfig_t clientConfigs[] =
     { .name = "ILL_FORMATTED",    .log_level = Debug_LOG_LEVEL_DEBUG,   .log_file = NULL,         .id = 50000u },
 
     { .name = "LogFileReader",    .log_level = Debug_LOG_LEVEL_DEBUG,   .log_file = NULL,         .id = 50001u },
-    { .name = "FileReaderWriter", .log_level = Debug_LOG_LEVEL_DEBUG,   .log_file = &log_file_02, .id = 50002u }
+    { .name = "FileReaderWriter", .log_level = Debug_LOG_LEVEL_DEBUG,   .log_file = &log_file_02, .id = 50002u },
+
+    { .name = "ChanMux",          .log_level = Debug_LOG_LEVEL_ASSERT,  .log_file = NULL,         .id = 3001u }
 };
 
 static const size_t CLIENT_CONFIGS_COUNT = sizeof(clientConfigs)
@@ -257,6 +259,8 @@ void mapClientConfigsDataPorts()
 
     (clientConfig)++->buffer = dataport_buf_logFileReader;
     (clientConfig)++->buffer = dataport_buf_fileReaderWriter;
+
+    (clientConfig)++->buffer = dataport_buf_chanMux;
 
     // If the manipulated pointer does not point to the end of clientConfigs
     // array, then data ports got misconfigured.
