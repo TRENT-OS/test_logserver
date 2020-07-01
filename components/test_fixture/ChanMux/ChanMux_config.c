@@ -39,8 +39,9 @@ static const ChanMux_ChannelCtx_t channelCtx[] = {
         CHANMUX_CHANNEL_NVM,
         &client_channel,
         client_fifo_buffer, // must be the buffer and not a pointer
-        CHANMUX_DATAPORT_DUPLEX_SHARED_ASSIGN(pm_port),
-        pm_event_hasData_emit),
+        CHANMUX_DATAPORT_ASSIGN(partitionManager_chan_portRead,
+                                partitionManager_chan_portWrite),
+        partitionManager_chan_DataAvailable_emit),
 };
 
 

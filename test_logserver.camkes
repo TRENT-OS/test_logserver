@@ -52,12 +52,10 @@ assembly {
         //----------------------------------------------------------------------
         // PartitionManager connections
         //----------------------------------------------------------------------
-        component   PartitionManager       partition_manager;
+        component   PartitionManager       partitionManager;
 
-        connection  seL4RPCCall            partition_manager_chanmux(from partition_manager.chanMux_rpc, to chanMux.chanMux_rpc);
-        connection  seL4SharedData         dataConnection(from partition_manager.chanMux_port, to chanMux.pm_port);
-        connection  seL4Notification       dataAvailableLan(from chanMux.pm_event_hasData, to partition_manager.chanMux_event_hasData);
-
+        CHANMUX_INSTANCE_CONNECT_INTERFACE(chanMux, partitionManager)
+        CHANMUX_INSTANCE_CONNECT_CHANNEL(chanMux, partitionManager, chan)
 
         //----------------------------------------------------------------------
         // LogServer
@@ -66,8 +64,8 @@ assembly {
 
         connection  seL4RPCCall            logServer_2_time_server(from logServer.api_time_server, to time_server.api_time_server);
 
-        connection  seL4RPCCall            interface_partition_manager2logServer(from logServer.api_pm_component, to partition_manager.api_pm_component);
-        connection  seL4SharedData         dataport_interface_partition_manager2logServer(from logServer.pm_dataport_buf, to partition_manager.logServer_port);
+        connection  seL4RPCCall            interface_partition_manager2logServer(from logServer.api_pm_component, to partitionManager.api_pm_component);
+        connection  seL4SharedData         dataport_interface_partition_manager2logServer(from logServer.pm_dataport_buf, to partitionManager.logServer_port);
 
 
         //----------------------------------------------------------------------
@@ -75,8 +73,8 @@ assembly {
         //----------------------------------------------------------------------
         component   FileReaderWriter       fileReaderWriter;
 
-        connection  seL4RPCCall            interface_partition_manager2fileReaderWriter(from fileReaderWriter.api_pm_component, to partition_manager.api_pm_component);
-        connection  seL4SharedData         dataport_interface_partition_manager2fileReaderWriter(from fileReaderWriter.pm_dataport_buf, to partition_manager.fileReaderWriter_port);
+        connection  seL4RPCCall            interface_partition_manager2fileReaderWriter(from fileReaderWriter.api_pm_component, to partitionManager.api_pm_component);
+        connection  seL4SharedData         dataport_interface_partition_manager2fileReaderWriter(from fileReaderWriter.pm_dataport_buf, to partitionManager.fileReaderWriter_port);
 
         connection  seL4RPCCall            conn_rpc_logServer2fileReaderWriter(     from fileReaderWriter.log_server_interface,      to logServer.log_server_interface);
 
@@ -250,7 +248,7 @@ assembly {
 
         // assign endpoint badges for n:1 RPC interface of ChanMUX. The generic
         // naming scheme is <component>.<interface>_attributes = <badge ID>
-        partition_manager.chanMux_rpc_attributes = CHANMUX_ID_PM;
+        CHANMUX_ASSIGN_CLIENT_BADGE(chanMux, partitionManager, CHANMUX_ID_PM)
 
         // UART
         CONFIGURE_INSTANCE_UART(
