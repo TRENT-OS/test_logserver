@@ -78,6 +78,10 @@ int run(void)
         Debug_LOG_ERROR("OS_FileSystem_format failed with error code %d!", err);
         return err;
     }
+
+    // ToDo: Clean this up; for now the test expects it..
+    Debug_LOG_INFO("Partition 0 successfully created!");
+
     err = OS_FileSystem_mount(hFs);
     if (OS_SUCCESS != err)
     {
