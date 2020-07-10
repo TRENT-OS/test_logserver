@@ -15,13 +15,8 @@ import "components/test_fixture/partition_manager/partition_manager.camkes";
 
 #include "system_config.h"
 
-#include "UART/Uart.camkes"
-DECLARE_COMPONENT_UART(UART)
-
-#define CHANMUX_COMPONENT_NAME  ChanMux
-#define CHANMUX_UPPER_INTERFACES "components/test_fixture/ChanMux/ChanMux_upper_interface.camkes"
-#include "ChanMux/ChanMux.camkes"
-
+#include "RamDisk/RamDisk.camkes"
+DECLARE_COMPONENT_RamDisk(RamDisk)
 
 assembly {
     composition {
@@ -36,27 +31,6 @@ assembly {
         connection  seL4HardwareInterrupt  time_server_irq_ticks(from timerDev.irq_ticks, to time_server.irq_ticks);
         connection  seL4HardwareInterrupt  time_server_irq_sleep(from timerDev.irq_sleep, to time_server.irq_sleep);
 
-
-        //----------------------------------------------------------------------
-        // UART connections
-        //----------------------------------------------------------------------
-        DECLARE_AND_CONNECT_INSTANCE_UART(
-            UART, uartDrv)
-
-
-        //----------------------------------------------------------------------
-        // ChanMux connections
-        //----------------------------------------------------------------------
-        DECLARE_AND_CONNECT_INSTANCE_CHANMUX_TO_UART(ChanMux, chanMux, uartDrv)
-
-        //----------------------------------------------------------------------
-        // PartitionManager connections
-        //----------------------------------------------------------------------
-        component   PartitionManager       partitionManager;
-
-        CHANMUX_INSTANCE_CONNECT_INTERFACE(chanMux, partitionManager)
-        CHANMUX_INSTANCE_CONNECT_CHANNEL(chanMux, partitionManager, chan)
-
         //----------------------------------------------------------------------
         // LogServer
         //----------------------------------------------------------------------
@@ -64,20 +38,22 @@ assembly {
 
         connection  seL4RPCCall            logServer_2_time_server(from logServer.api_time_server, to time_server.api_time_server);
 
-        connection  seL4RPCCall            interface_partition_manager2logServer(from logServer.api_pm_component, to partitionManager.api_pm_component);
-        connection  seL4SharedData         dataport_interface_partition_manager2logServer(from logServer.pm_dataport_buf, to partitionManager.logServer_port);
-
+        DECLARE_AND_CONNECT_INSTANCE_RamDisk(
+          RamDisk, ramDisk,
+          logServer.storage_rpc,
+          logServer.storage_dp)
 
         //----------------------------------------------------------------------
         // FileReaderWriter Client
         //----------------------------------------------------------------------
         component   FileReaderWriter       fileReaderWriter;
 
-        connection  seL4RPCCall            interface_partition_manager2fileReaderWriter(from fileReaderWriter.api_pm_component, to partitionManager.api_pm_component);
-        connection  seL4SharedData         dataport_interface_partition_manager2fileReaderWriter(from fileReaderWriter.pm_dataport_buf, to partitionManager.fileReaderWriter_port);
-
         connection  seL4RPCCall            conn_rpc_logServer2fileReaderWriter(     from fileReaderWriter.log_server_interface,      to logServer.log_server_interface);
 
+        DECLARE_AND_CONNECT_INSTANCE_RamDisk(
+            RamDisk, ramDisk_frw,
+            fileReaderWriter.storage_rpc,
+            fileReaderWriter.storage_dp)
 
         //----------------------------------------------------------------------
         // LogFileReader Client
@@ -86,12 +62,11 @@ assembly {
 
         connection  seL4RPCCall            conn_rpc_logServer2logFileReader(        from logFileReader.log_server_interface,         to logServer.log_server_interface);
 
-
         //----------------------------------------------------------------------
         // Test Apps
         //----------------------------------------------------------------------
-
         component SendsIllFormattedString sendsIllFormattedString;
+
         connection  seL4RPCCall         conn_rpc_logServer2sendsIllFormattedString(from sendsIllFormattedString.log_server_interface,      to logServer.log_server_interface);
 
         component LogsAllLevels     app_lvl_none;
@@ -142,8 +117,6 @@ assembly {
         connection  seL4RPCCall         conn_rpc_logServer2app_cl_filter_trace(  from app_cl_filter_trace.log_server_interface,   to logServer.log_server_interface);
         connection  seL4RPCCall         conn_rpc_logServer2app_cl_filter_custom( from app_cl_filter_custom.log_server_interface,  to logServer.log_server_interface);
 
-        connection  seL4RPCCall         conn_rpc_logServer2chanmux(              from chanMux.log_server_interface,               to logServer.log_server_interface);
-
 
         // seL4Notification
         connection  seL4Notification    conn_dataAvailable_logServer2logFileReader_finish( from logServer.logServer_finish, to logFileReader.logServer_finish);
@@ -177,8 +150,6 @@ assembly {
         connection  seL4SharedData      conn_dataConnection_fileReaderWriter(from fileReaderWriter.dataport_buf, to logServer.dataport_buf_fileReaderWriter);
 
         connection  seL4SharedData      conn_dataConnection_sendsIllFormattedString(from sendsIllFormattedString.logServer_buf, to logServer.dataport_buf_sendsIllFormattedString);
-
-        connection  seL4SharedData      conn_dataConnection_chanMux(from chanMux.logServer_buf, to logServer.dataport_buf_chanMux);
     }
     configuration {
 
@@ -246,14 +217,5 @@ assembly {
         time_server.sem_ticks_value = 0;
         time_server.sem_sleep_value = 0;
 
-        // assign endpoint badges for n:1 RPC interface of ChanMUX. The generic
-        // naming scheme is <component>.<interface>_attributes = <badge ID>
-        CHANMUX_ASSIGN_CLIENT_BADGE(chanMux, partitionManager, CHANMUX_ID_PM)
-
-        // UART
-        CONFIGURE_INSTANCE_UART(
-            uartDrv,
-            CFG_CHANMUX_DEFAULT_UART_PHYS_ADDR,
-            CFG_CHANMUX_DEFAULT_UART_INTR)
     }
 }

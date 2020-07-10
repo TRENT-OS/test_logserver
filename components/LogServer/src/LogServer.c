@@ -12,8 +12,7 @@
 
 #include "custom_format.h"
 
-#include "OS_Filesystem.h"
-#include "OS_PartitionManager.h"
+#include "OS_FileSystem.h"
 
 #include <stdio.h>
 #include <camkes.h>
@@ -24,7 +23,7 @@
 #define NO_FILTER_ID_FIRST 0xCAFE
 #define NO_FILTER_ID_LAST  (NO_FILTER_ID_FIRST + Debug_LOG_LEVEL_CUSTOM)
 
-static const uint8_t  PARTITION_ID  = 1u;
+// static const uint8_t  PARTITION_ID  = 1u;
 
 #define LOG_FILENAME_01 "log_01.txt"
 #define LOG_FILENAME_02 "log_02.txt"
@@ -75,12 +74,19 @@ static ClientConfig_t clientConfigs[] =
 
     { .name = "LogFileReader",    .log_level = Debug_LOG_LEVEL_DEBUG,   .log_file = NULL,         .id = 50001u },
     { .name = "FileReaderWriter", .log_level = Debug_LOG_LEVEL_DEBUG,   .log_file = &log_file_02, .id = 50002u },
+};
 
-    { .name = "ChanMux",          .log_level = Debug_LOG_LEVEL_ASSERT,  .log_file = NULL,         .id = 3001u }
+static OS_FileSystem_Config_t cfgFs =
+{
+    .type = OS_FileSystem_Type_LITTLEFS,
+    .size = OS_FileSystem_STORAGE_MAX,
+    .storage = OS_FILESYSTEM_ASSIGN_Storage(
+        storage_rpc,
+        storage_dp),
 };
 
 static const size_t CLIENT_CONFIGS_COUNT = sizeof(clientConfigs)
-                                         / sizeof(*clientConfigs);
+                                           / sizeof(*clientConfigs);
 
 uint32_t API_LOG_SERVER_GET_SENDER_ID(void);
 
@@ -101,6 +107,8 @@ static bool filesystem_init(void);
 
 #define LOG_SUCCESS() Debug_LOG_DEBUG("%s => SUCCESS!", __func__)
 
+static OS_FileSystem_Handle_t hFs;
+
 void pre_init()
 {
     // set up consumer chain
@@ -110,7 +118,7 @@ void pre_init()
     initClients();
 
     // create filesystem
-    if(!filesystem_init())
+    if (!filesystem_init())
     {
         printf("Fail to init filesystem!\n");
         return;
@@ -127,7 +135,7 @@ run()
     const int demo_time_sec = 75;
     const int one_sec       = 1000;
 
-    for(
+    for (
         int time_passed_sec = 0;
         time_passed_sec < demo_time_sec;
         ++time_passed_sec)
@@ -145,81 +153,26 @@ run()
 static bool
 filesystem_init(void)
 {
-    hPartition_t phandle;
-    OS_PartitionManagerDataTypes_DiskData_t pm_disk_data;
-    OS_PartitionManagerDataTypes_PartitionData_t pm_partition_data;
+    OS_Error_t err;
 
-    OS_Error_t ret =  OS_PartitionManager_getInfoDisk(&pm_disk_data);
-
-    if(OS_SUCCESS != ret)
+    err = OS_FileSystem_init(&hFs, &cfgFs);
+    if (OS_SUCCESS != err)
     {
-        printf("Fail to get disk info! Error code: %d\n", ret);
-
+        printf("OS_FileSystem_init failed with error code %d!", err);
         return false;
     }
-
-    ret = OS_PartitionManager_getInfoPartition(PARTITION_ID, &pm_partition_data);
-    if(OS_SUCCESS != ret)
+    err = OS_FileSystem_format(hFs);
+    if (OS_SUCCESS != err)
     {
-        printf(
-            "Fail to get partition info: %d! Error code: %d\n",
-            pm_partition_data.partition_id,
-            ret);
-
+        printf("OS_FileSystem_format failed with error code %d!", err);
         return false;
     }
-
-    ret = OS_Filesystem_init(pm_partition_data.partition_id, 0);
-    if(OS_SUCCESS != ret)
+    err = OS_FileSystem_mount(hFs);
+    if (OS_SUCCESS != err)
     {
-        printf(
-            "Fail to init partition: %d! Error code: %d\n",
-            pm_partition_data.partition_id,
-            ret);
-
+        printf("OS_FileSystem_mount failed with error code %d!", err);
         return false;
     }
-
-    phandle = OS_Filesystem_open(pm_partition_data.partition_id);
-    if(!OS_Filesystem_validatePartitionHandle(phandle))
-    {
-        printf("Fail to open partition: %d!\n", pm_partition_data.partition_id);
-        return false;
-    }
-
-    ret = OS_Filesystem_create(
-            phandle,
-            FS_TYPE_FAT16,
-            pm_partition_data.partition_size,
-            0,  // default value: size of sector:   512
-            0,  // default value: size of cluster:  512
-            0,  // default value: reserved sectors count: FAT12/FAT16 = 1; FAT32 = 3
-            0,  // default value: count file/dir entries: FAT12/FAT16 = 16; FAT32 = 0
-            0,  // default value: count header sectors: 512
-            FS_PARTITION_OVERWRITE_CREATE);
-
-    if(OS_SUCCESS != ret)
-    {
-        printf(
-            "Fail to create filesystem on partition: %d! Error code: %d\n",
-            pm_partition_data.partition_id,
-            ret);
-
-        return false;
-    }
-
-    ret = OS_Filesystem_close(phandle);
-    if(OS_SUCCESS != ret)
-    {
-        printf(
-            "Fail to close partition: %d! Error code: %d\n",
-            pm_partition_data.partition_id,
-            ret);
-
-        return false;
-    }
-
-    LOG_SUCCESS();
 
     return true;
 }
@@ -260,8 +213,6 @@ void mapClientConfigsDataPorts()
     (clientConfig)++->buffer = dataport_buf_logFileReader;
     (clientConfig)++->buffer = dataport_buf_fileReaderWriter;
 
-    (clientConfig)++->buffer = dataport_buf_chanMux;
-
     // If the manipulated pointer does not point to the end of clientConfigs
     // array, then data ports got misconfigured.
     assert(clientConfig == &clientConfigs[CLIENT_CONFIGS_COUNT]);
@@ -269,8 +220,8 @@ void mapClientConfigsDataPorts()
 
 void initLogFiles()
 {
-    OS_LoggerFile_ctor(&log_file_01, PARTITION_ID, LOG_FILENAME_01);
-    OS_LoggerFile_ctor(&log_file_02, PARTITION_ID, LOG_FILENAME_02);
+    OS_LoggerFile_ctor(&log_file_01, hFs, LOG_FILENAME_01);
+    OS_LoggerFile_ctor(&log_file_02, hFs, LOG_FILENAME_02);
     OS_LoggerFile_create(&log_file_01);
     OS_LoggerFile_create(&log_file_02);
 }
@@ -294,16 +245,16 @@ void initLogTargetsAndSubjects()
 
     // attach observed object to subject
     OS_LoggerSubject_attach(
-        (OS_LoggerAbstractSubject_Handle_t *)&subject,
+        (OS_LoggerAbstractSubject_Handle_t*)&subject,
         &filesystem);
 
     OS_LoggerSubject_attach(
-        (OS_LoggerAbstractSubject_Handle_t *)&subject,
+        (OS_LoggerAbstractSubject_Handle_t*)&subject,
         &console);
 
     // Emitter configuration
     OS_LoggerSubject_attach(
-        (OS_LoggerAbstractSubject_Handle_t *)&subject_log_server,
+        (OS_LoggerAbstractSubject_Handle_t*)&subject_log_server,
         &console_log_server);
 }
 
@@ -323,20 +274,21 @@ void initClients()
         &clientConfigs[LOG_SERVER_ID].log_filter,
         API_LOG_SERVER_EMIT);
 
-    for(size_t i = 0; i < CLIENT_CONFIGS_COUNT; ++i)
+    for (size_t i = 0; i < CLIENT_CONFIGS_COUNT; ++i)
     {
         OS_LoggerFilter_ctor(
             &clientConfigs[i].log_filter,
-             clientConfigs[i].log_level);
+            clientConfigs[i].log_level);
 
         bool isFilterNull = (NO_FILTER_ID_FIRST <= clientConfigs[i].id)
-                         && (NO_FILTER_ID_LAST  >= clientConfigs[i].id);
+                            && (NO_FILTER_ID_LAST  >= clientConfigs[i].id);
 
         OS_LoggerFilter_Handle_t* const pFilter = isFilterNull ?
-                                        NULL : &clientConfigs[i].log_filter;
+                                                  NULL : &clientConfigs[i].log_filter;
 
         const bool isLogServer  = (LOG_SERVER_ID == clientConfigs[i].id);
-        OS_LoggerSubject_Handle_t* pSubject = isLogServer ? &subject_log_server : &subject;
+        OS_LoggerSubject_Handle_t* pSubject = isLogServer ? &subject_log_server :
+                                              &subject;
 
         OS_LoggerConsumer_ctor(
             &clientConfigs[i].consumer,

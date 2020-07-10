@@ -7,7 +7,7 @@
  */
 
 /** @cond SKIP_IMPORTS */
-import <if_OS_PartitionManager.camkes>;
+import <if_OS_Storage.camkes>;
 import <if_OS_Logger.camkes>;
 /** @endcond */
 
@@ -19,7 +19,7 @@ component FileReaderWriter {
     dataport Buf                     dataport_buf;
     uses     if_OS_Logger            log_server_interface;
 
-    // interface to partition manager
-    dataport Buf                     pm_dataport_buf;
-    uses partition_manager_interface api_pm_component;
+    // interface to storage
+    uses        if_OS_Storage        storage_rpc;
+    dataport    Buf                  storage_dp;
 }

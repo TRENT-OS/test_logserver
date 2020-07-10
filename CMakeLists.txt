@@ -26,17 +26,14 @@ DeclareCAmkESComponent(
     C_FLAGS
         -Wall
         -Werror
-        -DOS_FS_BUILD_AS_LIB_BASIC_HANDLE
-        -DOS_PARTITION_MANAGER_BUILD_AS_COMPONENT
+        # We need to remove the Debug_Logs from the FS
+        -DOS_FILESYSTEM_REMOVE_DEBUG_LOGGING
     LIBS
         os_core_api
         os_log_server_backend_filesystem
         os_libs
         os_logger
-        os_partition_manager_api
-        os_filesystem_core
-        os_filesystem_fat
-        os_filesystem_spiffs
+        os_filesystem
 )
 
 DeclareCAmkESComponent(
@@ -96,47 +93,22 @@ DeclareCAmkESComponent(
     FileReaderWriter
     SOURCES
         "components/log_clients/FileReaderWriter/FileReaderWriter.c"
-    C_FLAGS
-        -DOS_FS_BUILD_AS_LIB_BASIC_HANDLE
-        -DOS_PARTITION_MANAGER_BUILD_AS_COMPONENT
+   C_FLAGS
         -Wall
         -Werror
+        # We need to remove the Debug_Logs from the FS
+        -DOS_FILESYSTEM_REMOVE_DEBUG_LOGGING
     LIBS
         os_core_api
         os_logger
         os_libs
-        os_partition_manager_api
-        os_filesystem_core
-        os_filesystem_fat
-        os_filesystem_spiffs
+        os_filesystem
 )
 
-DeclareCAmkESComponent(
-    PartitionManager
-    SOURCES
-        "components/test_fixture/partition_manager/partition_manager.c"
-    C_FLAGS
-        -Wall
-        -Werror
-        -DOS_PARTITION_MANAGER_BUILD_AS_COMPONENT
-    LIBS
-        os_core_api
-        os_logger
-        os_libs
-        proxy_nvm
-        os_partition_manager
-)
-
-DeclareCAmkESComponent_UART(
-    UART
-)
-
-DeclareCAmkESComponent_ChanMux(
-    ChanMux
-    components/test_fixture/ChanMux/ChanMux_config.c
+DeclareCAmkESComponent_RamDisk(
+    RamDisk
     system_config
 )
-
 
 DeclareAndCreateCamkESSystem(test_logserver.camkes)
 GenerateSimulateScript()

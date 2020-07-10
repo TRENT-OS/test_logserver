@@ -1,18 +1,19 @@
 #include "LibDebug/Debug.h"
 
-#include "OS_Filesystem.h"
-#include "OS_PartitionManager.h"
+#include "OS_FileSystem.h"
+
+#include <stdlib.h>
+#include <string.h>
+
 #include <camkes.h>
 
 
 
 #if !defined (DATABUFFER_CLIENT)
-    #define DATABUFFER_CLIENT       (void *)dataport_buf
+#define DATABUFFER_CLIENT       (void *)dataport_buf
 #endif
 
 
-
-#define PARTITION_ID                0
 
 #define FILE_NAME_P1_F1             "p1_f1.txt"
 #define FILE_NAME_P1_F2             "p1_f2.txt"
@@ -21,105 +22,30 @@
 
 static OS_LoggerFilter_Handle_t filter;
 
+static OS_FileSystem_Config_t cfgFs =
+{
+    .type = OS_FileSystem_Type_LITTLEFS,
+    .size = OS_FileSystem_STORAGE_MAX,
+    .storage = OS_FILESYSTEM_ASSIGN_Storage(
+        storage_rpc,
+        storage_dp),
+};
+
 static
 OS_Error_t
 _create_file(
-    hPartition_t phandle,
-    const char *name,
+    OS_FileSystem_Handle_t hFs,
+    const char* name,
     int length,
     const char c);
 
 static
 OS_Error_t
 _read_from_file(
-    hPartition_t phandle,
-    const char *name,
+    OS_FileSystem_Handle_t hFs,
+    const char* name,
     int length,
     const char c);
-
-static OS_Error_t
-filesystem_init(void)
-{
-    hPartition_t phandle;
-    OS_PartitionManagerDataTypes_DiskData_t pm_disk_data;
-    OS_PartitionManagerDataTypes_PartitionData_t pm_partition_data;
-
-    OS_Error_t ret = OS_PartitionManager_getInfoDisk(&pm_disk_data);
-    if(OS_SUCCESS != ret)
-    {
-        Debug_LOG_ERROR("Fail to get disk info! Error code: %d", ret);
-        return ret;
-    }
-
-    ret = OS_PartitionManager_getInfoPartition(
-            PARTITION_ID,
-            &pm_partition_data);
-
-    if(OS_SUCCESS != ret)
-    {
-        Debug_LOG_ERROR(
-            "Fail to get partition info: %d! Error code: %d",
-            pm_partition_data.partition_id,
-            ret);
-
-        return ret;
-    }
-
-    ret = OS_Filesystem_init(pm_partition_data.partition_id, 0);
-    if(OS_SUCCESS != ret)
-    {
-        Debug_LOG_ERROR("Fail to init partition: %d! Error code: %d",
-        pm_partition_data.partition_id,
-        ret);
-
-        return ret;
-    }
-
-    phandle = OS_Filesystem_open(pm_partition_data.partition_id);
-    if(!OS_Filesystem_validatePartitionHandle(phandle))
-    {
-        ret = OS_ERROR_INVALID_HANDLE;
-        Debug_LOG_ERROR(
-            "Fail to open partition: %d! Error code: %d",
-            pm_partition_data.partition_id,
-            ret);
-
-        return ret;
-    }
-
-    ret = OS_Filesystem_create(
-                phandle,
-                FS_TYPE_FAT32,
-                pm_partition_data.partition_size,
-                0,  // default value: size of sector:   512
-                0,  // default value: size of cluster:  512
-                0,  // default value: reserved sectors count: FAT12/FAT16 = 1; FAT32 = 3
-                0,  // default value: count file/dir entries: FAT12/FAT16 = 16; FAT32 = 0
-                0,  // default value: count header sectors: 512
-                FS_PARTITION_OVERWRITE_CREATE);
-
-    if(OS_SUCCESS != ret)
-    {
-        Debug_LOG_ERROR(
-            "Fail to create filesystem on partition: %d! Error code: %d",
-            pm_partition_data.partition_id,
-            ret);
-
-        return ret;
-    }
-
-    ret = OS_Filesystem_close(phandle);
-    if(OS_SUCCESS != ret)
-    {
-        Debug_LOG_ERROR(
-            "Fail to close partition: %d!",
-            pm_partition_data.partition_id);
-
-        return ret;
-    }
-
-    return ret;
-}
 
 void post_init()
 {
@@ -133,57 +59,47 @@ void post_init()
 
 int run(void)
 {
-    hPartition_t phandle;
-    int64_t length;
+    OS_Error_t err;
+    OS_FileSystem_Handle_t hFs;
+    size_t length;
 
-    /*******************/
-    /* Filesystem init */
-    /*******************/
-    OS_Error_t ret = filesystem_init();
-    if(OS_SUCCESS != ret)
+    /*************/
+    /* Create fs */
+    /*************/
+    err = OS_FileSystem_init(&hFs, &cfgFs);
+    if (OS_SUCCESS != err)
     {
-        Debug_LOG_ERROR(
-            "Fail to init demo! Error code: %d",
-            ret);
-
-        return ret;
+        Debug_LOG_ERROR("OS_FileSystem_init failed with error code %d!", err);
+        return err;
     }
-
-    /*******************/
-    /* Open partitions */
-    /*******************/
-    phandle = OS_Filesystem_open(PARTITION_ID);
-    if(!OS_Filesystem_validatePartitionHandle(phandle))
+    err = OS_FileSystem_format(hFs);
+    if (OS_SUCCESS != err)
     {
-        ret = OS_ERROR_INVALID_HANDLE;
-        Debug_LOG_ERROR(
-            "Fail to open partition: %d! Error code: %d",
-            PARTITION_ID,
-            ret);
-
-        return ret;
+        Debug_LOG_ERROR("OS_FileSystem_format failed with error code %d!", err);
+        return err;
     }
-
-    /*******************/
-    /* Partition mount */
-    /***************** */
-    OS_Filesystem_mount(phandle);
+    err = OS_FileSystem_mount(hFs);
+    if (OS_SUCCESS != err)
+    {
+        Debug_LOG_ERROR("OS_FileSystem_mount failed with error code %d!", err);
+        return err;
+    }
 
     /****************/
     /* Create files */
     /****************/
-    ret = _create_file(phandle, FILE_NAME_P1_F1, DATA_LENGTH, 'a');
-    if(OS_SUCCESS != ret)
+    err = _create_file(hFs, FILE_NAME_P1_F1, DATA_LENGTH, 'a');
+    if (OS_SUCCESS != err)
     {
-        Debug_LOG_ERROR("_create_file error %d", ret);
-        return ret;
+        Debug_LOG_ERROR("_create_file error %d", err);
+        return err;
     }
 
-    ret = _create_file(phandle, FILE_NAME_P1_F2, DATA_LENGTH * 2, 'b');
-    if(OS_SUCCESS != ret)
+    err = _create_file(hFs, FILE_NAME_P1_F2, DATA_LENGTH * 2, 'b');
+    if (OS_SUCCESS != err)
     {
-        Debug_LOG_ERROR("_create_file error %d", ret);
-        return ret;
+        Debug_LOG_ERROR("_create_file error %d", err);
+        return err;
     }
 
     /*****************/
@@ -191,56 +107,56 @@ int run(void)
     /*****************/
     Debug_LOG_DEBUG("### Get file size from file %s ###", FILE_NAME_P1_F2);
 
-    length = OS_Filesystem_getSizeOfFile(phandle, FILE_NAME_P1_F2);
-    Debug_LOG_DEBUG("file_getSize:      %lld", length);
-    if(length < 0){
+    err = OS_FileSystemFile_getSize(hFs, FILE_NAME_P1_F2, &length);
+    if (OS_SUCCESS != err)
+    {
         Debug_LOG_ERROR("file_getSize error from file: %s", FILE_NAME_P1_F2);
         return OS_ERROR_GENERIC;
     }
 
+    Debug_LOG_DEBUG("file_getSize:      %zu", length);
+
     /**************/
     /* Read files */
     /**************/
-    ret = _read_from_file(phandle, FILE_NAME_P1_F1, DATA_LENGTH, 'a');
-    if(OS_SUCCESS != ret)
+    err = _read_from_file(hFs, FILE_NAME_P1_F1, DATA_LENGTH, 'a');
+    if (OS_SUCCESS != err)
     {
         Debug_LOG_ERROR("Read from file %s failed. Error code: %d",
-        FILE_NAME_P1_F1,
-        ret);
-
-        return ret;
+                        FILE_NAME_P1_F1,
+                        err);
+        return err;
     }
 
-    ret = _read_from_file(phandle, FILE_NAME_P1_F2, DATA_LENGTH * 2, 'b');
-    if(OS_SUCCESS != ret)
+    err = _read_from_file(hFs, FILE_NAME_P1_F2, DATA_LENGTH * 2, 'b');
+    if (OS_SUCCESS != err)
     {
         Debug_LOG_ERROR("Read from file %s failed. Error code: %d",
-        FILE_NAME_P1_F2,
-        ret);
-
-        return ret;
+                        FILE_NAME_P1_F2,
+                        err);
+        return err;
     }
 
     /**********************/
     /* Unmount partitions */
     /**********************/
-    ret = OS_Filesystem_unmount(phandle);
-    Debug_LOG_DEBUG("partition_unmount 1: %d", ret);
+    err = OS_FileSystem_unmount(hFs);
+    Debug_LOG_DEBUG("partition_unmount: %d", err);
 
-    if(OS_SUCCESS != ret)
+    if (OS_SUCCESS != err)
     {
-        return ret;
+        return err;
     }
 
     /********************/
     /* Close partitions */
     /********************/
-    ret = OS_Filesystem_close(phandle);
-    Debug_LOG_DEBUG("partition_close 1: %d", ret);
+    err = OS_FileSystem_free(hFs);
+    Debug_LOG_DEBUG("partition_close: %d", err);
 
-    if(OS_SUCCESS != ret)
+    if (OS_SUCCESS != err)
     {
-        return ret;
+        return err;
     }
 
     return OS_SUCCESS;
@@ -249,15 +165,17 @@ int run(void)
 //static
 OS_Error_t
 _create_file(
-    hPartition_t phandle,
-    const char *name,
+    OS_FileSystem_Handle_t hFs,
+    const char* name,
     int length,
     const char c)
 {
-    hFile_t fhandle;
+    OS_Error_t err;
+    OS_FileSystemFile_Handle_t hFile;
     char buf_write_file[length];
 
-    if(length > DATABUFFER_SIZE){
+    if (length > DATABUFFER_SIZE)
+    {
         Debug_LOG_ERROR("Length for data buffer to big!");
 
         return OS_ERROR_INVALID_PARAMETER;
@@ -265,13 +183,12 @@ _create_file(
 
     Debug_LOG_DEBUG("### Create file %s ###", name);
     // Open file
-    fhandle = OS_Filesystem_openFile(phandle, name, FA_CREATE_ALWAYS | FA_WRITE);
-    if(!OS_Filesystem_validateFileHandle(fhandle))
+    err = OS_FileSystemFile_open(hFs, &hFile, name,
+                                 OS_FileSystem_OpenMode_RDWR,
+                                 OS_FileSystem_OpenFlags_CREATE);
+    if (OS_SUCCESS != err)
     {
-        Debug_LOG_ERROR(
-            "Failed to open the file: %s",
-            name);
-
+        Debug_LOG_ERROR("Failed to open the file: %s",  name);
         return OS_ERROR_INVALID_HANDLE;
     }
 
@@ -279,16 +196,16 @@ _create_file(
     memset(buf_write_file, c, length);
 
     // Call filesystem api function to write into a file
-    OS_Error_t err = OS_Filesystem_writeFile(fhandle, 0, length, buf_write_file);
+    err = OS_FileSystemFile_write(hFs, hFile, 0, length, buf_write_file);
     Debug_LOG_DEBUG("file_write:        %d", err);
 
-    if(OS_SUCCESS != err)
+    if (OS_SUCCESS != err)
     {
         return err;
     }
 
     // Close this file
-    err = OS_Filesystem_closeFile(fhandle);
+    err = OS_FileSystemFile_close(hFs, hFile);
     Debug_LOG_DEBUG("file_close:        %d", err);
 
     return err;
@@ -297,16 +214,18 @@ _create_file(
 //static
 OS_Error_t
 _read_from_file(
-    hPartition_t phandle,
-    const char *name,
+    OS_FileSystem_Handle_t hFs,
+    const char* name,
     int length,
     const char c)
 {
-    hFile_t fhandle;
+    OS_Error_t err;
+    OS_FileSystemFile_Handle_t hFile;
     char buf_read_file[length];
     char buf_write_file[length];
 
-    if(length > DATABUFFER_SIZE){
+    if (length > DATABUFFER_SIZE)
+    {
         Debug_LOG_ERROR("Length for data buffer to big!");
 
         return OS_ERROR_INVALID_PARAMETER;
@@ -316,14 +235,12 @@ _read_from_file(
     memset(buf_write_file, c, length);
 
     Debug_LOG_DEBUG("### Read from file %s ###", name);
-    // Open file
-    fhandle = OS_Filesystem_openFile(phandle, name, FA_READ);
-    if(!OS_Filesystem_validateFileHandle(fhandle))
+    err = OS_FileSystemFile_open(hFs, &hFile, name,
+                                 OS_FileSystem_OpenMode_RDONLY,
+                                 OS_FileSystem_OpenFlags_NONE);
+    if (OS_SUCCESS != err)
     {
-        Debug_LOG_ERROR(
-            "Failed to open the file: %s",
-            name);
-
+        Debug_LOG_ERROR("Failed to open the file: %s",  name);
         return OS_ERROR_INVALID_HANDLE;
     }
 
@@ -331,17 +248,17 @@ _read_from_file(
     memset(buf_read_file, 0, length);
 
     // Call filesystem api function to read from a file
-    OS_Error_t err = OS_Filesystem_readFile(fhandle, 0, length, buf_read_file);
+    err = OS_FileSystemFile_read(hFs, hFile, 0, length, buf_read_file);
     Debug_LOG_DEBUG("file_read:         %d", err);
-    if(OS_SUCCESS != err)
+    if (OS_SUCCESS != err)
     {
         return err;
     }
 
     int readErr = 0;
-    for(int i = 0; i < length; i++)
+    for (int i = 0; i < length; i++)
     {
-        if(buf_read_file[i] != buf_write_file[i])
+        if (buf_read_file[i] != buf_write_file[i])
         {
             Debug_LOG_ERROR(
                 "Read values corrupted at index %d! " \
@@ -354,13 +271,13 @@ _read_from_file(
         }
     }
 
-    if(readErr > 0)
+    if (readErr > 0)
     {
         return OS_ERROR_GENERIC;
     }
 
     // Close file
-    err = OS_Filesystem_closeFile(fhandle);
+    err = OS_FileSystemFile_close(hFs, hFile);
     Debug_LOG_DEBUG("file_close:        %d", err);
 
     return err;

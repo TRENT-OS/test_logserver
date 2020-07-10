@@ -18,7 +18,7 @@
  */
 
 /** @cond SKIP_IMPORTS */
-import <if_OS_PartitionManager.camkes>;
+import <if_OS_Storage.camkes>;
 import "../../interfaces/time_server.camkes";
 import <if_OS_Logger.camkes>;
 /** @endcond */
@@ -55,14 +55,12 @@ component LogServer {
     dataport Buf                     dataport_buf_logFileReader;
     dataport Buf                     dataport_buf_fileReaderWriter;
 
-    dataport Buf                     dataport_buf_chanMux;
-
     emits    DataAvailableEvent      logServer_finish;
 
     provides if_OS_Logger            log_server_interface;
 
     uses     time_server_inf         api_time_server;
 
-    dataport Buf                     pm_dataport_buf;
-    uses partition_manager_interface api_pm_component;
+    uses     if_OS_Storage           storage_rpc;
+    dataport Buf                     storage_dp;
 }
