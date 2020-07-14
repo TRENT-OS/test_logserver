@@ -24,7 +24,7 @@ static OS_LoggerFilter_Handle_t filter;
 
 static OS_FileSystem_Config_t cfgFs =
 {
-    .type = OS_FileSystem_Type_LITTLEFS,
+    .type = OS_FileSystem_Type_FATFS,
     .size = OS_FileSystem_STORAGE_MAX,
     .storage = OS_FILESYSTEM_ASSIGN_Storage(
         storage_rpc,
