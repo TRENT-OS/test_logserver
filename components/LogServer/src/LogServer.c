@@ -23,8 +23,6 @@
 #define NO_FILTER_ID_FIRST 0xCAFE
 #define NO_FILTER_ID_LAST  (NO_FILTER_ID_FIRST + Debug_LOG_LEVEL_CUSTOM)
 
-// static const uint8_t  PARTITION_ID  = 1u;
-
 #define LOG_FILENAME_01 "log_01.txt"
 #define LOG_FILENAME_02 "log_02.txt"
 
@@ -153,9 +151,7 @@ run()
 static bool
 filesystem_init(void)
 {
-    OS_Error_t err;
-
-    err = OS_FileSystem_init(&hFs, &cfgFs);
+    OS_Error_t err = OS_FileSystem_init(&hFs, &cfgFs);
     if (OS_SUCCESS != err)
     {
         printf("OS_FileSystem_init failed with error code %d!", err);
@@ -287,8 +283,9 @@ void initClients()
                                                   NULL : &clientConfigs[i].log_filter;
 
         const bool isLogServer  = (LOG_SERVER_ID == clientConfigs[i].id);
-        OS_LoggerSubject_Handle_t* pSubject = isLogServer ? &subject_log_server :
-                                              &subject;
+        OS_LoggerSubject_Handle_t* pSubject = isLogServer
+                                              ? &subject_log_server
+                                              : &subject;
 
         OS_LoggerConsumer_ctor(
             &clientConfigs[i].consumer,

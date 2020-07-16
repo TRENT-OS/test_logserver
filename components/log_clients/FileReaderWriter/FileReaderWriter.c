@@ -59,14 +59,13 @@ void post_init()
 
 int run(void)
 {
-    OS_Error_t err;
     OS_FileSystem_Handle_t hFs;
     size_t length;
 
     /*************/
     /* Create fs */
     /*************/
-    err = OS_FileSystem_init(&hFs, &cfgFs);
+    OS_Error_t err = OS_FileSystem_init(&hFs, &cfgFs);
     if (OS_SUCCESS != err)
     {
         Debug_LOG_ERROR("OS_FileSystem_init failed with error code %d!", err);
@@ -115,7 +114,7 @@ int run(void)
     if (OS_SUCCESS != err)
     {
         Debug_LOG_ERROR("file_getSize error from file: %s", FILE_NAME_P1_F2);
-        return OS_ERROR_GENERIC;
+        return err;
     }
 
     Debug_LOG_DEBUG("file_getSize:      %zu", length);
@@ -174,7 +173,6 @@ _create_file(
     int length,
     const char c)
 {
-    OS_Error_t err;
     OS_FileSystemFile_Handle_t hFile;
     char buf_write_file[length];
 
@@ -187,9 +185,11 @@ _create_file(
 
     Debug_LOG_DEBUG("### Create file %s ###", name);
     // Open file
-    err = OS_FileSystemFile_open(hFs, &hFile, name,
-                                 OS_FileSystem_OpenMode_RDWR,
-                                 OS_FileSystem_OpenFlags_CREATE);
+    OS_Error_t err = OS_FileSystemFile_open(hFs,
+                                            &hFile,
+                                            name,
+                                            OS_FileSystem_OpenMode_RDWR,
+                                            OS_FileSystem_OpenFlags_CREATE);
     if (OS_SUCCESS != err)
     {
         Debug_LOG_ERROR("Failed to open the file: %s",  name);
@@ -239,7 +239,9 @@ _read_from_file(
     memset(buf_write_file, c, length);
 
     Debug_LOG_DEBUG("### Read from file %s ###", name);
-    err = OS_FileSystemFile_open(hFs, &hFile, name,
+    err = OS_FileSystemFile_open(hFs,
+                                 &hFile,
+                                 name,
                                  OS_FileSystem_OpenMode_RDONLY,
                                  OS_FileSystem_OpenFlags_NONE);
     if (OS_SUCCESS != err)
