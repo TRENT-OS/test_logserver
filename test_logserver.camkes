@@ -11,7 +11,6 @@ import "components/LogServer/LogServer.camkes";
 
 // Test Fixture
 import "components/test_fixture/time_server/time_server.camkes";
-import "components/test_fixture/partition_manager/partition_manager.camkes";
 
 #include "system_config.h"
 
