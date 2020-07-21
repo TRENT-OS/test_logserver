@@ -60,7 +60,7 @@ void post_init()
 int run(void)
 {
     OS_FileSystem_Handle_t hFs;
-    size_t length;
+    off_t length;
 
     /*************/
     /* Create fs */
