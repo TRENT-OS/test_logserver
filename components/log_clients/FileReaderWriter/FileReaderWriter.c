@@ -78,8 +78,7 @@ int run(void)
         return err;
     }
 
-    // ToDo: Clean this up; for now the test expects it..
-    Debug_LOG_INFO("Partition 0 successfully created!");
+    Debug_LOG_INFO("Filesystem successfully created!");
 
     err = OS_FileSystem_mount(hFs);
     if (OS_SUCCESS != err)
@@ -141,24 +140,20 @@ int run(void)
     }
 
     /**********************/
-    /* Unmount partitions */
+    /* Unmount filesystem */
     /**********************/
-    err = OS_FileSystem_unmount(hFs);
-    Debug_LOG_DEBUG("partition_unmount: %d", err);
-
-    if (OS_SUCCESS != err)
+    if (OS_SUCCESS != OS_FileSystem_unmount(hFs))
     {
+        Debug_LOG_ERROR("Unmounting filesystem failed: %d", err);
         return err;
     }
 
-    /********************/
-    /* Close partitions */
-    /********************/
-    err = OS_FileSystem_free(hFs);
-    Debug_LOG_DEBUG("partition_close: %d", err);
-
-    if (OS_SUCCESS != err)
+    /*******************/
+    /* Free filesystem */
+    /*******************/
+    if (OS_SUCCESS != OS_FileSystem_free(hFs))
     {
+        Debug_LOG_DEBUG("Freeing filesystem failed: %d", err);
         return err;
     }
 
