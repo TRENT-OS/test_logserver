@@ -19,7 +19,7 @@
 
 /** @cond SKIP_IMPORTS */
 import <if_OS_Storage.camkes>;
-import "../../interfaces/time_server.camkes";
+import <if_OS_Timer.camkes>;
 import <if_OS_Logger.camkes>;
 /** @endcond */
 
@@ -59,7 +59,8 @@ component LogServer {
 
     provides if_OS_Logger            log_server_interface;
 
-    uses     time_server_inf         api_time_server;
+    consumes TimerReady              timeServer_notify;
+    uses     if_OS_Timer             timeServer_rpc;
 
     uses     if_OS_Storage           storage_rpc;
     dataport Buf                     storage_dp;

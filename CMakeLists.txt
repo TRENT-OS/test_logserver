@@ -34,20 +34,7 @@ DeclareCAmkESComponent(
         os_libs
         os_logger
         os_filesystem
-)
-
-DeclareCAmkESComponent(
-    TimeServer
-    INCLUDES
-        components/test_fixture/time_server/include
-        components/test_fixture/time_server/timestamp
-    SOURCES
-        "components/test_fixture/time_server/src/main.c"
-        "components/test_fixture/time_server/src/time_server.c"
-        "components/test_fixture/time_server/timestamp/timestamp.c"
-    C_FLAGS
-        -Wall
-        -Werror
+        TimeServer_client
 )
 
 DeclareCAmkESComponent(
@@ -103,6 +90,10 @@ DeclareCAmkESComponent(
         os_logger
         os_libs
         os_filesystem
+)
+
+DeclareCAmkESComponent_TimeServer(
+    TimeServer
 )
 
 DeclareCAmkESComponent_RamDisk(

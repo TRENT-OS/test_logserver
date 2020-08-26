@@ -1,4 +1,5 @@
 #include "LibDebug/Debug.h"
+#include "TimeServer.h"
 
 #include "Logger/Server/OS_LoggerFile.h"
 
@@ -83,6 +84,10 @@ static OS_FileSystem_Config_t cfgFs =
         storage_dp),
 };
 
+static const if_OS_Timer_t timer = IF_OS_TIMER_ASSIGN(
+                                       timeServer_rpc,
+                                       timeServer_notify);
+
 static const size_t CLIENT_CONFIGS_COUNT = sizeof(clientConfigs)
                                            / sizeof(*clientConfigs);
 
@@ -127,18 +132,38 @@ void pre_init()
     LOG_SUCCESS();
 }
 
+static uint64_t
+get_time_sec(
+    void)
+{
+    OS_Error_t err;
+    uint64_t sec;
+
+    if ((err = TimeServer_getTime(&timer, TimeServer_PRECISION_SEC,
+                                  &sec)) != OS_SUCCESS)
+    {
+        Debug_LOG_ERROR("TimeServer_getTime() failed with %d", err);
+        sec = 0;
+    }
+
+    return sec;
+}
+
 int
 run()
 {
+    OS_Error_t err;
     const int demo_time_sec = 75;
-    const int one_sec       = 1000;
 
     for (
         int time_passed_sec = 0;
         time_passed_sec < demo_time_sec;
         ++time_passed_sec)
     {
-        api_time_server_sleep(one_sec);
+        if ((err = TimeServer_sleep(&timer, TimeServer_PRECISION_SEC, 1)) != OS_SUCCESS)
+        {
+            Debug_LOG_ERROR("TimeServer_sleep() failed with %d", err);
+        }
     }
 
     printf("logServer finish\n");
@@ -260,7 +285,7 @@ void initClients()
     OS_LoggerConsumerCallback_ctor(
         &log_consumer_callback,
         API_LOG_SERVER_GET_SENDER_ID,
-        api_time_server_get_timestamp);
+        get_time_sec);
 
     mapClientConfigsDataPorts();
 

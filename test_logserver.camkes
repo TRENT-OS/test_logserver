@@ -9,38 +9,33 @@ import "components/log_clients/SendsIllFormattedString/SendsIllFormattedString.c
 // Server
 import "components/LogServer/LogServer.camkes";
 
-// Test Fixture
-import "components/test_fixture/time_server/time_server.camkes";
-
 #include "system_config.h"
 
 #include "RamDisk/RamDisk.camkes"
 DECLARE_COMPONENT_RamDisk(RamDisk)
 
+#include "TimeServer/camkes/TimeServer.camkes"
+DECLARE_COMPONENT_TimeServer(TimeServer)
+
 assembly {
     composition {
-
-        //----------------------------------------------------------------------
-        // TimeServer
-        //----------------------------------------------------------------------
-        component   TimerDev               timerDev;
-        component   TimeServer             time_server;
-
-        connection  seL4HardwareMMIO       time_server_mem(from time_server.reg, to timerDev.reg);
-        connection  seL4HardwareInterrupt  time_server_irq_ticks(from timerDev.irq_ticks, to time_server.irq_ticks);
-        connection  seL4HardwareInterrupt  time_server_irq_sleep(from timerDev.irq_sleep, to time_server.irq_sleep);
-
         //----------------------------------------------------------------------
         // LogServer
         //----------------------------------------------------------------------
         component   LogServer              logServer;
 
-        connection  seL4RPCCall            logServer_2_time_server(from logServer.api_time_server, to time_server.api_time_server);
-
         DECLARE_AND_CONNECT_INSTANCE_RamDisk(
           RamDisk, ramDisk,
           logServer.storage_rpc,
           logServer.storage_dp)
+
+        //----------------------------------------------------------------------
+        // TimeServer
+        //----------------------------------------------------------------------
+        DECLARE_AND_CONNECT_INSTANCE_TimeServer(
+            TimeServer,
+            timeServer,
+            logServer.timeServer_rpc, logServer.timeServer_notify)
 
         //----------------------------------------------------------------------
         // FileReaderWriter Client
@@ -151,6 +146,7 @@ assembly {
         connection  seL4SharedData      conn_dataConnection_sendsIllFormattedString(from sendsIllFormattedString.logServer_buf, to logServer.dataport_buf_sendsIllFormattedString);
     }
     configuration {
+        ASSIGN_CLIENT_BADGE_TimeServer(logServer, timeServer_rpc, 1)
 
         app_lvl_none.log_server_interface_attributes          = 10;
         app_lvl_assert.log_server_interface_attributes        = 200;
@@ -206,15 +202,6 @@ assembly {
 
         logFileReader.log_server_interface_attributes    = 50001;
         fileReaderWriter.log_server_interface_attributes = 50002;
-
-        // timer
-        timerDev.reg_paddr = 0xF8001000;    // paddr of mmio registers
-        timerDev.reg_size = 0x1000;         // size of mmio registers
-        timerDev.irq_ticks_irq_number = 42; // time_server irq number
-        timerDev.irq_sleep_irq_number = 43; // time_server irq number
-        // assign an initial value to semaphore
-        time_server.sem_ticks_value = 0;
-        time_server.sem_sleep_value = 0;
 
     }
 }
