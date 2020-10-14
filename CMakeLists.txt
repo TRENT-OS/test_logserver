@@ -1,5 +1,5 @@
 #
-# Test Log Server
+# Test Log server
 #
 # Copyright (C) 2020, Hensoldt Cyber GmbH
 #
