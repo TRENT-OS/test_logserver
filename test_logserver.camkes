@@ -15,7 +15,7 @@ import "components/LogServer/LogServer.camkes";
 DECLARE_COMPONENT_RamDisk(RamDisk)
 
 #include "TimeServer/camkes/TimeServer.camkes"
-DECLARE_COMPONENT_TimeServer(TimeServer)
+TimeServer_COMPONENT_DECLARE(TimeServer)
 
 assembly {
     composition {
@@ -32,10 +32,12 @@ assembly {
         //----------------------------------------------------------------------
         // TimeServer
         //----------------------------------------------------------------------
-        DECLARE_AND_CONNECT_INSTANCE_TimeServer(
-            TimeServer,
+        component TimeServer timeServer;
+
+        TimeServer_INSTANCE_CONNECT_CLIENTS(
             timeServer,
-            logServer.timeServer_rpc, logServer.timeServer_notify)
+            logServer.timeServer_rpc, logServer.timeServer_notify
+        )
 
         //----------------------------------------------------------------------
         // FileReaderWriter Client
@@ -146,7 +148,9 @@ assembly {
         connection  seL4SharedData      conn_dataConnection_sendsIllFormattedString(from sendsIllFormattedString.logServer_buf, to logServer.dataport_buf_sendsIllFormattedString);
     }
     configuration {
-        ASSIGN_CLIENT_BADGE_TimeServer(logServer, timeServer_rpc, 1)
+        TimeServer_CLIENT_ASSIGN_BADGE(
+            logServer.timeServer_rpc, 1
+        )
 
         app_lvl_none.log_server_interface_attributes          = 10;
         app_lvl_assert.log_server_interface_attributes        = 200;
