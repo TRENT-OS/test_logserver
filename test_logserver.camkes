@@ -148,8 +148,8 @@ assembly {
         connection  seL4SharedData      conn_dataConnection_sendsIllFormattedString(from sendsIllFormattedString.logServer_buf, to logServer.dataport_buf_sendsIllFormattedString);
     }
     configuration {
-        TimeServer_CLIENT_ASSIGN_BADGE(
-            logServer.timeServer_rpc, 1
+        TimeServer_CLIENT_ASSIGN_BADGES(
+            logServer.timeServer_rpc
         )
 
         app_lvl_none.log_server_interface_attributes          = 10;
