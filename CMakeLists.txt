@@ -92,7 +92,7 @@ DeclareCAmkESComponent(
         os_filesystem
 )
 
-DeclareCAmkESComponent_TimeServer(
+TimeServer_DeclareCAmkESComponent(
     TimeServer
 )
 
