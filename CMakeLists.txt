@@ -96,7 +96,7 @@ TimeServer_DeclareCAmkESComponent(
     TimeServer
 )
 
-DeclareCAmkESComponent_RamDisk(
+RamDisk_DeclareCAmkESComponent(
     RamDisk
     system_config
 )
