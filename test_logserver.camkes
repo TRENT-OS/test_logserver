@@ -12,10 +12,10 @@ import "components/LogServer/LogServer.camkes";
 #include "system_config.h"
 
 #include "RamDisk/RamDisk.camkes"
-RamDisk_COMPONENT_DECLARE(RamDisk)
+RamDisk_COMPONENT_DEFINE(RamDisk)
 
 #include "TimeServer/camkes/TimeServer.camkes"
-TimeServer_COMPONENT_DECLARE(TimeServer)
+TimeServer_COMPONENT_DEFINE(TimeServer)
 
 assembly {
     composition {
