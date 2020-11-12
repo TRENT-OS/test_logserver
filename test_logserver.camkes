@@ -12,7 +12,7 @@ import "components/LogServer/LogServer.camkes";
 #include "system_config.h"
 
 #include "RamDisk/RamDisk.camkes"
-DECLARE_COMPONENT_RamDisk(RamDisk)
+RamDisk_COMPONENT_DECLARE(RamDisk)
 
 #include "TimeServer/camkes/TimeServer.camkes"
 TimeServer_COMPONENT_DECLARE(TimeServer)
@@ -24,8 +24,10 @@ assembly {
         //----------------------------------------------------------------------
         component   LogServer              logServer;
 
-        DECLARE_AND_CONNECT_INSTANCE_RamDisk(
-          RamDisk, ramDisk,
+        component   RamDisk                ramDisk;
+
+        RamDisk_INSTANCE_CONNECT_CLIENT(
+          ramDisk,
           logServer.storage_rpc,
           logServer.storage_dp)
 
@@ -46,8 +48,10 @@ assembly {
 
         connection  seL4RPCCall            conn_rpc_logServer2fileReaderWriter(     from fileReaderWriter.log_server_interface,      to logServer.log_server_interface);
 
-        DECLARE_AND_CONNECT_INSTANCE_RamDisk(
-            RamDisk, ramDisk_frw,
+        component   RamDisk                ramDisk_frw;
+
+        RamDisk_INSTANCE_CONNECT_CLIENT(
+            ramDisk_frw,
             fileReaderWriter.storage_rpc,
             fileReaderWriter.storage_dp)
 
