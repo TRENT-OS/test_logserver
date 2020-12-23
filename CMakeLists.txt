@@ -31,7 +31,7 @@ DeclareCAmkESComponent(
     LIBS
         os_core_api
         os_log_server_backend_filesystem
-        os_libs
+        lib_debug
         os_logger
         os_filesystem
         TimeServer_client
@@ -47,7 +47,7 @@ DeclareCAmkESComponent(
     LIBS
         os_core_api
         os_logger
-        os_libs
+        lib_debug
 )
 
 DeclareCAmkESComponent(
@@ -60,7 +60,7 @@ DeclareCAmkESComponent(
     LIBS
         os_core_api
         os_logger
-        os_libs
+        lib_debug
 )
 
 DeclareCAmkESComponent(
@@ -73,7 +73,7 @@ DeclareCAmkESComponent(
     LIBS
         os_core_api
         os_logger
-        os_libs
+        lib_debug
 )
 
 DeclareCAmkESComponent(
@@ -88,7 +88,7 @@ DeclareCAmkESComponent(
     LIBS
         os_core_api
         os_logger
-        os_libs
+        lib_debug
         os_filesystem
 )
 

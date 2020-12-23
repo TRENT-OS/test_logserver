@@ -1,4 +1,4 @@
-#include "LibDebug/Debug.h"
+#include "lib_debug/Debug.h"
 #include "TimeServer.h"
 
 #include "Logger/Server/OS_LoggerFile.h"

@@ -1,4 +1,4 @@
-#include "LibDebug/Debug.h"
+#include "lib_debug/Debug.h"
 
 #include "OS_FileSystem.h"
 

@@ -1,4 +1,4 @@
-#include "LibDebug/Debug.h"
+#include "lib_debug/Debug.h"
 #include "Logger/Client/OS_LoggerFileClient.h"
 #include <camkes.h>
 
