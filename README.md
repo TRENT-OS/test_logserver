@@ -8,7 +8,6 @@ The following components are used in the demo:
 * FileReaderWriter
 * LogFileReader
 * LogsAllLevels
-* SendsIllFormattedString
 * LogServer
 
 The following features are presented in the demo:

@@ -50,8 +50,6 @@ component LogServer {
     dataport Buf                     dataport_buf_cl_filter_trace;
     dataport Buf                     dataport_buf_cl_filter_custom;
 
-    dataport Buf                     dataport_buf_sendsIllFormattedString;
-
     dataport Buf                     dataport_buf_logFileReader;
     dataport Buf                     dataport_buf_fileReaderWriter;
 

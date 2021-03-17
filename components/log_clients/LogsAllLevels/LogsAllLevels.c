@@ -5,9 +5,6 @@
 
 static OS_LoggerFilter_Handle_t filter;
 
-static void testLogging();
-static void tearDownLogging();
-
 // Max possible entry is 3941 characters (PAGE_SIZE - log_header
 // e.g. 4096 - 193).
 //
@@ -48,14 +45,6 @@ void post_init()
 
 int run()
 {
-    testLogging();
-    tearDownLogging();
-
-    return 0;
-}
-
-void testLogging()
-{
     Debug_LOG(Debug_LOG_LEVEL_NONE, "   NONE", "Debug_LOG_NONE");
     Debug_LOG(Debug_LOG_LEVEL_MAX,  "    MAX", "Debug_LOG_MAX");
 
@@ -72,9 +61,6 @@ void testLogging()
     Debug_LOG_TRACE  ("Debug_LOG_TRACE");
 
     Debug_LOG(Debug_LOG_LEVEL_CUSTOM, " CUSTOM", "Debug_LOG_CUSTOM");
-}
 
-void tearDownLogging()
-{
-    done_emit();
+    return 0;
 }

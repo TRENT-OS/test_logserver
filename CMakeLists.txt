@@ -51,19 +51,6 @@ DeclareCAmkESComponent(
 )
 
 DeclareCAmkESComponent(
-    SendsIllFormattedString
-    SOURCES
-        "components/log_clients/SendsIllFormattedString/SendsIllFormattedString.c"
-    C_FLAGS
-        -Wall
-        -Werror
-    LIBS
-        os_core_api
-        os_logger
-        lib_debug
-)
-
-DeclareCAmkESComponent(
     LogFileReader
     SOURCES
         "components/log_clients/LogFileReader/LogFileReader.c"

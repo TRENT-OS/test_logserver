@@ -4,7 +4,6 @@ import <std_connector.camkes>;
 import "components/log_clients/FileReaderWriter/FileReaderWriter.camkes";
 import "components/log_clients/LogFileReader/LogFileReader.camkes";
 import "components/log_clients/LogsAllLevels/LogsAllLevels.camkes";
-import "components/log_clients/SendsIllFormattedString/SendsIllFormattedString.camkes";
 
 // Server
 import "components/LogServer/LogServer.camkes";
@@ -65,9 +64,6 @@ assembly {
         //----------------------------------------------------------------------
         // Test Apps
         //----------------------------------------------------------------------
-        component SendsIllFormattedString sendsIllFormattedString;
-
-        connection  seL4RPCCall         conn_rpc_logServer2sendsIllFormattedString(from sendsIllFormattedString.log_server_interface,      to logServer.log_server_interface);
 
         component LogsAllLevels     app_lvl_none;
         component LogsAllLevels     app_lvl_assert;
@@ -120,7 +116,6 @@ assembly {
 
         // seL4Notification
         connection  seL4Notification    conn_dataAvailable_logServer2logFileReader_finish( from logServer.logServer_finish, to logFileReader.logServer_finish);
-        connection  seL4Notification    conn_finished_app_lvl_max2sendsIllFormattedString(from app_lvl_max.done, to sendsIllFormattedString.ready);
 
         // seL4SharedData
         connection  seL4SharedData      conn_dataConnection_app_lvl_none(   from app_lvl_none.logServer_buf,    to logServer.dataport_buf_lvl_none);
@@ -148,8 +143,6 @@ assembly {
 
         connection  seL4SharedData      conn_dataConnection_logFileReader(from logFileReader.dataport_buf, to logServer.dataport_buf_logFileReader);
         connection  seL4SharedData      conn_dataConnection_fileReaderWriter(from fileReaderWriter.dataport_buf, to logServer.dataport_buf_fileReaderWriter);
-
-        connection  seL4SharedData      conn_dataConnection_sendsIllFormattedString(from sendsIllFormattedString.logServer_buf, to logServer.dataport_buf_sendsIllFormattedString);
     }
     configuration {
         TimeServer_CLIENT_ASSIGN_BADGES(
@@ -205,8 +198,6 @@ assembly {
         app_cl_filter_custom.log_lvl  = 9;
 
         chanMux.log_lvl = 1;
-
-        sendsIllFormattedString.log_server_interface_attributes = 50000;
 
         logFileReader.log_server_interface_attributes    = 50001;
         fileReaderWriter.log_server_interface_attributes = 50002;
