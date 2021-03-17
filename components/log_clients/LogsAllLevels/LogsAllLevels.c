@@ -21,9 +21,9 @@ static OS_LoggerFilter_Handle_t filter;
 //          system/components/log_clients/LogsAllLevels/LogsAllLevels.c:`
 // 8. file line (4 characters including trailing whitespace) e.g. `43: `
 #define LOG_HEADER_SZ (11 + 15 + 20 + 4 + 4 + sizeof(__FILE__) + 4)
-char maxPossibleLogEntry[PAGE_SIZE - LOG_HEADER_SZ];
+static char maxPossibleLogEntry[PAGE_SIZE - LOG_HEADER_SZ];
 
-const char format_string[] =
+static const char format_string[] =
                     "%d %u %o %x %X %f %F %e %E %g %G %a %A %c %s %p %n %%";
 
 #define NO_FILTER -1
