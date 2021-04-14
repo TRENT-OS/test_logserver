@@ -28,7 +28,7 @@ assembly {
         RamDisk_INSTANCE_CONNECT_CLIENT(
           ramDisk,
           logServer.storage_rpc,
-          logServer.storage_dp)
+          logServer.storage_port)
 
         //----------------------------------------------------------------------
         // TimeServer
@@ -52,7 +52,7 @@ assembly {
         RamDisk_INSTANCE_CONNECT_CLIENT(
             ramDisk_frw,
             fileReaderWriter.storage_rpc,
-            fileReaderWriter.storage_dp)
+            fileReaderWriter.storage_port)
 
         //----------------------------------------------------------------------
         // LogFileReader Client

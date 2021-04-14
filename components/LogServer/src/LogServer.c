@@ -79,7 +79,7 @@ static OS_FileSystem_Config_t cfgFs =
     .size = OS_FileSystem_USE_STORAGE_MAX,
     .storage = IF_OS_STORAGE_ASSIGN(
         storage_rpc,
-        storage_dp),
+        storage_port),
 };
 
 static const if_OS_Timer_t timer = IF_OS_TIMER_ASSIGN(
