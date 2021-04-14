@@ -15,7 +15,7 @@ component LogFileReader {
     control;
 
     // interface to the log server
-    dataport Buf                dataport_buf;
+    dataport Buf                logServer_port;
 
     consumes DataAvailableEvent logServer_finish;
 

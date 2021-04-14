@@ -204,31 +204,31 @@ void mapClientConfigsDataPorts()
 
     (clientConfig)++->buffer = buf_log_server;
 
-    (clientConfig)++->buffer = dataport_buf_lvl_none;
-    (clientConfig)++->buffer = dataport_buf_lvl_assert;
-    (clientConfig)++->buffer = dataport_buf_lvl_fatal;
-    (clientConfig)++->buffer = dataport_buf_lvl_error;
-    (clientConfig)++->buffer = dataport_buf_lvl_warning;
-    (clientConfig)++->buffer = dataport_buf_lvl_info;
-    (clientConfig)++->buffer = dataport_buf_lvl_debug;
-    (clientConfig)++->buffer = dataport_buf_lvl_trace;
-    (clientConfig)++->buffer = dataport_buf_lvl_custom;
-    (clientConfig)++->buffer = dataport_buf_lvl_max;
+    (clientConfig)++->buffer = buf_lvl_none_port;
+    (clientConfig)++->buffer = buf_lvl_assert_port;
+    (clientConfig)++->buffer = buf_lvl_fatal_port;
+    (clientConfig)++->buffer = buf_lvl_error_port;
+    (clientConfig)++->buffer = buf_lvl_warning_port;
+    (clientConfig)++->buffer = buf_lvl_info_port;
+    (clientConfig)++->buffer = buf_lvl_debug_port;
+    (clientConfig)++->buffer = buf_lvl_trace_port;
+    (clientConfig)++->buffer = buf_lvl_custom_port;
+    (clientConfig)++->buffer = buf_lvl_max_port;
 
-    (clientConfig)++->buffer = dataport_buf_no_filters;
+    (clientConfig)++->buffer = buf_no_filters_port;
 
-    (clientConfig)++->buffer = dataport_buf_cl_filter_none;
-    (clientConfig)++->buffer = dataport_buf_cl_filter_assert;
-    (clientConfig)++->buffer = dataport_buf_cl_filter_fatal;
-    (clientConfig)++->buffer = dataport_buf_cl_filter_error;
-    (clientConfig)++->buffer = dataport_buf_cl_filter_warning;
-    (clientConfig)++->buffer = dataport_buf_cl_filter_info;
-    (clientConfig)++->buffer = dataport_buf_cl_filter_debug;
-    (clientConfig)++->buffer = dataport_buf_cl_filter_trace;
-    (clientConfig)++->buffer = dataport_buf_cl_filter_custom;
+    (clientConfig)++->buffer = buf_cl_filter_none_port;
+    (clientConfig)++->buffer = buf_cl_filter_assert_port;
+    (clientConfig)++->buffer = buf_cl_filter_fatal_port;
+    (clientConfig)++->buffer = buf_cl_filter_error_port;
+    (clientConfig)++->buffer = buf_cl_filter_warning_port;
+    (clientConfig)++->buffer = buf_cl_filter_info_port;
+    (clientConfig)++->buffer = buf_cl_filter_debug_port;
+    (clientConfig)++->buffer = buf_cl_filter_trace_port;
+    (clientConfig)++->buffer = buf_cl_filter_custom_port;
 
-    (clientConfig)++->buffer = dataport_buf_logFileReader;
-    (clientConfig)++->buffer = dataport_buf_fileReaderWriter;
+    (clientConfig)++->buffer = buf_logFileReader_port;
+    (clientConfig)++->buffer = buf_fileReaderWriter_port;
 
     // If the manipulated pointer does not point to the end of clientConfigs
     // array, then data ports got misconfigured.

@@ -27,31 +27,31 @@ import <if_OS_Logger.camkes>;
 component LogServer {
     control;
 
-    dataport Buf                     dataport_buf_lvl_none;
-    dataport Buf                     dataport_buf_lvl_max;
-    dataport Buf                     dataport_buf_lvl_assert;
-    dataport Buf                     dataport_buf_lvl_fatal;
-    dataport Buf                     dataport_buf_lvl_error;
-    dataport Buf                     dataport_buf_lvl_warning;
-    dataport Buf                     dataport_buf_lvl_info;
-    dataport Buf                     dataport_buf_lvl_debug;
-    dataport Buf                     dataport_buf_lvl_trace;
-    dataport Buf                     dataport_buf_lvl_custom;
+    dataport Buf                     buf_lvl_none_port;
+    dataport Buf                     buf_lvl_max_port;
+    dataport Buf                     buf_lvl_assert_port;
+    dataport Buf                     buf_lvl_fatal_port;
+    dataport Buf                     buf_lvl_error_port;
+    dataport Buf                     buf_lvl_warning_port;
+    dataport Buf                     buf_lvl_info_port;
+    dataport Buf                     buf_lvl_debug_port;
+    dataport Buf                     buf_lvl_trace_port;
+    dataport Buf                     buf_lvl_custom_port;
 
-    dataport Buf                     dataport_buf_no_filters;
+    dataport Buf                     buf_no_filters_port;
 
-    dataport Buf                     dataport_buf_cl_filter_none;
-    dataport Buf                     dataport_buf_cl_filter_assert;
-    dataport Buf                     dataport_buf_cl_filter_fatal;
-    dataport Buf                     dataport_buf_cl_filter_error;
-    dataport Buf                     dataport_buf_cl_filter_warning;
-    dataport Buf                     dataport_buf_cl_filter_info;
-    dataport Buf                     dataport_buf_cl_filter_debug;
-    dataport Buf                     dataport_buf_cl_filter_trace;
-    dataport Buf                     dataport_buf_cl_filter_custom;
+    dataport Buf                     buf_cl_filter_none_port;
+    dataport Buf                     buf_cl_filter_assert_port;
+    dataport Buf                     buf_cl_filter_fatal_port;
+    dataport Buf                     buf_cl_filter_error_port;
+    dataport Buf                     buf_cl_filter_warning_port;
+    dataport Buf                     buf_cl_filter_info_port;
+    dataport Buf                     buf_cl_filter_debug_port;
+    dataport Buf                     buf_cl_filter_trace_port;
+    dataport Buf                     buf_cl_filter_custom_port;
 
-    dataport Buf                     dataport_buf_logFileReader;
-    dataport Buf                     dataport_buf_fileReaderWriter;
+    dataport Buf                     buf_logFileReader_port;
+    dataport Buf                     buf_fileReaderWriter_port;
 
     emits    DataAvailableEvent      logServer_finish;
 

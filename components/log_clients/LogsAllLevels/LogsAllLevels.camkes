@@ -20,7 +20,7 @@ component LogsAllLevels {
     control;
 
     // interface to log server
-    dataport Buf                logServer_buf;
+    dataport Buf                logServer_port;
 
     uses     if_OS_Logger       log_server_interface;
 

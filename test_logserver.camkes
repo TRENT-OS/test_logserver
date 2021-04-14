@@ -118,31 +118,31 @@ assembly {
         connection  seL4Notification    conn_dataAvailable_logServer2logFileReader_finish( from logServer.logServer_finish, to logFileReader.logServer_finish);
 
         // seL4SharedData
-        connection  seL4SharedData      conn_dataConnection_app_lvl_none(   from app_lvl_none.logServer_buf,    to logServer.dataport_buf_lvl_none);
-        connection  seL4SharedData      conn_dataConnection_app_lvl_assert( from app_lvl_assert.logServer_buf,  to logServer.dataport_buf_lvl_assert);
-        connection  seL4SharedData      conn_dataConnection_app_lvl_fatal(  from app_lvl_fatal.logServer_buf,   to logServer.dataport_buf_lvl_fatal);
-        connection  seL4SharedData      conn_dataConnection_app_lvl_error(  from app_lvl_error.logServer_buf,   to logServer.dataport_buf_lvl_error);
-        connection  seL4SharedData      conn_dataConnection_app_lvl_warning(from app_lvl_warning.logServer_buf, to logServer.dataport_buf_lvl_warning);
-        connection  seL4SharedData      conn_dataConnection_app_lvl_info(   from app_lvl_info.logServer_buf,    to logServer.dataport_buf_lvl_info);
-        connection  seL4SharedData      conn_dataConnection_app_lvl_debug(  from app_lvl_debug.logServer_buf,   to logServer.dataport_buf_lvl_debug);
-        connection  seL4SharedData      conn_dataConnection_app_lvl_trace(  from app_lvl_trace.logServer_buf,   to logServer.dataport_buf_lvl_trace);
-        connection  seL4SharedData      conn_dataConnection_app_lvl_custom( from app_lvl_custom.logServer_buf,  to logServer.dataport_buf_lvl_custom);
-        connection  seL4SharedData      conn_dataConnection_app_lvl_max(    from app_lvl_max.logServer_buf,     to logServer.dataport_buf_lvl_max);
+        connection  seL4SharedData      conn_dataConnection_app_lvl_none(   from app_lvl_none.logServer_port,    to logServer.buf_lvl_none_port);
+        connection  seL4SharedData      conn_dataConnection_app_lvl_assert( from app_lvl_assert.logServer_port,  to logServer.buf_lvl_assert_port);
+        connection  seL4SharedData      conn_dataConnection_app_lvl_fatal(  from app_lvl_fatal.logServer_port,   to logServer.buf_lvl_fatal_port);
+        connection  seL4SharedData      conn_dataConnection_app_lvl_error(  from app_lvl_error.logServer_port,   to logServer.buf_lvl_error_port);
+        connection  seL4SharedData      conn_dataConnection_app_lvl_warning(from app_lvl_warning.logServer_port, to logServer.buf_lvl_warning_port);
+        connection  seL4SharedData      conn_dataConnection_app_lvl_info(   from app_lvl_info.logServer_port,    to logServer.buf_lvl_info_port);
+        connection  seL4SharedData      conn_dataConnection_app_lvl_debug(  from app_lvl_debug.logServer_port,   to logServer.buf_lvl_debug_port);
+        connection  seL4SharedData      conn_dataConnection_app_lvl_trace(  from app_lvl_trace.logServer_port,   to logServer.buf_lvl_trace_port);
+        connection  seL4SharedData      conn_dataConnection_app_lvl_custom( from app_lvl_custom.logServer_port,  to logServer.buf_lvl_custom_port);
+        connection  seL4SharedData      conn_dataConnection_app_lvl_max(    from app_lvl_max.logServer_port,     to logServer.buf_lvl_max_port);
 
-        connection  seL4SharedData      conn_dataConnection_app_no_filters( from app_no_filters.logServer_buf,  to logServer.dataport_buf_no_filters);
+        connection  seL4SharedData      conn_dataConnection_app_no_filters( from app_no_filters.logServer_port,  to logServer.buf_no_filters_port);
 
-        connection  seL4SharedData      conn_dataConnection_app_cl_filter_none(   from app_cl_filter_none.logServer_buf,    to logServer.dataport_buf_cl_filter_none);
-        connection  seL4SharedData      conn_dataConnection_app_cl_filter_assert( from app_cl_filter_assert.logServer_buf,  to logServer.dataport_buf_cl_filter_assert);
-        connection  seL4SharedData      conn_dataConnection_app_cl_filter_fatal(  from app_cl_filter_fatal.logServer_buf,   to logServer.dataport_buf_cl_filter_fatal);
-        connection  seL4SharedData      conn_dataConnection_app_cl_filter_error(  from app_cl_filter_error.logServer_buf,   to logServer.dataport_buf_cl_filter_error);
-        connection  seL4SharedData      conn_dataConnection_app_cl_filter_warning(from app_cl_filter_warning.logServer_buf, to logServer.dataport_buf_cl_filter_warning);
-        connection  seL4SharedData      conn_dataConnection_app_cl_filter_info(   from app_cl_filter_info.logServer_buf,    to logServer.dataport_buf_cl_filter_info);
-        connection  seL4SharedData      conn_dataConnection_app_cl_filter_debug(  from app_cl_filter_debug.logServer_buf,   to logServer.dataport_buf_cl_filter_debug);
-        connection  seL4SharedData      conn_dataConnection_app_cl_filter_trace(  from app_cl_filter_trace.logServer_buf,   to logServer.dataport_buf_cl_filter_trace);
-        connection  seL4SharedData      conn_dataConnection_app_cl_filter_custom( from app_cl_filter_custom.logServer_buf,  to logServer.dataport_buf_cl_filter_custom);
+        connection  seL4SharedData      conn_dataConnection_app_cl_filter_none(   from app_cl_filter_none.logServer_port,    to logServer.buf_cl_filter_none_port);
+        connection  seL4SharedData      conn_dataConnection_app_cl_filter_assert( from app_cl_filter_assert.logServer_port,  to logServer.buf_cl_filter_assert_port);
+        connection  seL4SharedData      conn_dataConnection_app_cl_filter_fatal(  from app_cl_filter_fatal.logServer_port,   to logServer.buf_cl_filter_fatal_port);
+        connection  seL4SharedData      conn_dataConnection_app_cl_filter_error(  from app_cl_filter_error.logServer_port,   to logServer.buf_cl_filter_error_port);
+        connection  seL4SharedData      conn_dataConnection_app_cl_filter_warning(from app_cl_filter_warning.logServer_port, to logServer.buf_cl_filter_warning_port);
+        connection  seL4SharedData      conn_dataConnection_app_cl_filter_info(   from app_cl_filter_info.logServer_port,    to logServer.buf_cl_filter_info_port);
+        connection  seL4SharedData      conn_dataConnection_app_cl_filter_debug(  from app_cl_filter_debug.logServer_port,   to logServer.buf_cl_filter_debug_port);
+        connection  seL4SharedData      conn_dataConnection_app_cl_filter_trace(  from app_cl_filter_trace.logServer_port,   to logServer.buf_cl_filter_trace_port);
+        connection  seL4SharedData      conn_dataConnection_app_cl_filter_custom( from app_cl_filter_custom.logServer_port,  to logServer.buf_cl_filter_custom_port);
 
-        connection  seL4SharedData      conn_dataConnection_logFileReader(from logFileReader.dataport_buf, to logServer.dataport_buf_logFileReader);
-        connection  seL4SharedData      conn_dataConnection_fileReaderWriter(from fileReaderWriter.dataport_buf, to logServer.dataport_buf_fileReaderWriter);
+        connection  seL4SharedData      conn_dataConnection_logFileReader(from logFileReader.logServer_port, to logServer.buf_logFileReader_port);
+        connection  seL4SharedData      conn_dataConnection_fileReaderWriter(from fileReaderWriter.logServer_port, to logServer.buf_fileReaderWriter_port);
     }
     configuration {
         TimeServer_CLIENT_ASSIGN_BADGES(

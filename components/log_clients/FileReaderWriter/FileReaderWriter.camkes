@@ -16,7 +16,7 @@ component FileReaderWriter {
     control;
 
     // interface to log server
-    dataport Buf                     dataport_buf;
+    dataport Buf                     logServer_port;
     uses     if_OS_Logger            log_server_interface;
 
     // interface to storage

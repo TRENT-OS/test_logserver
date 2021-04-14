@@ -10,7 +10,7 @@
 
 
 #if !defined (DATABUFFER_CLIENT)
-#define DATABUFFER_CLIENT       (void *)dataport_buf
+#define DATABUFFER_CLIENT       (void *)logServer_port
 #endif
 
 

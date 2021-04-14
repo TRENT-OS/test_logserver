@@ -32,12 +32,12 @@ void post_init()
 {
     if(NO_FILTER == log_lvl)
     {
-        OS_LoggerEmitter_getInstance(logServer_buf, NULL, API_LOG_SERVER_EMIT);
+        OS_LoggerEmitter_getInstance(logServer_port, NULL, API_LOG_SERVER_EMIT);
     }
     else
     {
         OS_LoggerFilter_ctor(&filter, log_lvl);
-        OS_LoggerEmitter_getInstance(logServer_buf, &filter, API_LOG_SERVER_EMIT);
+        OS_LoggerEmitter_getInstance(logServer_port, &filter, API_LOG_SERVER_EMIT);
     }
 
     memset(maxPossibleLogEntry, 'H', sizeof(maxPossibleLogEntry));
