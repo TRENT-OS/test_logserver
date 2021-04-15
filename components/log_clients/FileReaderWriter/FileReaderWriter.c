@@ -7,14 +7,6 @@
 
 #include <camkes.h>
 
-
-
-#if !defined (DATABUFFER_CLIENT)
-#define DATABUFFER_CLIENT       (void *)logServer_port
-#endif
-
-
-
 #define FILE_NAME_P1_F1             "p1_f1.txt"
 #define FILE_NAME_P1_F2             "p1_f2.txt"
 
@@ -52,7 +44,7 @@ void post_init()
     OS_LoggerFilter_ctor(&filter, Debug_LOG_LEVEL_DEBUG);
 
     OS_LoggerEmitter_getInstance(
-        DATABUFFER_CLIENT,
+        logServer_port,
         &filter,
         API_LOG_SERVER_EMIT);
 }

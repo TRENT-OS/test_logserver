@@ -2,14 +2,6 @@
 #include "Logger/Client/OS_LoggerFileClient.h"
 #include <camkes.h>
 
-
-
-#if !defined (DATABUFFER_CLIENT)
-    #define DATABUFFER_CLIENT       (void *)logServer_port
-#endif
-
-
-
 #define LOG_FILENAME_01             "log_01.txt"
 #define LOG_FILENAME_02             "log_02.txt"
 
@@ -32,7 +24,7 @@ int run()
     OS_LoggerFileClientCallback_ctor(&log_file_client_callback, API_LOG_SERVER_READ_LOG_FILE);
 
     // set up log file client
-    OS_LoggerFileClient_ctor(&log_file_client, DATABUFFER_CLIENT, buf, &log_file_client_callback);
+    OS_LoggerFileClient_ctor(&log_file_client, logServer_port, buf, &log_file_client_callback);
 
     // read log file 01
     retval = OS_LoggerFileClient_read(&log_file_client, LOG_FILENAME_01, 0, DATABUFFER_SIZE);
