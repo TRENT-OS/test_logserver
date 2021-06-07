@@ -16,7 +16,7 @@ target_include_directories(${PROJECT_NAME} INTERFACE ${CMAKE_CURRENT_LIST_DIR})
 
 
 #-------------------------------------------------------------------------------
-project(demo_logserver C)
+project(test_logserver C)
 
 DeclareCAmkESComponent(
     LogServer

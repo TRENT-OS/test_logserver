@@ -2,7 +2,7 @@
 
 /**
  * @file
- * @brief   Log file reader used at the end of the demo to dump logs from the
+ * @brief   Log file reader used at the end of the test to dump logs from the
  *          files to the console.
  */
 

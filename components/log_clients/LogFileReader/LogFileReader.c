@@ -60,7 +60,7 @@ int run()
 
     printf("\nlog file 02 content:\n"
            "%s"
-           "\ndemo finished successfully\n",
+           "\ntest finished successfully\n",
            buf);
 
     return 0;

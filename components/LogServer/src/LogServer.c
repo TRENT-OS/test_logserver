@@ -151,11 +151,11 @@ int
 run()
 {
     OS_Error_t err;
-    const int demo_time_sec = 75;
+    const int test_time_sec = 75;
 
     for (
         int time_passed_sec = 0;
-        time_passed_sec < demo_time_sec;
+        time_passed_sec < test_time_sec;
         ++time_passed_sec)
     {
         if ((err = TimeServer_sleep(&timer, TimeServer_PRECISION_SEC, 1)) != OS_SUCCESS)
