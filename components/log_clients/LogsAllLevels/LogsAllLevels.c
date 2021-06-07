@@ -1,27 +1,29 @@
 #include "lib_debug/Debug.h"
+#include "Logger/Common/OS_LoggerEntry.h"
+
 #include <camkes.h>
 
 #include <string.h>
 
 static OS_LoggerFilter_Handle_t filter;
 
-// Max possible entry is 3941 characters (PAGE_SIZE - log_header
-// e.g. 4096 - 193).
+// Max possible entry is (OS_Logger_ENTRY_MESSAGE_LENGTH + 1 - LOG_HEADER_SZ).
 //
-// Currently log_header's size is 193, and it consists of:
-//
-// 1. client id (11 characters) e.g. `0000051966 `
-// 2. client name (15 characters) e.g. `FILTER_NULL    `
-// 3. timestamp (20 characters) e.g. `01.01.1969-00:00:00 `
-// 4. client filter_lvl (4 characters) e.g. `  0 `
-// 5. server filer_lvl (4 characters) e.g. `  0 `
-// 6. log lvl (9 characters) e.g. ` ASSERT: `
-// 7. file name (126 characters) e.g.
+// Currently the log header that the client generates consists of:
+// 1. log lvl (9 characters) e.g. ` ASSERT: `
+// 2. file name (126 characters) e.g.
 //      `/home/jenkins/workspace/generic_jobs/generic_pipeline_sandbox/src/
 //          system/components/log_clients/LogsAllLevels/LogsAllLevels.c:`
-// 8. file line (4 characters including trailing whitespace) e.g. `43: `
-#define LOG_HEADER_SZ (11 + 15 + 20 + 4 + 4 + sizeof(__FILE__) + 4)
-static char maxPossibleLogEntry[PAGE_SIZE - LOG_HEADER_SZ];
+// 3. file line (4 characters including trailing whitespace) e.g. `43: `
+#define LOG_HEADER_SZ (9 + sizeof(__FILE__) + 4)
+
+static char maxPossibleLogEntry[(OS_Logger_ENTRY_MESSAGE_LENGTH + 1)
+                                - LOG_HEADER_SZ];
+
+// The following entry tries to log a full dataport size without regarding the
+// necessary overhead of the metadata and the header. This message should get
+// truncated to the max allowed size as outlined above.
+static char tooLargeLogEntry[OS_DATAPORT_DEFAULT_SIZE];
 
 static const char format_string[] =
     "%d %u %o %x %X %f %F %e %E %g %G %a %A %c %s %p %n %%";
@@ -41,6 +43,18 @@ void post_init()
     }
 
     memset(maxPossibleLogEntry, 'H', sizeof(maxPossibleLogEntry));
+    maxPossibleLogEntry[sizeof(maxPossibleLogEntry) - 1] = '\0';
+
+    memset(tooLargeLogEntry, 'L', sizeof(tooLargeLogEntry));
+    tooLargeLogEntry[sizeof(tooLargeLogEntry) - 1] = '\0';
+
+    // Copy a marker to the end of the max possible entry length. This marker
+    // will be used by the test parser to verify that the too large entry got
+    // truncated correctly.
+    memcpy(
+        &tooLargeLogEntry[sizeof(maxPossibleLogEntry) - sizeof("END")],
+        "END",
+        strlen("END")); // Do not copy null terminator.
 }
 
 int run()
@@ -50,6 +64,7 @@ int run()
 
     Debug_LOG_ASSERT("");
     Debug_LOG_ASSERT("%s", maxPossibleLogEntry);
+    Debug_LOG_ASSERT("%s", tooLargeLogEntry);
     Debug_LOG_ASSERT("%s", format_string);
 
     Debug_LOG_ASSERT ("Debug_LOG_ASSERT");
