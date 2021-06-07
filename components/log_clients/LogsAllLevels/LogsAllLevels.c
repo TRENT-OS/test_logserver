@@ -24,13 +24,13 @@ static OS_LoggerFilter_Handle_t filter;
 static char maxPossibleLogEntry[PAGE_SIZE - LOG_HEADER_SZ];
 
 static const char format_string[] =
-                    "%d %u %o %x %X %f %F %e %E %g %G %a %A %c %s %p %n %%";
+    "%d %u %o %x %X %f %F %e %E %g %G %a %A %c %s %p %n %%";
 
 #define NO_FILTER -1
 
 void post_init()
 {
-    if(NO_FILTER == log_lvl)
+    if (NO_FILTER == log_lvl)
     {
         OS_LoggerEmitter_getInstance(logServer_port, NULL, API_LOG_SERVER_EMIT);
     }
