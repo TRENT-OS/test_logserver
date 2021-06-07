@@ -58,10 +58,10 @@ int run()
         return 0;
     }
 
-    printf("log file 02 content:\n"
+    printf("\nlog file 02 content:\n"
            "%s"
-           "demo finished successfully\n",
-                buf);
+           "\ndemo finished successfully\n",
+           buf);
 
     return 0;
 }
