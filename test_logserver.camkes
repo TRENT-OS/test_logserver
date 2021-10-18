@@ -202,5 +202,7 @@ assembly {
         logFileReader.log_server_interface_attributes    = 50001;
         fileReaderWriter.log_server_interface_attributes = 50002;
 
+        ramDisk.storage_size = (1 * 1024 * 1024);
+        ramDisk_frw.storage_size = (1 * 1024 * 1024);
     }
 }

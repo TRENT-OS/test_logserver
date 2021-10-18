@@ -85,7 +85,6 @@ TimeServer_DeclareCAmkESComponent(
 
 RamDisk_DeclareCAmkESComponent(
     RamDisk
-    system_config
 )
 
 DeclareAndCreateCamkESSystem(test_logserver.camkes)
