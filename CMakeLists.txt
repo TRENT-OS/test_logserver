@@ -48,6 +48,7 @@ DeclareCAmkESComponent(
         os_core_api
         os_logger
         lib_debug
+        lib_compiler
 )
 
 DeclareCAmkESComponent(

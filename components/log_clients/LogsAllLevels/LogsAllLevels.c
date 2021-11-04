@@ -1,4 +1,5 @@
 #include "lib_debug/Debug.h"
+#include "lib_compiler/compiler.h"
 #include "Logger/Common/OS_LoggerEntry.h"
 
 #include <camkes.h>
@@ -25,7 +26,7 @@ static char maxPossibleLogEntry[(OS_Logger_ENTRY_MESSAGE_LENGTH + 1)
 // truncated to the max allowed size as outlined above.
 static char tooLargeLogEntry[OS_DATAPORT_DEFAULT_SIZE];
 
-static const char format_string[] =
+DECL_UNUSED_VAR(static const char format_string[]) =
     "%d %u %o %x %X %f %F %e %E %g %G %a %A %c %s %p %n %%";
 
 #define NO_FILTER -1
